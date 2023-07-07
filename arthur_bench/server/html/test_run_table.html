@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Run</title>
+</head>
+<body>
+<a
+      href="http://www.arthur.ai"
+      style="
+        box-sizing: border-box;
+        text-decoration: underline;
+      "
+      >
+      <img
+        src="https://arthurai-assets.s3.amazonaws.com/logo-black-transparent.png"
+        height="38"
+        alt="Arthur"
+        style="
+      -ms-interpolation-mode: bicubic;
+      margin-left: 30px;
+      margin-top: 30px;
+    "
+      />
+</a>
+<h2
+  class="align-center"
+  style="
+    font-family: 'Helvetica Neue', Helvetica, Arial,
+      'Lucida Grande', sans-serif;
+    font-weight: 400;
+    line-height: 56px;
+    margin: 0;
+    margin-bottom: 30px;
+    font-size: 36px;
+    text-transform: capitalize;
+    text-align: left;
+    color: #1A0016 !important;
+    margin-top: 30px;
+  "
+>
+  Test Run: {{run_name}} for Test Suite: {{test_suite_name}}
+</h2>
+
+<table id="runTable" style="box-sizing: border-box; mso-table-lspace: 0; mso-table-rspace: 0; width: 100%; border: 1px solid black; border-collapse: collapse; padding: 4px; margin-bottom: 30px;">
+    <thead>
+    <tr>
+        <th style="text-align: left; font-size: 14px; font-weight: bold; border: 1px solid black; border-collapse: collapse; padding: 4px;">Input</th>
+        <th style="text-align: left; font-size: 14px; font-weight: bold; border: 1px solid black; border-collapse: collapse; padding: 4px;">Reference Output</th>
+        <th style="text-align: left; font-size: 14px; font-weight: bold; border: 1px solid black; border-collapse: collapse; padding: 4px;">Candidate Output</th>
+        <th style="text-align: left; font-size: 14px; font-weight: bold; border: 1px solid black; border-collapse: collapse; padding: 4px;">Score</th>
+    </tr>
+    </thead>
+<tbody style="
+          box-sizing: border-box;
+          font-family: 'Helvetica Neue', Helvetica,
+            Arial, 'Lucida Grande', sans-serif;
+          font-size: 14px;
+          vertical-align: top;
+        ">
+{% for case in cases %}
+    <tr>
+        <td style="border: 1px solid black; border-collapse: collapse; padding: 4px;">{{case.input}}</td>
+        <td style="border: 1px solid black; border-collapse: collapse; padding: 4px;">{{case.reference_output}}</td>
+        <td style="border: 1px solid black; border-collapse: collapse; padding: 4px;">{{case.output}}</td>
+        <td style="border: 1px solid black; border-collapse: collapse; padding: 4px;">{{case.score}}</td>
+
+    </tr>
+{% endfor %}
+</tbody>
+</table>
+
+</body>
+</html>
