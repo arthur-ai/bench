@@ -4,6 +4,8 @@ import pandas as pd
 from typing import List, Optional, Union
 from pathlib import Path
 
+from tqdm import tqdm
+
 from arthur_bench.scoring import ScoringMethod, load_scoring_method
 from arthur_bench.models.models import TestSuiteRequest, ScoringMethod as ScoringEnum, TestCaseOutput
 from arthur_bench.client.exceptions import UserValueError, ArthurInternalError
@@ -131,26 +133,28 @@ class TestSuite:
 
 		try:
 			all_scores = []
-			for i in range(0, len(self.suite.test_cases), batch_size):
-				# TODO: make suite iterable: https://arthurai.atlassian.net/browse/LLM-250
-				batch = [(case.input, case.reference_output) for case in self.suite.test_cases[i:i+batch_size]]
-				input_batch, ref_batch = zip(*batch)
+			with tqdm(total=len(self.suite.test_cases)) as pbar:
+				for i in range(0, len(self.suite.test_cases), batch_size):
+					# TODO: make suite iterable: https://arthurai.atlassian.net/browse/LLM-250
+					batch = [(case.input, case.reference_output) for case in self.suite.test_cases[i:i+batch_size]]
+					input_batch, ref_batch = zip(*batch)
 
-				if context_list is not None:  
-					scores = scoring_method.run_batch(
-						list(ref_batch),
-						candidate_output_list[i:i+batch_size],
-						list(input_batch), 
-						context_list[i:i+batch_size]
-					)
-				else: 
-					scores = scoring_method.run_batch(
-						list(ref_batch),
-						candidate_output_list[i:i+batch_size],
-						list(input_batch)
-					)
+					if context_list is not None:
+						scores = scoring_method.run_batch(
+							list(ref_batch),
+							candidate_output_list[i:i+batch_size],
+							list(input_batch),
+							context_list[i:i+batch_size]
+						)
+					else:
+						scores = scoring_method.run_batch(
+							list(ref_batch),
+							candidate_output_list[i:i+batch_size],
+							list(input_batch)
+						)
 
-				all_scores.extend(scores)
+					all_scores.extend(scores)
+					pbar.update(len(batch))
 		except Exception as e:
 			logger.error(f"failed to create run: {e}")
 			if run_dir:
