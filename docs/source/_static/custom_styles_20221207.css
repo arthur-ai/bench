@@ -1,0 +1,84 @@
+.sidebar-logo {
+    padding: 20px 30px;
+}
+
+/* THEME UPDATES */
+
+/* bold text links a little for readability */
+p a, div.toctree-wrapper a, .headerlink, div.related-pages div.title {
+    font-weight: 500;
+}
+
+/* make bold text less bold */
+strong {
+    font-weight: 500;
+}
+
+/* unbold headings and reduce rounding in highlight */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: normal;
+    border-radius: 0.2rem;
+}
+
+/* make header links purple */
+.headerlink, .headerlink:hover {
+    color: var(--color-brand-primary);
+}
+
+/* sharpen rounded background behind code text */
+code.literal {
+    border-radius: 0.1em;
+}
+
+/* swap theme toggle color for secondary foreground to match the TOC icons next to it */
+.theme-toggle svg {
+    color: var(--color-foreground-secondary);
+}
+
+/* SIDEBAR */
+
+/* make selected page in side slightly less bold */
+.sidebar-tree .current.reference {
+    font-weight: 600;
+}
+
+/* override the sidebar hover text color if we want to use ash hover background in light mode */
+.sidebar-tree .reference:hover {
+    color: var(--color-sidebar-text--hover);
+}
+
+/* change triangle dropdown hover background to match items in list */
+.sidebar-tree li.has-children > label:hover {
+    /* use same hover background as the text to the left of it */
+    background-color: var(--color-sidebar-item-background--hover);
+}
+
+/* change sidebar triangle dropdown icon color when hovering over the triangle
+OR the text to the left of it */
+.sidebar-tree li.has-children > label:hover > i.icon,
+.sidebar-tree li.has-children > a.reference:hover ~ label > i.icon {
+    /* override hover icon color as above */
+    color: var(--color-sidebar-text--hover) !important ;
+}
+
+/* search */
+input.sidebar-search::placeholder {
+    color: var(--color-sidebar-search-text);
+}
+
+input.sidebar-search:hover::placeholder, input.sidebar-search:focus::placeholder {
+    color: var(--color-sidebar-search-foreground);
+}
+
+input.sidebar-search {
+    color: var(--color-sidebar-search-foreground--inactive);
+}
+
+input.sidebar-search:focus, input.sidebar-search:hover {
+    color: var(--color-sidebar-search-foreground);
+}
+
+/* disable right sidebar */
+.toc-drawer {
+    display: none;
+}
