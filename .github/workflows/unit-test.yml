@@ -33,4 +33,5 @@ jobs:
         mypy arthur_bench --ignore-missing-imports --install-types --non-interactive
     - name: Test with pytest
       run: |
+        export PYTHONPATH=./
         pytest
