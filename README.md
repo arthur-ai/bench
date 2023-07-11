@@ -29,7 +29,7 @@ In the `examples/` folder, you will find demo notebooks used to generate the Tes
 ### DATA
 <!-- ![ref_df](img/Reference_df.png) -->
 <p align="center">
-<img src="img/Reference_df.png" alt="Reference_df" width="750"/>
+<img src="./docs/source/_static/img/Reference_df.png" alt="Reference_df" width="750"/>
 
 Using Bench requires a reference dataset, including information such as:
 - **Inputs** to the LLM. For *Summarization* tasks, this may be the document to be summarized. For *Question & Answering* tasks, this may be the question asked.
@@ -62,8 +62,6 @@ For example, for a summarization task, your **Test Suite** might include the doc
 
 Reference data can be provided via CSV file, a pandas DataFrame, or lists of strings for inputs and reference outputs. To create a test suite in Bench:
 
-[//]: # (TODO: add link to that documentation)
-
 ```
 from arthur_bench.run.testsuite import TestSuite
 
@@ -93,6 +91,8 @@ my_existing_suite = TestSuite('my_bench_test', 'bertscore')
 ```
 
 ## Scoring Methods
+
+A **Scoring Method** is the criteria used to judge the candidate outputs for each run of the test suite. Each {class}`scoring method <arthur_bench.scoring.scoring_method.ScoringMethod>` implements the `run_batch` method to compute a score for a model output. Bench includes both embedding based methods like bert score as well as LLM-guided evaluations.
 
 | Scoring Method                    | Tasks | Requirements |
 |-----------------------------------|-----|-----|

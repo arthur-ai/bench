@@ -1,17 +1,16 @@
 Test Objects
 ============
 
-.. _test-suite
 .. autoclass:: arthur_bench.run.testsuite.TestSuite
    :members:
 
 .. autoclass:: arthur_bench.run.testrun.TestRun
    :members:
 
-.. autoclass:: arthur_bench.types.models.TestCaseRequest
+.. autoclass:: arthur_bench.models.models.TestCaseRequest
     :members:
 
-.. autoclass:: arthur_bench.types.models.TestSuiteRequest
+.. autoclass:: arthur_bench.models.models.TestSuiteRequest
     :members:
 
 Test Suite Loaders
