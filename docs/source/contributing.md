@@ -18,5 +18,7 @@ A scoring method can leverage any combination of input texts, context texts, and
 At this point, you should be able to create test suites with your new scoring method and test your implementation locally.
 
 **Contributing your scoring method**:
+- Fork the bench repository and create a pull request from your fork. This [Github guide](https://docs.github.com/en/get-started/quickstart/contributing-to-projects) provides more in depth instructions.
 - Your scoring method docstring should use [Sphinx format](https://sphinx-rtd-tutorial.readthedocs.io/en/latest/docstrings.html#the-sphinx-docstring-format) for compatibility with documentation.
+- Provide unit tests for the scoring method in a separate file in the `test` directory.
 
