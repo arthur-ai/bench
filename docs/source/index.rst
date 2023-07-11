@@ -23,6 +23,7 @@ Contents
    quickstart.md
    concepts.md
    sdk_reference
+   contributing.md
 
 
 Indices and tables
