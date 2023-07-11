@@ -40,7 +40,7 @@ class TestSuite:
 			reference_data: Optional[pd.DataFrame] = None,
 			reference_data_path: Optional[str] = None,
 			input_column: str = "input",
-			reference_column: str = "reference_output", 
+			reference_column: str = "reference_output",
 			input_text_list: Optional[List[str]] = None,
 			reference_output_list: Optional[List[str]] = None
 	):
@@ -145,9 +145,9 @@ class TestSuite:
 			if run_dir:
 				_clean_up_run(run_dir=run_dir)
 			raise ArthurInternalError(f"failed to create run {run_name}") from e
-		
+
 		test_case_outputs = [TestCaseOutput(output=output, score=score) for output, score in zip(candidate_output_list, all_scores)]
-		
+
 		run = TestRun(
 			name=run_name,
 			test_case_outputs=test_case_outputs,
