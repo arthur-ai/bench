@@ -24,7 +24,7 @@ class ScoringMethod(ABC):
         raise NotImplementedError
 
     def run(self, inputs: List[str], reference_outputs: List[str], candidate_outputs: List[str],
-            context_list: List[str], batch_size: int) -> list:
+            contexts: Optional[List[str]], batch_size: int) -> list:
         """
         Score a set of test cases. This method doesn't need to be implemented in most cases, but can be overriden to
         add additional functionality such as task-specific logging.
@@ -32,7 +32,7 @@ class ScoringMethod(ABC):
         :param inputs: input strings being tested
         :param reference_outputs: reference strings representing target outputs
         :param candidate_outputs: candidate generations to score
-        :param context_list: optional corresponding contexts, if needed by scoring method
+        :param contexts: optional corresponding contexts, if needed by scoring method
         :param batch_size: size of batches
         :return:
         """
@@ -43,7 +43,7 @@ class ScoringMethod(ABC):
                 input_batch = inputs[i:i + batch_size]
                 ref_batch = reference_outputs[i:i + batch_size]
 
-                context_batch = None if context_list is None else context_list[i:i + batch_size]
+                context_batch = None if contexts is None else contexts[i:i + batch_size]
                 scores = self.run_batch(
                     list(ref_batch),
                     candidate_outputs[i:i + batch_size],

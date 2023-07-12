@@ -84,7 +84,7 @@ class SummaryQuality(ScoringMethod):
         self.summary_compare = LLMChain(llm=ChatOpenAI(temperature=0), prompt=COMPARE)  # type: ignore
 
     def run(self, inputs: List[str], reference_outputs: List[str], candidate_outputs: List[str],
-            context_list: List[str], batch_size: int) -> list:
+            contexts: List[str], batch_size: int) -> list:
         # truncate inputs if needed
         truncated_inputs = []
         num_truncated = 0
@@ -100,7 +100,7 @@ class SummaryQuality(ScoringMethod):
             logger.warning(f"Truncated {num_truncated} out of {len(inputs)} total summary inputs to {CONTEXT_WINDOW} "
                            f"characters")
 
-        return super().run(truncated_inputs, reference_outputs, candidate_outputs, context_list, batch_size)
+        return super().run(truncated_inputs, reference_outputs, candidate_outputs, contexts, batch_size)
 
     def run_batch(self, reference_batch: List[str], candidate_batch: List[str],
                   input_text_batch: Optional[List[str]] = None,
