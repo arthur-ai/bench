@@ -3,7 +3,7 @@ from typing import List, Optional
 from arthur_bench.scoring import ScoringMethod
 from arthur_bench.scoring.utils import suppress_warnings
 
-DEFAULT_MODEL = "t5-base"
+DEFAULT_MODEL = "microsoft/deberta-v3-base"
 
 # weight precision and recall differently
 # for now, we have observed in experiments that
