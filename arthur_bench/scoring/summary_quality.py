@@ -72,6 +72,9 @@ CONTEXT_WINDOW = 2500
 LLM_CHOICE_OPTIONS = {'0': 0.0, '1': 1.0, 'tie': 0.5}
 
 
+logger = logging.getLogger(__name__)
+
+
 class SummaryQuality(ScoringMethod):
     """
     Comprehensive measure of summarization quality compared to a reference summary.
@@ -79,6 +82,25 @@ class SummaryQuality(ScoringMethod):
 
     def __init__(self):
         self.summary_compare = LLMChain(llm=ChatOpenAI(temperature=0), prompt=COMPARE)  # type: ignore
+
+    def run(self, inputs: List[str], reference_outputs: List[str], candidate_outputs: List[str],
+            context_list: List[str], batch_size: int) -> list:
+        # truncate inputs if needed
+        truncated_inputs = []
+        num_truncated = 0
+        for inp in inputs:
+            # truncate if needed
+            if len(inp) > CONTEXT_WINDOW:
+                num_truncated += 1
+                inp = inp[:CONTEXT_WINDOW]
+            # add to list we'll actually use
+            truncated_inputs.append(inp)
+
+        if num_truncated > 0:
+            logger.warning(f"Truncated {num_truncated} out of {len(inputs)} total summary inputs to {CONTEXT_WINDOW} "
+                           f"characters")
+
+        return super().run(truncated_inputs, reference_outputs, candidate_outputs, context_list, batch_size)
 
     def run_batch(self, reference_batch: List[str], candidate_batch: List[str],
                   input_text_batch: Optional[List[str]] = None,
@@ -99,8 +121,6 @@ class SummaryQuality(ScoringMethod):
             # run LLMChain to choose whether summary A or summary B is a better summary of the input text
             # (on truncated input text to fit in ChatGPT context window)
             llm_input = input_text_batch[i][:CONTEXT_WINDOW]
-            if llm_input != input_text_batch[i]:
-                logging.warn("The input text has been truncated to fit in the LLM evaluator's context window")
             choice = self.summary_compare({"text": llm_input, "summary_A": reference_batch[i],
                                            "summary_B": candidate_batch[i]})
 
