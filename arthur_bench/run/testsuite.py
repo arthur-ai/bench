@@ -127,24 +127,11 @@ class TestSuite:
 
 		scoring_method: ScoringMethod = load_scoring_method(self.suite.scoring_method)
 
+		inputs = [case.input for case in self.suite.test_cases]
+		ref_outputs = [case.reference_output for case in self.suite.test_cases]
 		try:
-			all_scores = []
-			with tqdm(total=len(self.suite.test_cases)) as pbar:
-				for i in range(0, len(self.suite.test_cases), batch_size):
-					# TODO: make suite iterable: https://arthurai.atlassian.net/browse/LLM-250
-					batch = [(case.input, case.reference_output) for case in self.suite.test_cases[i:i+batch_size]]
-					input_batch, ref_batch = zip(*batch)
-
-					context_batch = None if context_list is None else context_list[i:i+batch_size]
-					scores = scoring_method.run_batch(
-						list(ref_batch),
-						candidate_output_list[i:i+batch_size],
-						list(input_batch),
-						context_batch
-					)
-
-					all_scores.extend(scores)
-					pbar.update(len(batch))
+			all_scores = scoring_method.run(inputs, ref_outputs, candidate_output_list, context_list,
+											batch_size=batch_size)
 		except Exception as e:
 			logger.error(f"failed to create run: {e}")
 			if run_dir:
