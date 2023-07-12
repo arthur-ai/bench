@@ -84,7 +84,6 @@ LLM_CHOICE_OPTIONS = {'0': 0.0, '1': 1.0, 'tie': 0.5}
 
 logger = logging.getLogger(__name__)
 
-<<<<<<< HEAD
 def truncate_input_text(input_text, ref_output, cand_output) -> Tuple[str, bool]:
     """Truncates the input_text to fit in LLM evaluator context
     
@@ -104,8 +103,6 @@ def truncate_input_text(input_text, ref_output, cand_output) -> Tuple[str, bool]
         truncated = True
     return input_text, truncated
 
-=======
->>>>>>> fdc1b2f (cleanup summary input truncation warning to be a single warning per run)
 
 class SummaryQuality(ScoringMethod):
     """
