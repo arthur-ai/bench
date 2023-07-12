@@ -135,19 +135,13 @@ class TestSuite:
 					batch = [(case.input, case.reference_output) for case in self.suite.test_cases[i:i+batch_size]]
 					input_batch, ref_batch = zip(*batch)
 
-					if context_list is not None:
-						scores = scoring_method.run_batch(
-							list(ref_batch),
-							candidate_output_list[i:i+batch_size],
-							list(input_batch),
-							context_list[i:i+batch_size]
-						)
-					else:
-						scores = scoring_method.run_batch(
-							list(ref_batch),
-							candidate_output_list[i:i+batch_size],
-							list(input_batch)
-						)
+					context_batch = None if context_list is None else context_list[i:i+batch_size]
+					scores = scoring_method.run_batch(
+						list(ref_batch),
+						candidate_output_list[i:i+batch_size],
+						list(input_batch),
+						context_batch
+					)
 
 					all_scores.extend(scores)
 					pbar.update(len(batch))
