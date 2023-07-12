@@ -17,9 +17,6 @@ from arthur_bench.run.utils import _create_test_suite_dir, _initialize_metadata,
 logger = logging.getLogger(__name__)
 
 
-DEFAULT_BATCH_SIZE = 32
-
-
 class TestSuite:
 	"""
 		Reusable pipeline for running a test suite built from reference_data and evaluated using metric
@@ -85,7 +82,7 @@ class TestSuite:
 			context_column: Optional[str] = None,
 			context_list: Optional[List[str]] = None,
 			save: bool = True,
-			batch_size: int = DEFAULT_BATCH_SIZE,
+			batch_size: int = 1,
 			model_name: Optional[str] = None,
 			model_version: Optional[str] = None,
 			foundation_model: Optional[str] = None,
