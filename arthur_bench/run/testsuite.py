@@ -120,13 +120,12 @@ class TestSuite:
 		if len(candidate_output_list) != len(self.suite.test_cases):
 			raise UserValueError(
 				f"candidate data has {len(candidate_output_list)} tests but expected {len(self.suite.test_cases)} tests")
-			
-
-		scoring_method: ScoringMethod = load_scoring_method(self.suite.scoring_method)
 
 		run_dir = None
 		if save:
 			run_dir = _create_run_dir(self.suite.name, run_name)
+
+		scoring_method: ScoringMethod = load_scoring_method(self.suite.scoring_method)
 
 		try:
 			all_scores = []
