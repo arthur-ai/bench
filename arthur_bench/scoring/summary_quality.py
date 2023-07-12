@@ -164,5 +164,4 @@ class SummaryQuality(ScoringMethod):
                 res.append(LLM_CHOICE_OPTIONS.get(choice["text"][:3], -1.0))
             else:
                 res.append(-1.0)
-                
         return res
