@@ -20,14 +20,14 @@ class BERTScore(ScoringMethod):
     """
 
     def __init__(self):
-        self.scorer = BERTScorer(lang='en', model_type=DEFAULT_MODEL)
+        with suppress_warnings("transformers"):
+            self.scorer = BERTScorer(lang='en', model_type=DEFAULT_MODEL)
 
     def run_batch(self, reference_batch: List[str], candidate_batch: List[str],
                   input_text_batch: Optional[List[str]] = None, context_batch: Optional[List[str]] = None) -> List[float]:
 
         # get precision, recall, and F1 score from bert_score package
-        with suppress_warnings("transformers"):
-            p, r, f = self.scorer.score(candidate_batch, reference_batch, verbose=False)
+        p, r, f = self.scorer.score(candidate_batch, reference_batch, verbose=False)
 
         # return a BERTScore using our weighting of precision and recall (instead of F1 which weights them equally)
         return (PRECISION_WEIGHT * p + RECALL_WEIGHT * r).tolist()
