@@ -6,13 +6,15 @@ from pathlib import Path
 
 from tqdm import tqdm
 
-from arthur_bench.scoring import ScoringMethod, load_scoring_method
-from arthur_bench.models.models import TestSuiteRequest, ScoringMethod as ScoringEnum, TestCaseOutput
+from arthur_bench.scoring import ScoringMethod, scoring_method_class_from_string, ScoringMethodEnum
+from arthur_bench.models.models import TestSuiteRequest, TestCaseOutput, ScoringMethod as ScoringMethodMetadata
 from arthur_bench.client.exceptions import UserValueError, ArthurInternalError
 from arthur_bench.run.testrun import TestRun
 from arthur_bench.run.utils import _create_test_suite_dir, _initialize_metadata, _test_suite_dir, \
-	_create_run_dir, _clean_up_run, _load_suite_from_args, _load_run_data_from_args, _get_suite_if_exists, _get_scoring_method
-from arthur_bench.scoring.scoring_method import SINGLE_ITEM_BATCH_DEFAULT
+	_create_run_dir, _clean_up_run, _load_suite_from_args, _load_run_data_from_args, _get_suite_if_exists
+from arthur_bench.scoring.scoring_method import SINGLE_ITEM_BATCH_DEFAULT, _create_run_dir, _clean_up_run, \
+	_load_suite_from_args, _load_run_data_from_args, _get_suite_if_exists, _scoring_method_from_string
+
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +24,7 @@ class TestSuite:
 		Reusable pipeline for running a test suite built from reference_data and evaluated using metric
 
 		:param name: name of the test suite
-		:param scoring_method: scoring method to use to evaluate the results of a test run
+		:param scoring_method: scoring method to use to evaluate the results of a test run, as a string/enum or class
 		:param description: short description of the task tested by this suite
 		:param reference_data: dataframe of prompts and reference outputs
 		:param reference_data_path: filepath to csv of prompts and reference outputs,
@@ -35,7 +37,7 @@ class TestSuite:
 	def __init__(
 			self,
 			name: str,
-			scoring_method: Union[ScoringEnum, str],
+			scoring_method: Union[str, type[ScoringMethod]],
 			description: Optional[str] = None,
 			reference_data: Optional[pd.DataFrame] = None,
 			reference_data_path: Optional[str] = None,
@@ -45,11 +47,13 @@ class TestSuite:
 			reference_output_list: Optional[List[str]] = None
 	):
 		self.id = None
-		self.suite: TestSuiteRequest = _get_suite_if_exists(name) # type: ignore
+		self.suite: Optional[TestSuiteRequest] = _get_suite_if_exists(name)
 
 		if self.suite is None:
-			scoring_method = _get_scoring_method(scoring_method=scoring_method)
-			if scoring_method == ScoringEnum.QACorrectness:
+			# get a scoringMethod class
+			if isinstance(scoring_method, str):
+				scoring_method = _scoring_method_from_string(scoring_method=scoring_method)
+			if scoring_method.name() == ScoringMethodEnum.QACorrectness:
 				reference_column = None
 			cases = _load_suite_from_args(
 				reference_data=reference_data,
@@ -61,16 +65,19 @@ class TestSuite:
 			)
 			self.suite = TestSuiteRequest(
 				name=name,
-				scoring_method=scoring_method,
+				scoring_method=ScoringMethodMetadata(name=scoring_method.name(), type=scoring_method.type()),
 				description=description,
 				test_cases=cases,
 				**_initialize_metadata()
 			)
 			self._test_suite_dir: Path = _create_test_suite_dir(name)
 
+			# TODO: create scorer at self.scorer
 		else:
 			logger.info(f"Found existing test suite with name {name}. Using existing suite")
 			self._test_suite_dir = _test_suite_dir(name)
+
+			# TODO: load scorer at self.scorer
 
 	def run(
 			self,
@@ -125,7 +132,7 @@ class TestSuite:
 		if save:
 			run_dir = _create_run_dir(self.suite.name, run_name)
 
-		scoring_method: ScoringMethod = load_scoring_method(self.suite.scoring_method)
+		scoring_method: ScoringMethod = _scoring_method_from_string(self.suite.scoring_method)
 
 		inputs = [case.input for case in self.suite.test_cases]
 		# ref outputs should be None if any items are None (we validate nullness must be all-or-none)
@@ -138,8 +145,8 @@ class TestSuite:
 				else:
 					ref_outputs.append(case.reference_output)
 		try:
-			all_scores = scoring_method.run(candidate_output_list, ref_outputs, inputs, context_list,
-											batch_size=batch_size)
+			all_scores = self.scorer.run(candidate_output_list, ref_outputs, inputs, context_list,
+										 batch_size=batch_size)
 		except Exception as e:
 			logger.error(f"failed to create run: {e}")
 			if run_dir:
@@ -169,3 +176,5 @@ class TestSuite:
 		"""Save a test suite to local file system."""
 		suite_file = self._test_suite_dir / "suite.json"
 		suite_file.write_text(self.suite.json())
+
+		# TODO: serialize scorer

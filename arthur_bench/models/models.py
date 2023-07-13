@@ -13,11 +13,10 @@ from arthur_bench.client.exceptions import UserValueError
 from arthur_bench.models.client import Page, PageSize, TotalCount, TotalPages
 from pydantic import BaseModel, Field, validator
 
-class ScoringMethod(str, Enum):
-    BERTScore = 'bertscore'
-    SummaryQuality = 'summary_quality'
-    QACorrectness = 'qa_correctness'
-    ExactMatch = 'exact_match'
+
+class ScoringMethodType(str, Enum):
+    BuiltIn = 'built_in'  # TODO: best term for this?
+    Custom = 'custom'
 
 class TestCaseRequest(BaseModel):
     """
@@ -71,6 +70,11 @@ class TestSuiteRequest(BaseModel):
                 last_ref_output_null = False
 
         return v
+
+
+class ScoringMethod(BaseModel):
+    name: str
+    type: ScoringMethodType
 
 
 class TestSuite(BaseModel):

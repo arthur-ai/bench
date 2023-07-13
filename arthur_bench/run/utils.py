@@ -7,8 +7,9 @@ from typing import Dict, Any, Optional, List, Tuple, Union
 from datetime import datetime
 
 from arthur_bench import __version__
-from arthur_bench.models.models import TestCaseRequest, TestSuiteRequest, ScoringMethod
+from arthur_bench.models.models import TestCaseRequest, TestSuiteRequest, ScoringMethod as ScoringMethodEnum
 from arthur_bench.client.exceptions import UserValueError
+from arthur_bench.scoring import BERTScore, QAQualityCorrectness, SummaryQuality, ScoringMethod
 
 BENCH_FILE_DIR_KEY = 'BENCH_FILE_DIR'
 DEFAULT_BENCH_FILE_DIR = str(Path(os.getcwd()) / "bench")
@@ -118,14 +119,14 @@ def load_suite_from_json(filepath: Union[str, os.PathLike]) -> TestSuiteRequest:
         raise UserValueError("filepath must be json file")
     if isinstance(filepath, str):
         filepath = Path(filepath)
-    return TestSuiteRequest.parse_file(filepath) # type: ignore
+    return TestSuiteRequest.parse_file(filepath)  # type: ignore
 
 
 def _load_suite_from_args(
         reference_data: Optional[pd.DataFrame] = None,
         reference_data_path: Optional[str] = None,
         input_column: str = "input",
-        reference_column: Optional[str] = None, 
+        reference_column: Optional[str] = None,
         input_text_list: Optional[List[str]] = None,
         reference_output_list: Optional[List[str]] = None) -> List[TestCaseRequest]:
     if reference_data is not None:
@@ -174,14 +175,3 @@ def _get_suite_if_exists(name: str) -> Optional[TestSuiteRequest]:
     if test_suite_dir.is_dir():
         return load_suite_from_json(Path(test_suite_dir / "suite.json"))
     return None
-
-def _get_scoring_method(scoring_method: Union[str, ScoringMethod]) -> ScoringMethod:
-    if isinstance(scoring_method, ScoringMethod):
-        return scoring_method
-    elif isinstance(scoring_method, str):
-        try:
-            return ScoringMethod(scoring_method)
-        except ValueError:
-            raise UserValueError(f"invalid scoring method: {scoring_method}")
-    else:
-        raise UserValueError(f"invalid scoring method: {scoring_method}")

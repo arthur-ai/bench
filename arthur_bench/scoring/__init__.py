@@ -1,20 +1,29 @@
+from typing import Dict
+
 from .scoring_method import ScoringMethod
 from .bertscore import BERTScore
 from .qa_quality import QAQualityCorrectness
 from .summary_quality import SummaryQuality
 from .exact_match import ExactMatch
+from ..client.exceptions import UserValueError
 
-from arthur_bench.models.models import ScoringMethod as ScoringEnum
+
+# TODO: naming
+class ScoringMethodEnum(str, Enum):
+    BERTScore = 'bertscore'
+    SummaryQuality = 'summary_quality'
+    QACorrectness = 'qa_correctness'
 
 
-def load_scoring_method(name: ScoringEnum) -> ScoringMethod:
-    if name == ScoringEnum.BERTScore:
-        return BERTScore()
-    elif name == ScoringEnum.SummaryQuality:
-        return SummaryQuality()
-    elif name == ScoringEnum.QACorrectness:
-        return QAQualityCorrectness()
-    elif name == ScoringEnum.ExactMatch:
-        return ExactMatch()
+SCORING_METHOD_CLASS_MAP: Dict[str, type[ScoringMethod]] = {
+    ScoringMethodEnum.BERTScore: BERTScore,
+    ScoringMethodEnum.QACorrectness: QAQualityCorrectness,
+    ScoringMethodEnum.SummaryQuality: SummaryQuality
+}
+
+
+def scoring_method_class_from_string(method: str) -> type[ScoringMethod]:
+    if scoring_method in SCORING_METHOD_CLASS_MAP:
+        return SCORING_METHOD_CLASS_MAP[method]
     else:
-        raise ValueError(f"scoring method {name} is not valid")
+        raise UserValueError(f"Unknown ScoringMethod string {method}")
