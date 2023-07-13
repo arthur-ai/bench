@@ -112,6 +112,10 @@ class SummaryQuality(ScoringMethod):
     def __init__(self):
         self.summary_compare = LLMChain(llm=ChatOpenAI(temperature=0), prompt=COMPARE)  # type: ignore
 
+    @staticmethod
+    def name() -> str:
+        return "summary_quality"
+
     def run(self, candidate_outputs: List[str], reference_outputs: Optional[List[str]] = None,
             inputs: Optional[List[str]] = None, contexts: Optional[List[str]] = None,
             batch_size: int = SINGLE_ITEM_BATCH_DEFAULT) -> list:

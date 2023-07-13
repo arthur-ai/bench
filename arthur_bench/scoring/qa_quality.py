@@ -83,6 +83,10 @@ class QAQualityCorrectness(ScoringMethod):
     def __init__(self):
         self.evaluate_answer = LLMChain(llm=ChatOpenAI(temperature=0), prompt=DECIDE)
 
+    @staticmethod
+    def name() -> str:
+      return "qa_correctness"
+
     def run_batch(self, candidate_batch: List[str], reference_batch: Optional[List[str]] = None,
                   input_text_batch: Optional[List[str]] = None,
                   context_batch: Optional[List[str]] = None) -> List[float]:
