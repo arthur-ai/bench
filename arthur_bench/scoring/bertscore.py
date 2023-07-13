@@ -18,6 +18,7 @@ class BERTScore(ScoringMethod):
     
     https://arxiv.org/abs/1904.09675
     """
+
     @staticmethod
     def name() -> str:
         return "bertscore"

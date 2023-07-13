@@ -13,7 +13,6 @@ from arthur_bench.client.exceptions import UserValueError
 from arthur_bench.models.client import Page, PageSize, TotalCount, TotalPages
 from pydantic import BaseModel, Field, validator
 from pydantic import BaseModel, Field
-from ..scoring import ScoringMethodEnum as ScoringMethod  # backwards compatibility; TODO: remove
 
 
 class ScoringMethodType(str, Enum):

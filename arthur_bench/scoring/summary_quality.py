@@ -81,7 +81,6 @@ TIKTOKEN_ENCODER = tiktoken.get_encoding("cl100k_base")
 TIKTOKEN_ERROR_PADDING = 150
 LLM_CHOICE_OPTIONS = {'0': 0.0, '1': 1.0, 'tie': 0.5}
 
-
 logger = logging.getLogger(__name__)
 
 def truncate_input_text(input_text, ref_output, cand_output) -> Tuple[str, bool]:

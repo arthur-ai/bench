@@ -19,6 +19,7 @@ class ScoringMethod(ABC):
     """
     Base class for all scoring methods.     
     """
+
     @staticmethod
     @abstractmethod
     def name() -> str:

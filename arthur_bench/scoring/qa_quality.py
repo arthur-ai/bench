@@ -2,11 +2,11 @@ from typing import List, Optional
 
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
-from langchain.prompts.chat import ChatPromptTemplate, SystemMessagePromptTemplate, AIMessagePromptTemplate, HumanMessagePromptTemplate, BasePromptTemplate
+from langchain.prompts.chat import ChatPromptTemplate, SystemMessagePromptTemplate, AIMessagePromptTemplate, \
+    HumanMessagePromptTemplate, BasePromptTemplate
 
 from arthur_bench.scoring import ScoringMethod
 from arthur_bench.client.exceptions import UserValueError
-
 
 system_message_prompt = SystemMessagePromptTemplate.from_template(
 """Given the following context (extracted parts of a long document), a question, and an answer, decide if the final answer is correct.
@@ -71,8 +71,8 @@ DECISION:"""
 )
 
 DECIDE = ChatPromptTemplate.from_messages(
-  [system_message_prompt, example_summaries_1, example_choice_1, example_summaries_2, example_choice_2, 
-    example_summaries_3, example_choice_3, comparison_template])
+    [system_message_prompt, example_summaries_1, example_choice_1, example_summaries_2, example_choice_2,
+     example_summaries_3, example_choice_3, comparison_template])
 
 
 class QAQualityCorrectness(ScoringMethod):
@@ -85,25 +85,27 @@ class QAQualityCorrectness(ScoringMethod):
 
     @staticmethod
     def name() -> str:
-      return "qa_correctness"
+        return "qa_correctness"
 
     def run_batch(self, candidate_batch: List[str], reference_batch: Optional[List[str]] = None,
                   input_text_batch: Optional[List[str]] = None,
                   context_batch: Optional[List[str]] = None) -> List[float]:
-      """
-      Reference batch is not used for this scoring method, QA correctness requires an input_text_batch and context_batch
-      """
-      if input_text_batch is None:
-        raise UserValueError("input text is required for this scoring method. Please provide a dataframe column or a list of your input text strings in the Test Suite.")
-      if context_batch is None:
-        raise UserValueError("context is required for this scoring method. Please provide a dataframe column or a list of your context strings in the Test Suite.")
-      
-      res = []
-      for i in range(len(input_text_batch)):
-        llmchoice = self.evaluate_answer({"question": input_text_batch[i], "context": context_batch[i], "answer": candidate_batch[i]})["text"]
-        if llmchoice not in ["0", "1", "NA"]:
-            llmchoice = "-1"
-        llmchoice = {'0': 0.0, '1': 1.0, 'NA': -1.0, '-1': -1.0}[llmchoice]
-        res.append(llmchoice)
-      return res
+        """
+        Reference batch is not used for this scoring method, QA correctness requires an input_text_batch and context_batch
+        """
+        if input_text_batch is None:
+            raise UserValueError(
+                "input text is required for this scoring method. Please provide a dataframe column or a list of your input text strings in the Test Suite.")
+        if context_batch is None:
+            raise UserValueError(
+                "context is required for this scoring method. Please provide a dataframe column or a list of your context strings in the Test Suite.")
 
+        res = []
+        for i in range(len(input_text_batch)):
+            llmchoice = self.evaluate_answer(
+                {"question": input_text_batch[i], "context": context_batch[i], "answer": candidate_batch[i]})["text"]
+            if llmchoice not in ["0", "1", "NA"]:
+                llmchoice = "-1"
+            llmchoice = {'0': 0.0, '1': 1.0, 'NA': -1.0, '-1': -1.0}[llmchoice]
+            res.append(llmchoice)
+        return res
