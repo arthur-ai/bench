@@ -14,7 +14,7 @@ from arthur_bench.run.testrun import TestRun
 from arthur_bench.run.utils import _create_test_suite_dir, _initialize_metadata, _test_suite_dir, \
 	_create_run_dir, _clean_up_run, _load_suite_from_args, _load_run_data_from_args, _get_suite_if_exists
 from arthur_bench.scoring.scoring_method import SINGLE_ITEM_BATCH_DEFAULT, _create_run_dir, _clean_up_run, \
-	_load_suite_from_args, _load_run_data_from_args, _get_suite_if_exists, _scoring_method_from_string
+	_load_suite_from_args, _load_run_data_from_args, _get_suite_if_exists, _scoring_method_class_from_string
 
 
 logger = logging.getLogger(__name__)
@@ -55,7 +55,7 @@ class TestSuite:
 
 		# get a scoringMethod class
 		if isinstance(scoring_method, str):
-			scoring_method = _scoring_method_from_string(scoring_method=scoring_method)
+			scoring_method = scoring_method_class_from_string(scoring_method)
 
 		if self.suite is None:
 			if scoring_method.name() == ScoringMethodEnum.QACorrectness:
@@ -68,9 +68,10 @@ class TestSuite:
 				input_text_list=input_text_list,
 				reference_output_list=reference_output_list
 			)
+			method_meta = ScoringMethodMetadata(name=scoring_method.name(), type=scoring_method.type())
 			self.suite = TestSuiteRequest(
 				name=name,
-				scoring_method=ScoringMethodMetadata(name=scoring_method.name(), type=scoring_method.type()),
+				scoring_method=method_meta,
 				description=description,
 				test_cases=cases,
 				**_initialize_metadata()
@@ -80,7 +81,16 @@ class TestSuite:
 		else:
 			logger.info(f"Found existing test suite with name {name}. Using existing suite")
 			self._test_suite_dir = _test_suite_dir(name)
-			self.scorer = scoring_method.load(self._test_suite_dir / SCORER_FILENAME)
+			# TODO: see matching TODO in save()
+			if self.suite.scoring_method.type == ScoringMethodType.Custom:
+				try:
+					self.scorer = scoring_method.load(self._test_suite_dir / SCORER_FILENAME)
+				except FileNotFoundError as e:
+					raise UserValueError(f"Can't find serialized scorer for custom scorer at "
+										 f"{self._test_suite_dir / SCORER_FILENAME}") from e
+			else:
+				scoring_method_class = scoring_method_class_from_string(self.suite.scoring_method.name)
+				self.scorer = scoring_method_class()
 
 	def run(
 			self,
@@ -134,8 +144,6 @@ class TestSuite:
 		run_dir = None
 		if save:
 			run_dir = _create_run_dir(self.suite.name, run_name)
-
-		scoring_method: ScoringMethod = _scoring_method_from_string(self.suite.scoring_method)
 
 		inputs = [case.input for case in self.suite.test_cases]
 		# ref outputs should be None if any items are None (we validate nullness must be all-or-none)

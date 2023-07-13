@@ -35,6 +35,11 @@ class TestCaseRequest(BaseModel):
     """
 
 
+class ScoringMethod(BaseModel):
+    name: str
+    type: ScoringMethodType
+
+
 class TestSuiteRequest(BaseModel):
     """
     Test case data and metadata for the test suite.
