@@ -7,7 +7,8 @@ from pathlib import Path
 from tqdm import tqdm
 
 from arthur_bench.scoring import ScoringMethod, scoring_method_class_from_string, ScoringMethodEnum
-from arthur_bench.models.models import TestSuiteRequest, TestCaseOutput, ScoringMethod as ScoringMethodMetadata
+from arthur_bench.models.models import TestSuiteRequest, TestCaseOutput, ScoringMethod as ScoringMethodMetadata, \
+	ScoringMethodType
 from arthur_bench.client.exceptions import UserValueError, ArthurInternalError
 from arthur_bench.run.testrun import TestRun
 from arthur_bench.run.utils import _create_test_suite_dir, _initialize_metadata, _test_suite_dir, \
@@ -17,6 +18,9 @@ from arthur_bench.scoring.scoring_method import SINGLE_ITEM_BATCH_DEFAULT, _crea
 
 
 logger = logging.getLogger(__name__)
+
+
+SCORER_FILENAME = "scorer.bin"
 
 
 class TestSuite:
@@ -49,10 +53,11 @@ class TestSuite:
 		self.id = None
 		self.suite: Optional[TestSuiteRequest] = _get_suite_if_exists(name)
 
+		# get a scoringMethod class
+		if isinstance(scoring_method, str):
+			scoring_method = _scoring_method_from_string(scoring_method=scoring_method)
+
 		if self.suite is None:
-			# get a scoringMethod class
-			if isinstance(scoring_method, str):
-				scoring_method = _scoring_method_from_string(scoring_method=scoring_method)
 			if scoring_method.name() == ScoringMethodEnum.QACorrectness:
 				reference_column = None
 			cases = _load_suite_from_args(
@@ -71,13 +76,11 @@ class TestSuite:
 				**_initialize_metadata()
 			)
 			self._test_suite_dir: Path = _create_test_suite_dir(name)
-
-			# TODO: create scorer at self.scorer
+			self.scorer = scoring_method()
 		else:
 			logger.info(f"Found existing test suite with name {name}. Using existing suite")
 			self._test_suite_dir = _test_suite_dir(name)
-
-			# TODO: load scorer at self.scorer
+			self.scorer = scoring_method.load(self._test_suite_dir / SCORER_FILENAME)
 
 	def run(
 			self,
@@ -177,4 +180,9 @@ class TestSuite:
 		suite_file = self._test_suite_dir / "suite.json"
 		suite_file.write_text(self.suite.json())
 
-		# TODO: serialize scorer
+		# TODO: align all "scorer" vs "scoring_method" vs other names
+
+		# TODO: serialize all or just builtin? follow up re: casing in exact-match scorer
+		if self.scorer.type() == ScoringMethodType.Custom:
+			scorer_path = self._test_suite_dir / SCORER_FILENAME
+			self.scorer.save(scorer_path)
