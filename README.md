@@ -58,9 +58,9 @@ Consider the task of *Question & Answering* about specific documents:
 
 A **Test Suite** can hold Input data and Reference Outputs as well as a _Scoring Method_ which will be used to compare the reference outputs to the candidate outputs provided in each **Test Run**. 
 
-For example, for a summarization task, your **Test Suite** might include the documents to summarize, desirable reference summaries, and the [summary quality](#summary-quality) scoring metric.
+For example, for a summarization task, your **Test Suite** might include the documents to summarize, desirable reference summaries, and the [summary quality](#summary_quality) scoring metric.
 
-Reference data can be provided via CSV file, a pandas DataFrame, or lists of strings for inputs and reference outputs. To create a test suite in Bench:
+Reference data can be provided via CSV file, a pandas DataFrame, or lists of strings for inputs and reference outputs. Please see our [documentation](https://docs.arthur.ai/bench/index.html) for more detail. To create a test suite in Bench:
 
 [//]: # (TODO: add link to that documentation)
 
