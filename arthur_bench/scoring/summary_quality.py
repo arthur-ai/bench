@@ -1,4 +1,5 @@
 import logging
+import tiktoken
 from typing import List, Optional
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
@@ -67,7 +68,15 @@ comparison_template = HumanMessagePromptTemplate.from_template(
 COMPARE = ChatPromptTemplate.from_messages(
 	[system_message_prompt, example_summaries_1, example_choice_1, example_summaries_2, example_choice_2, comparison_template])
 
-CONTEXT_WINDOW = 2500
+CONTEXT_WINDOW_MAP = {
+	'gpt-3.5-turbo' : 4096,
+	'gpt-4' : 8192,
+	'gpt-3.5-turbo-16k' : 16,384
+	'gpt-4-32k' : 32,768
+}
+EVALUATOR_MODEL = 'gpt-3.5-turbo'
+TIKTOKEN_ENCODER = tiktoken.get_encoding("cl100k_base")
+
 LLM_CHOICE_OPTIONS = {'0': 0.0, '1': 1.0, 'tie': 0.5}
 
 class SummaryQuality(ScoringMethod):
@@ -91,11 +100,19 @@ class SummaryQuality(ScoringMethod):
     
 		res = []
 		for i in range(len(input_text_batch)):
-			# run LLMChain to choose whether summary A or summary B is a better summary of the input text
-			# (on truncated input text to fit in ChatGPT context window)
-			llm_input = input_text_batch[i][:CONTEXT_WINDOW]
-			if llm_input != input_text_batch[i]:
+			
+			# Truncate the input text if {input text + summary A + summary B} exceeds the evaluator context window
+			input_text = input_text_batch[i]
+			llm_prompt_untruncated = COMPARE.format(text=input_text, summary_A=reference_batch[i], summary_B=candidate_batch[i])
+			input_text_tokens = TIKTOKEN_ENCODER.encode(input_text)
+			llm_prompt_tokens = TIKTOKEN_ENCODER.encode(llm_prompt_untruncated)
+			num_to_truncate_from_input_text_tokens = len(llm_prompt_tokens) - CONTEXT_WINDOW_MAP[EVALUATOR_MODEL]
+			if num_to_truncate_from_input_text > 0:
+				input_text_tokens_truncated = input_text_tokens_truncated[:-num_to_truncate_from_input_text_tokens]
+				input_text = TIKTOKEN_ENCODER.decode(input_text_tokens_truncated)
 				logging.warn("The input text has been truncated to fit in the LLM evaluator's context window")
+			
+			# Run LLMChain to choose whether summary A or summary B is a better summary of the input text
 			choice = self.summary_compare({"text": llm_input, "summary_A": reference_batch[i],
 				"summary_B": candidate_batch[i]})
 
