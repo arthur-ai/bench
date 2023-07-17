@@ -49,7 +49,7 @@ Consider the task of *Question & Answering* about specific documents:
 > - **Input**: "What war was referred to in the Gettysburg Address?"
 > - **Reference Output**: The American Civil War
 > 
-> **Candidate Dataset**
+> **Candidate Dataset:**
 > - **Candidate Output**: The American War
 > - **Context**: _(The Gettysburg Address)_ "Four score and seven years ago our fathers brought forth on this continent, a new nation, conceived in Liberty, and dedicated to the proposition that all men are created equal ...
 > that this nation, under God, shall have a new birth of freedom – and that government of the people, by the people, for the people, shall not perish from the earth."
