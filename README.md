@@ -10,7 +10,6 @@ Bench is built for evaluating LLMs for production use cases. Bench can be used f
 
 ### Package installation and environment setup
 Install Bench with minimum dependencies:
-
 `pip install arthur-bench`
 
 Install Bench with optional dependencies for serving results locally:  
@@ -27,13 +26,16 @@ In the `examples/` folder, you will find demo notebooks used to generate the Tes
 ## Key Concepts
 
 ### DATA
-<!-- ![ref_df](img/Reference_df.png) -->
 <p align="center">
 <img src="img/Reference_df.png" alt="Reference_df" width="750"/>
 
-Using Bench requires a reference dataset, including information such as:
+Using Bench requires data, including information such as:
+
+**A Reference Dataset:**
 - **Inputs** to the LLM. For *Summarization* tasks, this may be the document to be summarized. For *Question & Answering* tasks, this may be the question asked.
 - **Reference Outputs**: these are your baseline outputs. Teams can use either human-labeled ground truth annotations or the outputs from your LLM model in production that you are using Bench to compare against.
+
+**A Candidate Dataset**
 - **Candidate Outputs**: these are the outputs from your new candidate LLM.
 - **Context**: contextual information for Question & Answering tasks.
 
@@ -43,8 +45,11 @@ Using Bench requires a reference dataset, including information such as:
 
 Consider the task of *Question & Answering* about specific documents: 
 
+> **Reference Dataset:**
 > - **Input**: "What war was referred to in the Gettysburg Address?"
 > - **Reference Output**: The American Civil War
+> 
+> **Candidate Dataset**
 > - **Candidate Output**: The American War
 > - **Context**: _(The Gettysburg Address)_ "Four score and seven years ago our fathers brought forth on this continent, a new nation, conceived in Liberty, and dedicated to the proposition that all men are created equal ...
 > that this nation, under God, shall have a new birth of freedom – and that government of the people, by the people, for the people, shall not perish from the earth."
@@ -62,7 +67,6 @@ For example, for a summarization task, your **Test Suite** might include the doc
 
 Reference data can be provided via CSV file, a pandas DataFrame, or lists of strings for inputs and reference outputs. Please see our [documentation](https://docs.arthur.ai/bench/index.html) for more detail. To create a test suite in Bench:
 
-[//]: # (TODO: add link to that documentation)
 
 ```
 from arthur_bench.run.testsuite import TestSuite
