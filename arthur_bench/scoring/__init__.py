@@ -3,6 +3,7 @@ from .bertscore import BERTScore
 from .qa_quality import QAQualityCorrectness
 from .summary_quality import SummaryQuality
 from .exact_match import ExactMatch
+from .code_eval import CodeEval
 
 from arthur_bench.models.models import ScoringMethod as ScoringEnum
 
@@ -16,5 +17,7 @@ def load_scoring_method(name: ScoringEnum) -> ScoringMethod:
         return QAQualityCorrectness()
     elif name == ScoringEnum.ExactMatch:
         return ExactMatch()
+    elif name == ScoringEnum.CodeEval:
+        return CodeEval()
     else:
         raise ValueError(f"scoring method {name} is not valid")

@@ -17,6 +17,7 @@ class ScoringMethod(str, Enum):
     SummaryQuality = 'summary_quality'
     QACorrectness = 'qa_correctness'
     ExactMatch = 'exact_match'
+    CodeEval = 'code_eval'
 
 class TestCaseRequest(BaseModel):
     """
