@@ -1,5 +1,6 @@
 import logging
-from typing import List, Optional
+import tiktoken
+from typing import List, Optional, Tuple
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts.chat import ChatPromptTemplate, SystemMessagePromptTemplate, AIMessagePromptTemplate, \
@@ -68,11 +69,36 @@ COMPARE = ChatPromptTemplate.from_messages(
     [system_message_prompt, example_summaries_1, example_choice_1, example_summaries_2, example_choice_2,
      comparison_template])
 
-CONTEXT_WINDOW = 2500
+CONTEXT_WINDOW_MAP = {
+	'gpt-3.5-turbo' : 4096,
+	'gpt-4' : 8192,
+	'gpt-3.5-turbo-16k' : 16384,
+	'gpt-4-32k' : 32768
+}
+EVALUATOR_MODEL = 'gpt-3.5-turbo'
+TIKTOKEN_ENCODER = tiktoken.get_encoding("cl100k_base")
 LLM_CHOICE_OPTIONS = {'0': 0.0, '1': 1.0, 'tie': 0.5}
 
 
 logger = logging.getLogger(__name__)
+
+def truncate_input_text(input_text, ref_output, cand_output) -> Tuple[str, bool]:
+    """Truncates the input_text to fit in LLM evaluator context
+    
+    Truncate the input text so that the filled-in COMPARE prompt
+    which contains {input text + summary A + summary B} fits in the evaluator context window
+    
+    Returns the tuple (text, whether text was truncated)
+    """
+    llm_prompt_untruncated = COMPARE.format(text=input_text, summary_A=ref_output, summary_B=cand_output)
+    llm_prompt_tokens = TIKTOKEN_ENCODER.encode(llm_prompt_untruncated)
+    num_to_truncate_from_input_text_tokens = len(llm_prompt_tokens) - CONTEXT_WINDOW_MAP[EVALUATOR_MODEL]
+    truncated = False
+    if num_to_truncate_from_input_text_tokens > 0:
+        input_text_tokens_truncated = input_text_tokens_truncated[:-num_to_truncate_from_input_text_tokens]
+        input_text = TIKTOKEN_ENCODER.decode(input_text_tokens_truncated)
+        truncated = True
+    return input_text, truncated
 
 
 class SummaryQuality(ScoringMethod):
@@ -88,17 +114,16 @@ class SummaryQuality(ScoringMethod):
         # truncate inputs if needed
         truncated_inputs = []
         num_truncated = 0
-        for inp in inputs:
-            # truncate if needed
-            if len(inp) > CONTEXT_WINDOW:
-                num_truncated += 1
-                inp = inp[:CONTEXT_WINDOW]
+        for i, inp in enumerate(inputs):
+            inp, truncated = truncate_input_text(inp, reference_outputs[i], candidate_outputs[i])
+            num_truncated += int(truncated)
+
             # add to list we'll actually use
             truncated_inputs.append(inp)
 
         if num_truncated > 0:
-            logger.warning(f"Truncated {num_truncated} out of {len(inputs)} total summary inputs to {CONTEXT_WINDOW} "
-                           f"characters")
+            logger.warning(f"Truncated {num_truncated} out of {len(inputs)} total summary inputs to "
+                           f"{CONTEXT_WINDOW_MAP[EVALUATOR_MODEL]} characters")
 
         return super().run(truncated_inputs, reference_outputs, candidate_outputs, contexts, batch_size)
 
@@ -117,11 +142,14 @@ class SummaryQuality(ScoringMethod):
             raise UserValueError("using context is not currently supported for summary quality")
 
         res = []
+        num_truncated = 0
         for i in range(len(input_text_batch)):
             # run LLMChain to choose whether summary A or summary B is a better summary of the input text
             # (on truncated input text to fit in ChatGPT context window)
-            llm_input = input_text_batch[i][:CONTEXT_WINDOW]
-            choice = self.summary_compare({"text": llm_input, "summary_A": reference_batch[i],
+            inp, truncated = truncate_input_text(input_text_batch[i], reference_batch[i], candidate_batch[i])
+            num_truncated += int(truncated)
+            
+            choice = self.summary_compare({"text": inp, "summary_A": reference_batch[i],
                                            "summary_B": candidate_batch[i]})
 
             # return -1.0 if the LLMChain returns an invalid result
@@ -129,4 +157,8 @@ class SummaryQuality(ScoringMethod):
                 res.append(LLM_CHOICE_OPTIONS.get(choice["text"][:3], -1.0))
             else:
                 res.append(-1.0)
+                
+        if num_truncated > 0:
+            logger.warning(f"Truncated {num_truncated} out of {len(input_text_batch)} total summary inputs to "
+                           f"{CONTEXT_WINDOW_MAP[EVALUATOR_MODEL]} characters")
         return res
