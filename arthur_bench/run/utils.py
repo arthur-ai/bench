@@ -135,7 +135,7 @@ def _load_suite_from_args(
     elif input_text_list is not None and reference_output_list is not None:
         return load_suite_from_list(input_text_list, reference_output_list)
     else:
-        raise UserValueError("must specify data using either reference_data data frame," 
+        raise UserValueError("must specify data using either reference_data data frame, " 
                          "reference_data_path csv or input_text_list and reference_output_list strings")
     
 
