@@ -142,14 +142,10 @@ class SummaryQuality(ScoringMethod):
             raise UserValueError("using context is not currently supported for summary quality")
 
         res = []
-        num_truncated = 0
         for i in range(len(input_text_batch)):
             # run LLMChain to choose whether summary A or summary B is a better summary of the input text
-            # (on truncated input text to fit in ChatGPT context window)
-            inp, truncated = truncate_input_text(input_text_batch[i], reference_batch[i], candidate_batch[i])
-            num_truncated += int(truncated)
             
-            choice = self.summary_compare({"text": inp, "summary_A": reference_batch[i],
+            choice = self.summary_compare({"text": input_text_batch[i], "summary_A": reference_batch[i],
                                            "summary_B": candidate_batch[i]})
 
             # return -1.0 if the LLMChain returns an invalid result
@@ -158,7 +154,4 @@ class SummaryQuality(ScoringMethod):
             else:
                 res.append(-1.0)
                 
-        if num_truncated > 0:
-            logger.warning(f"Truncated {num_truncated} out of {len(input_text_batch)} total summary inputs to "
-                           f"{CONTEXT_WINDOW_MAP[EVALUATOR_MODEL]} characters")
         return res
