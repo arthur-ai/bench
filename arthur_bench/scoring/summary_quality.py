@@ -114,8 +114,8 @@ class SummaryQuality(ScoringMethod):
         # truncate inputs if needed
         truncated_inputs = []
         num_truncated = 0
-        for i, inp in enumerate(inputs):
-            inp, truncated = truncate_input_text(inp, reference_outputs[i], candidate_outputs[i])
+        for i in range(len(inputs)):
+            inp, truncated = truncate_input_text(inputs[i], reference_outputs[i], candidate_outputs[i])
             num_truncated += int(truncated)
 
             # add to list we'll actually use
