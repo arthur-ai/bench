@@ -100,9 +100,15 @@ my_existing_suite = TestSuite('my_bench_test', 'bertscore')
 
 | Scoring Method                    | Tasks | Requirements |
 |-----------------------------------|-----|-----|
+| Exact Match (`exact_match`) | any| Reference Output, Candidate Output|
 | BERT Score (`bertscore`)          | any | Reference Output, Candidate Output|
 | Summary Quality (`summary_quality`)  | Summarization | Input, Reference Output, Candidate Output|
 | QA Correctness (`qa_correctness`) | Question-Answering| Input, Candidate Output, Context|
+| Code Eval (`code_eval`) | Code Generation| Input, Candidate Output (generated solution code), Reference Output (unit test script)|
+
+#### `exact_match`
+
+The ExactMatch metric evaluates, for each test case, whether the candidate LLM output is an exact match of the provided reference output.
 
 #### `bertscore`
 
@@ -115,6 +121,10 @@ The Summary Quality scoring method is a comprehensive measure of summarization q
 #### `qa_correctness`
 
 The QA correctness metric evaluates the correctness of an answer, given a question and context. This scoring method does not require a reference output, but does require context. Each row of the Test Run will receive a binary 0, indicating an incorrect output, or 1, indicating a correct output.
+
+#### `code_eval`
+
+The CodeEval metric evaluates whether the provided candidate output (an LLM-generated script) passes the unit test provided in the reference output. This scoring method wraps the [`code_eval`](https://huggingface.co/spaces/evaluate-metric/code_eval) metric interface from HuggingFace 
 
 ## FAQ
 
