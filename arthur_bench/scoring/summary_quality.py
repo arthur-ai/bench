@@ -91,11 +91,12 @@ def truncate_input_text(input_text, ref_output, cand_output) -> Tuple[str, bool]
     Returns the tuple (text, whether text was truncated)
     """
     llm_prompt_untruncated = COMPARE.format(text=input_text, summary_A=ref_output, summary_B=cand_output)
+    input_text_tokens = TIKTOKEN_ENCODER.encode(input_text)
     llm_prompt_tokens = TIKTOKEN_ENCODER.encode(llm_prompt_untruncated)
     num_to_truncate_from_input_text_tokens = len(llm_prompt_tokens) - CONTEXT_WINDOW_MAP[EVALUATOR_MODEL]
     truncated = False
     if num_to_truncate_from_input_text_tokens > 0:
-        input_text_tokens_truncated = input_text_tokens_truncated[:-num_to_truncate_from_input_text_tokens]
+        input_text_tokens_truncated = input_text_tokens[:-num_to_truncate_from_input_text_tokens]
         input_text = TIKTOKEN_ENCODER.decode(input_text_tokens_truncated)
         truncated = True
     return input_text, truncated
