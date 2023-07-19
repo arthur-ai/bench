@@ -5,6 +5,8 @@ from tqdm import tqdm
 
 from arthur_bench.models.models import TestCaseRequest
 
+SINGLE_ITEM_BATCH_DEFAULT = 1
+
 
 class ScoringMethod(ABC):
     """
@@ -23,15 +25,15 @@ class ScoringMethod(ABC):
         """
         raise NotImplementedError
 
-    def run(self, inputs: List[str], reference_outputs: List[str], candidate_outputs: List[str],
-            contexts: Optional[List[str]], batch_size: int) -> list:
+    def run(self, reference_outputs: List[str], candidate_outputs: List[str], inputs: Optional[List[str]] = None,
+            contexts: Optional[List[str]] = None, batch_size: int = SINGLE_ITEM_BATCH_DEFAULT) -> list:
         """
         Score a set of test cases. This method doesn't need to be implemented in most cases, but can be overriden to
         add additional functionality such as task-specific logging.
 
-        :param inputs: input strings being tested
         :param reference_outputs: reference strings representing target outputs
         :param candidate_outputs: candidate generations to score
+        :param inputs: input strings being tested
         :param contexts: optional corresponding contexts, if needed by scoring method
         :param batch_size: size of batches
         :return:

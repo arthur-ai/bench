@@ -7,6 +7,7 @@ from langchain.prompts.chat import ChatPromptTemplate, SystemMessagePromptTempla
     HumanMessagePromptTemplate, BasePromptTemplate
 from arthur_bench.scoring import ScoringMethod
 from arthur_bench.client.exceptions import UserValueError
+from arthur_bench.scoring.scoring_method import SINGLE_ITEM_BATCH_DEFAULT
 
 system_message_prompt = SystemMessagePromptTemplate.from_template(
 """You compare two summaries of a text. You respond with a Choice, either a 0, 1, or tie ONLY.
@@ -110,8 +111,8 @@ class SummaryQuality(ScoringMethod):
     def __init__(self):
         self.summary_compare = LLMChain(llm=ChatOpenAI(temperature=0), prompt=COMPARE)  # type: ignore
 
-    def run(self, inputs: List[str], reference_outputs: List[str], candidate_outputs: List[str],
-            contexts: Optional[List[str]], batch_size: int) -> list:
+    def run(self, reference_outputs: List[str], candidate_outputs: List[str], inputs: Optional[List[str]] = None,
+            contexts: Optional[List[str]] = None, batch_size: int = SINGLE_ITEM_BATCH_DEFAULT) -> list:
         # truncate inputs if needed
         truncated_inputs = []
         num_truncated = 0
@@ -126,7 +127,7 @@ class SummaryQuality(ScoringMethod):
             logger.warning(f"Truncated {num_truncated} out of {len(inputs)} total summary inputs to "
                            f"{CONTEXT_WINDOW_MAP[EVALUATOR_MODEL]} characters")
 
-        return super().run(truncated_inputs, reference_outputs, candidate_outputs, contexts, batch_size)
+        return super().run(reference_outputs, candidate_outputs, truncated_inputs, contexts, batch_size)
 
     def run_batch(self, reference_batch: List[str], candidate_batch: List[str],
                   input_text_batch: Optional[List[str]] = None,

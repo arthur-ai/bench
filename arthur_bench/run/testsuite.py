@@ -12,7 +12,7 @@ from arthur_bench.client.exceptions import UserValueError, ArthurInternalError
 from arthur_bench.run.testrun import TestRun
 from arthur_bench.run.utils import _create_test_suite_dir, _initialize_metadata, _test_suite_dir, \
 	_create_run_dir, _clean_up_run, _load_suite_from_args, _load_run_data_from_args, _get_suite_if_exists, _get_scoring_method
-
+from arthur_bench.scoring.scoring_method import SINGLE_ITEM_BATCH_DEFAULT
 
 logger = logging.getLogger(__name__)
 
@@ -82,7 +82,7 @@ class TestSuite:
 			context_column: Optional[str] = None,
 			context_list: Optional[List[str]] = None,
 			save: bool = True,
-			batch_size: int = 1,
+			batch_size: int = SINGLE_ITEM_BATCH_DEFAULT,
 			model_name: Optional[str] = None,
 			model_version: Optional[str] = None,
 			foundation_model: Optional[str] = None,
@@ -130,7 +130,7 @@ class TestSuite:
 		inputs = [case.input for case in self.suite.test_cases]
 		ref_outputs = [case.reference_output for case in self.suite.test_cases]
 		try:
-			all_scores = scoring_method.run(inputs, ref_outputs, candidate_output_list, context_list,
+			all_scores = scoring_method.run(ref_outputs, candidate_output_list, inputs, context_list,
 											batch_size=batch_size)
 		except Exception as e:
 			logger.error(f"failed to create run: {e}")
