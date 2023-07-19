@@ -26,7 +26,7 @@ class ScoringMethod(ABC):
         raise NotImplementedError
 
     def run(self, reference_outputs: List[str], candidate_outputs: List[str], inputs: Optional[List[str]] = None,
-            contexts: Optional[List[str]] = None, batch_size: int = SINGLE_ITEM_BATCH_DEFAULT) -> list:
+            contexts: Optional[List[str]] = None, batch_size: int = SINGLE_ITEM_BATCH_DEFAULT) -> List[float]:
         """
         Score a set of test cases. This method doesn't need to be implemented in most cases, but can be overriden to
         add additional functionality such as task-specific logging.
@@ -39,21 +39,21 @@ class ScoringMethod(ABC):
         :return:
         """
         all_scores = []
-        with tqdm(total=len(inputs)) as pbar:
-            for i in range(0, len(inputs), batch_size):
+        with tqdm(total=len(reference_outputs)) as pbar:
+            for i in range(0, len(reference_outputs), batch_size):
                 # TODO: make suite iterable: https://arthurai.atlassian.net/browse/LLM-250
-                input_batch = inputs[i:i + batch_size]
+                input_batch = list(inputs[i:i + batch_size]) if inputs is not None else None
                 ref_batch = reference_outputs[i:i + batch_size]
 
                 context_batch = None if contexts is None else contexts[i:i + batch_size]
                 scores = self.run_batch(
                     list(ref_batch),
                     candidate_outputs[i:i + batch_size],
-                    list(input_batch),
+                    input_batch,
                     context_batch
                 )
 
                 all_scores.extend(scores)
-                pbar.update(len(input_batch))
+                pbar.update(len(ref_batch))
     
         return all_scores

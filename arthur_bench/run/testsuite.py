@@ -128,7 +128,7 @@ class TestSuite:
 		scoring_method: ScoringMethod = load_scoring_method(self.suite.scoring_method)
 
 		inputs = [case.input for case in self.suite.test_cases]
-		ref_outputs = [case.reference_output for case in self.suite.test_cases]
+		ref_outputs: List[str] = [case.reference_output for case in self.suite.test_cases]
 		try:
 			all_scores = scoring_method.run(ref_outputs, candidate_output_list, inputs, context_list,
 											batch_size=batch_size)

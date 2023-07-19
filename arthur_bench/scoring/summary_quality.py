@@ -113,6 +113,8 @@ class SummaryQuality(ScoringMethod):
 
     def run(self, reference_outputs: List[str], candidate_outputs: List[str], inputs: Optional[List[str]] = None,
             contexts: Optional[List[str]] = None, batch_size: int = SINGLE_ITEM_BATCH_DEFAULT) -> list:
+        if inputs is None:
+            raise TypeError("Inputs must be provided for Summary Quality scorer, got None")
         # truncate inputs if needed
         truncated_inputs = []
         num_truncated = 0
