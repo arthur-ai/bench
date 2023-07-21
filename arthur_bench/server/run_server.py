@@ -46,7 +46,13 @@ def test_suites(request: Request):
         suites = duckdb.sql(f"SELECT name, description, created_at, scoring_method FROM read_json_auto('{SERVER_ROOT_DIR}/*/suite.json', timestampformat='{TIMESTAMP_FORMAT}')").df().to_dict('records')
     except duckdb.IOException:
         suites = []
-    send_event({"event_type": "test_suites", "event_properties": {"num_test_suites": len(suites)}}, USER_ID)
+    scoring_methods = {}
+    for suite in suites:
+        if suite["scoring_method"] not in scoring_methods:
+            scoring_methods[suite["scoring_method"]] = 0
+        else:
+            scoring_methods[suite["scoring_method"]] += 1
+    send_event({"event_type": "test_suites", "event_properties": {"num_test_suites": len(suites), **scoring_methods}}, USER_ID)
     return templates.TemplateResponse("test_suite_overview.html", {"request": request,
                                                                    "suites": suites})
 
