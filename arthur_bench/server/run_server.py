@@ -38,16 +38,15 @@ TIMESTAMP_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
 
 @app.get("/", response_class=RedirectResponse)
 def home(request: Request):
-    return templates.TemplateResponse("usage_data_prompt.html", {"request": request})
+    return RedirectResponse("/test_suites")
 
 @app.get("/test_suites", response_class=HTMLResponse)
-def test_suites(request: Request, usage_data: bool = False):
-    set_track_usage_data(USER_ID, usage_data)
+def test_suites(request: Request):
     try:
         suites = duckdb.sql(f"SELECT name, description, created_at, scoring_method FROM read_json_auto('{SERVER_ROOT_DIR}/*/suite.json', timestampformat='{TIMESTAMP_FORMAT}')").df().to_dict('records')
     except duckdb.IOException:
         suites = []
-    send_event({"event_type": "test_suites", "event_properties": {"num_test_suites": len(suites)}})
+    send_event({"event_type": "test_suites", "event_properties": {"num_test_suites": len(suites)}}, USER_ID)
     return templates.TemplateResponse("test_suite_overview.html", {"request": request,
                                                                    "suites": suites})
 
@@ -58,7 +57,7 @@ def test_runs(request: Request, test_suite_name: str):
         runs = duckdb.sql(f"SELECT name, created_at, model_name FROM read_json_auto('{SERVER_ROOT_DIR}/{test_suite_name}/*/run.json',timestampformat='{TIMESTAMP_FORMAT}')").df().to_dict('records')
     except duckdb.IOException:
         runs = []
-    send_event({"event_type": "test_runs", "event_properties": {"num_test_runs_for_suite": len(runs)}})
+    send_event({"event_type": "test_runs", "event_properties": {"num_test_runs_for_suite": len(runs), "suite_name": test_suite_name}}, USER_ID)
     return templates.TemplateResponse("test_run_overview.html", {"request": request,
                                                                  "runs": runs,
                                                                  "test_suite_name": test_suite_name})
@@ -74,7 +73,7 @@ def test_run_results(request: Request, test_suite_name: str, run_name: str):
                         f"SELECT unnest(test_case_outputs) as test_cases from read_json_auto('{SERVER_ROOT_DIR}/{test_suite_name}/{run_name}/run.json',timestampformat='{TIMESTAMP_FORMAT}')))").df().to_dict('records')
     except duckdb.IOException:
         cases = []
-    send_event({"event_type": "test_run", "event_properties": {"cases_in_run": len(cases)}})
+    send_event({"event_type": "test_run", "event_properties": {"run_name": run_name}}, USER_ID)
     return templates.TemplateResponse("test_run_table.html", {"request": request,
                                                               "cases": cases,
                                                               "test_suite_name": test_suite_name,
@@ -106,6 +105,7 @@ def run():
 
     global USER_ID
     USER_ID = get_or_persist_id()
+    set_track_usage_data()
 
     uvicorn.run("arthur_bench.server.run_server:app", host="127.0.0.1", port=8000, log_level="info")
 
