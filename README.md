@@ -10,10 +10,10 @@ Bench is built for evaluating LLMs for production use cases. Bench can be used f
 
 ### Package installation and environment setup
 Install Bench with minimum dependencies:
-`pip install arthur-bench`
+`pip install -e .`
 
 Install Bench with optional dependencies for serving results locally:  
-`pip install 'arthur-bench[server]'`
+`pip install -e '.[server]'`
 
 Bench saves test suites and test runs to the directory specified by the `BENCH_FILE_DIR`, which defaults to `./bench`
 
@@ -107,7 +107,6 @@ A **Scoring Method** is the criteria used to judge the candidate outputs for eac
 | BERT Score (`bertscore`)          | any | Reference Output, Candidate Output|
 | Summary Quality (`summary_quality`)  | Summarization | Input, Reference Output, Candidate Output|
 | QA Correctness (`qa_correctness`) | Question-Answering| Input, Candidate Output, Context|
-| Code Eval (`code_eval`) | Code Generation| Input, Candidate Output (generated solution code), Reference Output (unit test script)|
 
 #### `exact_match`
 

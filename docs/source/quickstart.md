@@ -2,10 +2,10 @@
 ### Package installation and environment setup
 Install Bench with minimum dependencies:
 
-`pip install arthur-bench`
+`pip install -e .`
 
 Install Bench with optional dependencies for serving results locally:  
-`pip install 'arthur-bench[server]'`
+`pip install -e '.[server]'`
 
 Bench saves test suites and test runs to the directory specified by the `BENCH_FILE_DIR`, which defaults to `./bench`
 
