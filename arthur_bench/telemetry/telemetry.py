@@ -15,7 +15,7 @@ class Telemetry(Enum):
 
 TRACK_USAGE_DATA: Telemetry = Telemetry.ON
 
-def set_track_usage_data():
+def set_track_usage_data(log_telemetry: bool):
     global TRACK_USAGE_DATA
 
     telemetry = os.getenv('BENCH_TELEMETRY_DISABLED', "0")
@@ -24,7 +24,7 @@ def set_track_usage_data():
     elif telemetry != "0":
         TRACK_USAGE_DATA = Telemetry.OFF
 
-    if TRACK_USAGE_DATA == Telemetry.ON:
+    if TRACK_USAGE_DATA == Telemetry.ON and not log_telemetry:
         logging.warn("""Telemetry data is being collected by Arthur! To disable, set the environment variable BENCH_TELEMETRY_DISABLED=1.
                      To disable and also log what would have been pushed, set BENCH_TELEMETRY_DISABLED=log.""")
 

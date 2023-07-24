@@ -17,6 +17,7 @@ except ImportError as e:
     raise ImportError("Can't run Bench Server without server dependencies, to install run: "
                       "pip install arthur-bench[server]") from e
 
+from typing import Tuple
 from arthur_bench.run.utils import _bench_root_dir
 from arthur_bench.telemetry.telemetry import send_event, set_track_usage_data
 
@@ -46,7 +47,7 @@ def test_suites(request: Request):
         suites = duckdb.sql(f"SELECT name, description, created_at, scoring_method FROM read_json_auto('{SERVER_ROOT_DIR}/*/suite.json', timestampformat='{TIMESTAMP_FORMAT}')").df().to_dict('records')
     except duckdb.IOException:
         suites = []
-    send_event({"event_type": "test_suites", "event_properties": {"num_test_suites": len(suites)}}, USER_ID)
+    send_event({"event_type": "test_suites_real", "event_properties": {"num_test_suites_real": len(suites)}}, USER_ID)
     return templates.TemplateResponse("test_suite_overview.html", {"request": request,
                                                                    "suites": suites})
 
@@ -59,7 +60,7 @@ def test_runs(request: Request, test_suite_name: str):
     except duckdb.IOException:
         runs = []
         suite = "Unknown"
-    send_event({"event_type": "test_runs", "event_properties": {"num_test_runs_for_suite": len(runs), "suite_name": test_suite_name, "scoring_method": suite}}, USER_ID)
+    send_event({"event_type": "test_runs_real", "event_properties": {"num_test_runs_for_suite_real": len(runs), "suite_name_real": test_suite_name, "scoring_method_real": suite}}, USER_ID)
     return templates.TemplateResponse("test_run_overview.html", {"request": request,
                                                                  "runs": runs,
                                                                  "test_suite_name": test_suite_name})
@@ -75,24 +76,24 @@ def test_run_results(request: Request, test_suite_name: str, run_name: str):
                         f"SELECT unnest(test_case_outputs) as test_cases from read_json_auto('{SERVER_ROOT_DIR}/{test_suite_name}/{run_name}/run.json',timestampformat='{TIMESTAMP_FORMAT}')))").df().to_dict('records')
     except duckdb.IOException:
         cases = []
-    send_event({"event_type": "test_run", "event_properties": {"run_name": run_name}}, USER_ID)
+    send_event({"event_type": "test_run_real", "event_properties": {"run_name_real": run_name}}, USER_ID)
     return templates.TemplateResponse("test_run_table.html", {"request": request,
                                                               "cases": cases,
                                                               "test_suite_name": test_suite_name,
                                                               "run_name": run_name})
 
-def get_or_persist_id() -> uuid.UUID:
+def get_or_persist_id() -> Tuple[uuid.UUID, bool]:
     file_name = os.path.join(SERVER_ROOT_DIR, ID_FILE)
     if os.path.isfile(file_name):
         with open(file_name) as f:
             u = json.loads(f.read())
-            return u['id']
+            return u['id'], u['telemetry_log']
 
     os.makedirs(os.path.dirname(file_name), exist_ok=True)
     id = uuid.uuid4()
     with open(file_name, 'w+') as f:
-        f.write(json.dumps({'id': str(id)}))
-    return id
+        f.write(json.dumps({'id': str(id), 'telemetry_log': True}))
+    return id, False
 
 def run():
     # parser needs to go in this function for compatibility with packaging
@@ -106,8 +107,8 @@ def run():
         SERVER_ROOT_DIR = args.directory
 
     global USER_ID
-    USER_ID = get_or_persist_id()
-    set_track_usage_data()
+    USER_ID, log_telemetry = get_or_persist_id()
+    set_track_usage_data(log_telemetry)
 
     uvicorn.run("arthur_bench.server.run_server:app", host="127.0.0.1", port=8000, log_level="info")
 
