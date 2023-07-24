@@ -18,15 +18,15 @@ TRACK_USAGE_DATA: Telemetry = Telemetry.ON
 def set_track_usage_data():
     global TRACK_USAGE_DATA
 
-    telemetry = os.getenv('BENCH_TELEMTRY_DISABLED', "0")
+    telemetry = os.getenv('BENCH_TELEMETRY_DISABLED', "0")
     if telemetry == "log":
         TRACK_USAGE_DATA = Telemetry.LOG
     elif telemetry != "0":
         TRACK_USAGE_DATA = Telemetry.OFF
 
     if TRACK_USAGE_DATA == Telemetry.ON:
-        logging.warn("""Telemetry data is being collected by Arthur! To disable, set the environment variable BENCH_TELEMTRY_DISABLED=1.
-                     To disable pushing metrics and instead log what would be pushed, set BENCH_TELEMTRY_DISABLED=log.""")
+        logging.warn("""Telemetry data is being collected by Arthur! To disable, set the environment variable BENCH_TELEMETRY_DISABLED=1.
+                     To disable and also log what would have been pushed, set BENCH_TELEMETRY_DISABLED=log.""")
 
 
 # A no-op if user opts out of data collection.

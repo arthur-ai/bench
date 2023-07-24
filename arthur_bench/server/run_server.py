@@ -46,13 +46,7 @@ def test_suites(request: Request):
         suites = duckdb.sql(f"SELECT name, description, created_at, scoring_method FROM read_json_auto('{SERVER_ROOT_DIR}/*/suite.json', timestampformat='{TIMESTAMP_FORMAT}')").df().to_dict('records')
     except duckdb.IOException:
         suites = []
-    scoring_methods = {}
-    for suite in suites:
-        if suite["scoring_method"] not in scoring_methods:
-            scoring_methods[suite["scoring_method"]] = 0
-        else:
-            scoring_methods[suite["scoring_method"]] += 1
-    send_event({"event_type": "test_suites", "event_properties": {"num_test_suites": len(suites), **scoring_methods}}, USER_ID)
+    send_event({"event_type": "test_suites", "event_properties": {"num_test_suites": len(suites)}}, USER_ID)
     return templates.TemplateResponse("test_suite_overview.html", {"request": request,
                                                                    "suites": suites})
 
@@ -61,9 +55,11 @@ def test_suites(request: Request):
 def test_runs(request: Request, test_suite_name: str):
     try:
         runs = duckdb.sql(f"SELECT name, created_at, model_name FROM read_json_auto('{SERVER_ROOT_DIR}/{test_suite_name}/*/run.json',timestampformat='{TIMESTAMP_FORMAT}')").df().to_dict('records')
+        suite = duckdb.sql(f"SELECT scoring_method FROM read_json_auto('{SERVER_ROOT_DIR}/{test_suite_name}/suite.json', timestampformat='{TIMESTAMP_FORMAT}')").df().to_dict('records')[0]
     except duckdb.IOException:
         runs = []
-    send_event({"event_type": "test_runs", "event_properties": {"num_test_runs_for_suite": len(runs), "suite_name": test_suite_name}}, USER_ID)
+        suite = "Unknown"
+    send_event({"event_type": "test_runs", "event_properties": {"num_test_runs_for_suite": len(runs), "suite_name": test_suite_name, "scoring_method": suite}}, USER_ID)
     return templates.TemplateResponse("test_run_overview.html", {"request": request,
                                                                  "runs": runs,
                                                                  "test_suite_name": test_suite_name})
