@@ -11,3 +11,4 @@ Scoring Methods
    bertscore.BERTScore
    qa_quality.QAQualityCorrectness
    summary_quality.SummaryQuality
+   exact_match.ExactMatch

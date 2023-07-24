@@ -10,10 +10,10 @@ Bench is built for evaluating LLMs for production use cases. Bench can be used f
 
 ### Package installation and environment setup
 Install Bench with minimum dependencies:
-`pip install arthur-bench`
+`pip install -e .`
 
 Install Bench with optional dependencies for serving results locally:  
-`pip install 'arthur-bench[server]'`
+`pip install -e '.[server]'`
 
 Bench saves test suites and test runs to the directory specified by the `BENCH_FILE_DIR`, which defaults to `./bench`
 
@@ -27,7 +27,7 @@ In the `examples/` folder, you will find demo notebooks used to generate the Tes
 
 ### DATA
 <p align="center">
-<img src="img/Reference_df.png" alt="Reference_df" width="750"/>
+<img src="./docs/source/_static/img/Reference_df.png" alt="Reference_df" width="750"/>
 
 Using Bench requires data, including information such as:
 
@@ -68,6 +68,7 @@ For example, for a summarization task, your **Test Suite** might include the doc
 Reference data can be provided via CSV file, a pandas DataFrame, or lists of strings for inputs and reference outputs. Please see our [documentation](https://docs.arthur.ai/bench/index.html) for more detail. To create a test suite in Bench:
 
 
+
 ```
 from arthur_bench.run.testsuite import TestSuite
 
@@ -98,13 +99,14 @@ my_existing_suite = TestSuite('my_bench_test', 'bertscore')
 
 ## Scoring Methods
 
+A **Scoring Method** is the criteria used to judge the candidate outputs for each run of the test suite. Each {class}`scoring method <arthur_bench.scoring.scoring_method.ScoringMethod>` implements the `run_batch` method to compute a score for a model output. Bench includes both embedding based methods like bert score as well as LLM-guided evaluations.
+
 | Scoring Method                    | Tasks | Requirements |
 |-----------------------------------|-----|-----|
 | Exact Match (`exact_match`) | any| Reference Output, Candidate Output|
 | BERT Score (`bertscore`)          | any | Reference Output, Candidate Output|
 | Summary Quality (`summary_quality`)  | Summarization | Input, Reference Output, Candidate Output|
 | QA Correctness (`qa_correctness`) | Question-Answering| Input, Candidate Output, Context|
-| Code Eval (`code_eval`) | Code Generation| Input, Candidate Output (generated solution code), Reference Output (unit test script)|
 
 #### `exact_match`
 
