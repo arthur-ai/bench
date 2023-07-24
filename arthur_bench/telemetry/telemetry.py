@@ -25,7 +25,8 @@ def set_track_usage_data(log_telemetry: bool):
         TRACK_USAGE_DATA = Telemetry.OFF
 
     if TRACK_USAGE_DATA == Telemetry.ON and not log_telemetry:
-        logging.warn("""Telemetry data is being collected by Arthur! To disable, set the environment variable BENCH_TELEMETRY_DISABLED=1.
+        logging.warn("""Telemetry data is being collected by Arthur! For more details please see https://github.com/arthur-ai/bench/tree/develop/arthur_bench/telemetry.
+                     To disable, set the environment variable BENCH_TELEMETRY_DISABLED=1.
                      To disable and also log what would have been pushed, set BENCH_TELEMETRY_DISABLED=log.""")
 
 
