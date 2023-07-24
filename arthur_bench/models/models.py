@@ -16,6 +16,7 @@ class ScoringMethod(str, Enum):
     BERTScore = 'bertscore'
     SummaryQuality = 'summary_quality'
     QACorrectness = 'qa_correctness'
+    ExactMatch = 'exact_match'
 
 class TestCaseRequest(BaseModel):
     """
