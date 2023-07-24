@@ -40,6 +40,7 @@ class TestSuiteRequest(BaseModel):
     name: str
     description: Optional[str] = None
     scoring_method: ScoringMethod
+    # TODO: validation on not some-null reference outputs
     test_cases: List[TestCaseRequest] = Field(..., min_items=1)
     created_by: str
     bench_version: str
