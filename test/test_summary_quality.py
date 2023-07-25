@@ -3,8 +3,6 @@ import pandas as pd
 from unittest.mock import Mock, patch
 from typing import List, Optional
 
-from langchain.llms.fake import FakeListLLM
-
 from helpers import assert_test_suite_equal
 from arthur_bench.run.testsuite import TestSuite
 from arthur_bench.scoring import ScoringMethod
@@ -13,16 +11,9 @@ from arthur_bench.run.testrun import TestRun
 
 
 @pytest.fixture
-def mock_llm():
-    mock_llm = Mock()
-    mock_llm.return_value = FakeListLLM
-    return mock_llm
-
-
-@pytest.fixture
-def mock_llm_chain():
+def mock_openai_function_call():
     chain = Mock()
-    chain.return_value = {"text": "0"}
+    chain.return_value = 0.0
     return chain
 
 
@@ -53,9 +44,9 @@ def mock_summary_data():
 
 
 # Test the run_batch method
-def test_run_batch(mock_llm_chain, mock_llm, mock_summary_data):
-    with patch('arthur_bench.scoring.summary_quality.LLMChain', return_value=mock_llm_chain):
-        with patch('arthur_bench.scoring.summary_quality.ChatOpenAI', mock_llm):
+def test_run_batch(mock_openai_function_call, mock_summary_data):
+    with patch('arthur_bench.scoring.summary_quality.compare_summaries', return_value=mock_openai_function_call):
+
 
             # create summary quality scoring method
             summary_quality = SummaryQuality()
@@ -69,27 +60,12 @@ def test_run_batch(mock_llm_chain, mock_llm, mock_summary_data):
 
             # assert LLMChain called with correct parameters
             for i in range(len(mock_summary_data)):
-                mock_llm_chain.assert_any_call({
-                    "text": mock_summary_data['source'][i],
-                    "summary_A": mock_summary_data['summary'][i],
-                    "summary_B": mock_summary_data['candidate_summary'][i]})
+                mock_openai_function_call.assert_any_call({
+                    mock_summary_data['source'][i],
+                    mock_summary_data['summary'][i],
+                    mock_summary_data['candidate_summary'][i]})
 
             # assert correct return values for mock LLMChain outputs
             assert result == [0.0] * len(mock_summary_data)
 
 
-# Test the run_batch method with different return values from LLMChain
-@pytest.mark.parametrize('llm_return,expected', [
-    ({"text": "0"}, [0.0]),
-    ({"text": "1"}, [1.0]),
-    ({"text": "tie"}, [0.5]),
-    ({"text": "invalid"}, [-1.0]),
-])
-def test_run_batch_with_different_llm_returns(llm_return, expected, mock_llm_chain, mock_llm):
-    mock_llm_chain.return_value = llm_return
-    with patch('arthur_bench.scoring.summary_quality.LLMChain', return_value=mock_llm_chain):
-        with patch('arthur_bench.scoring.summary_quality.ChatOpenAI', mock_llm):
-            summary_quality = SummaryQuality()
-            result = summary_quality.run_batch(["reference"], ["candidate"], ["input"])
-            mock_llm_chain.assert_called_once_with({"text": "input", "summary_A": "reference", "summary_B": "candidate"})
-            assert result == expected

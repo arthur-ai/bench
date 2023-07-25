@@ -4,8 +4,6 @@ from unittest.mock import Mock, patch
 import torch
 from typing import List, Optional
 
-from langchain.llms.fake import FakeListLLM
-
 from helpers import assert_test_suite_equal
 from arthur_bench.run.testsuite import TestSuite
 from arthur_bench.scoring import ScoringMethod
