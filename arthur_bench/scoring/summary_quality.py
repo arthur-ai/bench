@@ -6,7 +6,7 @@ from langchain.chat_models import ChatOpenAI
 from langchain.prompts.chat import ChatPromptTemplate, SystemMessagePromptTemplate, AIMessagePromptTemplate, \
     HumanMessagePromptTemplate, BasePromptTemplate
 from arthur_bench.scoring import ScoringMethod
-from arthur_bench.client.exceptions import UserValueError
+from arthur_bench.client.exceptions import UserValueError, UserTypeError
 from arthur_bench.scoring.scoring_method import SINGLE_ITEM_BATCH_DEFAULT
 
 system_message_prompt = SystemMessagePromptTemplate.from_template(
@@ -111,10 +111,13 @@ class SummaryQuality(ScoringMethod):
     def __init__(self):
         self.summary_compare = LLMChain(llm=ChatOpenAI(temperature=0), prompt=COMPARE)  # type: ignore
 
-    def run(self, reference_outputs: List[str], candidate_outputs: List[str], inputs: Optional[List[str]] = None,
-            contexts: Optional[List[str]] = None, batch_size: int = SINGLE_ITEM_BATCH_DEFAULT) -> list:
+    def run(self, candidate_outputs: List[str], reference_outputs: Optional[List[str]] = None,
+            inputs: Optional[List[str]] = None, contexts: Optional[List[str]] = None,
+            batch_size: int = SINGLE_ITEM_BATCH_DEFAULT) -> list:
         if inputs is None:
             raise TypeError("Inputs must be provided for Summary Quality scorer, got None")
+        if reference_outputs is None:
+            raise TypeError("Reference Outputs must be provided for Summary Quality scorer, got None")
         # truncate inputs if needed
         truncated_inputs = []
         num_truncated = 0
@@ -129,9 +132,9 @@ class SummaryQuality(ScoringMethod):
             logger.warning(f"Truncated {num_truncated} out of {len(inputs)} total summary inputs to "
                            f"{CONTEXT_WINDOW_MAP[EVALUATOR_MODEL]} characters")
 
-        return super().run(reference_outputs, candidate_outputs, truncated_inputs, contexts, batch_size)
+        return super().run(candidate_outputs, reference_outputs, truncated_inputs, contexts, batch_size)
 
-    def run_batch(self, reference_batch: List[str], candidate_batch: List[str],
+    def run_batch(self, candidate_batch: List[str], reference_batch: Optional[List[str]] = None,
                   input_text_batch: Optional[List[str]] = None,
                   context_batch: Optional[List[str]] = None) -> List[float]:
         """
@@ -141,6 +144,9 @@ class SummaryQuality(ScoringMethod):
             raise UserValueError(
                 "input text is required for this scoring method. Please provide a dataframe column or a list of your "
                 "input text strings in the Test Suite.")
+        if reference_batch is None:
+            raise UserTypeError("Reference Outputs must be provided for Summary Quality scorer. Please provide "
+                                "reference outputs to the test suite")
 
         if context_batch is not None:
             raise UserValueError("using context is not currently supported for summary quality")

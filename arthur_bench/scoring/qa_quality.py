@@ -83,7 +83,8 @@ class QAQualityCorrectness(ScoringMethod):
     def __init__(self):
         self.evaluate_answer = LLMChain(llm=ChatOpenAI(temperature=0), prompt=DECIDE)
 
-    def run_batch(self, reference_batch: List[str], candidate_batch: List[str], input_text_batch: Optional[List[str]] = None, 
+    def run_batch(self, candidate_batch: List[str], reference_batch: Optional[List[str]] = None,
+                  input_text_batch: Optional[List[str]] = None,
                   context_batch: Optional[List[str]] = None) -> List[float]:
       """
       Reference batch is not used for this scoring method, QA correctness requires an input_text_batch and context_batch

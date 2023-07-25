@@ -23,7 +23,7 @@ class BERTScore(ScoringMethod):
         with suppress_warnings("transformers"):
             self.scorer = BERTScorer(lang='en', model_type=DEFAULT_MODEL)
 
-    def run_batch(self, reference_batch: List[str], candidate_batch: List[str],
+    def run_batch(self, candidate_batch: List[str], reference_batch: Optional[List[str]] = None,
                   input_text_batch: Optional[List[str]] = None, context_batch: Optional[List[str]] = None) -> List[float]:
 
         # get precision, recall, and F1 score from bert_score package
