@@ -2,7 +2,6 @@ from enum import Enum
 import logging
 import json
 import openai
-from openai_function_call import openai_schema
 from pydantic import BaseModel
 from typing import List, Optional
 
@@ -14,7 +13,6 @@ class SummaryComparisonResult(Enum):
     OPTION_1_BETTER = 1.0
     TIE = 0.5
 
-@openai_schema
 class SummaryComparison(BaseModel):
     """The result of a summary comparison, returning a SummaryComparisonResult enum
     The comparison should be OPTION_0_BETTER if the summary labelled 0 is the better summary.
@@ -29,7 +27,15 @@ def compare_summaries(input_text: str, summary_0: str, summary_1: str):
     """Uses chatgpt to compare summaries"""
     completion = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
-        functions=[SummaryComparison.openai_schema],
+        functions=[{
+            'name': 'SummaryComparison',
+            'description': 'The result of a summary comparison, returning a SummaryComparisonResult enum\n    The comparison should be OPTION_0_BETTER if the summary labelled 0 is the better summary.\n    The comparison should be OPTION_1_BETTER if the summary labelled 1 is the better summary.\n    The comparison should be TIE if no summary is clearly better than the other.\n    A good summary captures the most important information in the text and doesnt focus too much on small details.\n    A bad summary has information that is conflicting or irrelevant to the original text, or has typos of words in the text.\n    ',
+            'parameters': {
+                 '$defs': {'SummaryComparisonResult': {'enum': [0.0, 1.0, 0.5],
+            'type': 'number'}},
+            'properties': {'comparison': {'$ref': '#/$defs/SummaryComparisonResult'}},
+            'required': ['comparison'],
+            'type': 'object'}}],
         messages=[
             {"role": "system", "content": "I'm going to ask for the better summary of the input_text between two options. Use SummaryComparison.openai_schema to parse this data"},
             {"role": "user", "content": """

@@ -1,6 +1,5 @@
 bert_score==0.3.13
 openai>=0.27.0
-openai-function-call==0.2.1
 pandas==2.0.1
 pydantic>=1.10.0,<2.0
 pyjwt<3,>=2.6

@@ -2,7 +2,6 @@ from enum import Enum
 from typing import List, Optional
 import json
 import openai
-from openai_function_call import openai_schema
 from pydantic import BaseModel
 
 from arthur_bench.scoring import ScoringMethod
@@ -13,7 +12,6 @@ class QA_ValidationResult(Enum):
     CORRECT = 1.0
     UNCLEAR = -1.0
 
-@openai_schema
 class QA_Validation(BaseModel):
     """The result of question-answer validation, returning a QA_ValidationResult enum
     The validation should be INCORRECT if the answer to the question is wrong and/or unsupported by the context
@@ -28,9 +26,21 @@ def validate_question_answer(question: str, answer: str, context: str):
     """Uses chatgpt to evaluate whether the answer to a question, given a context, is incorrect"""
     completion = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
-        functions=[QA_Validation.openai_schema],
+        functions=[
+           {'name': 'QA_Validation',
+            'description': 'The result of question-answer validation, returning a QA_ValidationResult enum\n    The validation should be INCORRECT if the answer to the question is wrong and/or unsupported by the context\n    The validation should be CORRECT if the answer to the question is correct and/or supported by the context.\n    A correct answer is in accordance with fact and truth, answers the question posed, and is supported by the evidence found in the extracted parts of the context documents.\n    An incorrect answer has information that is conflicting or irrelevant to the extracted parts of the context documents, or has typos of words in the text,\nor is a factually incorrect response to the questions.\n    ',
+            'parameters': {
+               '$defs': {
+                  'QA_ValidationResult': {
+                    'enum': [0.0, 1.0, -1.0],
+                    'type': 'number'}
+                    },
+                'properties': {
+                   'validation': {'$ref': '#/$defs/QA_ValidationResult'}},
+                'required': ['validation'],
+                'type': 'object'}}],
         messages=[
-            {"role": "system", "content": "I'm going to ask for the answer to a question to be validated against its context. Use QA_Validation.openai_schema to parse this data"},
+            {"role": "system", "content": "I'm going to ask for the answer to a question to be validated against its context. Use QA_Validation to parse this data"},
             {"role": "user", "content": """
             QUESTION: Compounds that are capable of accepting electrons, such as o 2 or f2, are called what?
             ========
