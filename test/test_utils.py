@@ -17,7 +17,6 @@ def test_load_suite_from_json(filepath, expected, request):
     else:
         raise RuntimeError("bad test structure")
 
-
 def test_load_suite_from_csv(mock_suite_cases):
     assert load_suite_from_csv(FIXTURE_FILE_DIR / 'mock_suite.csv', 'input', 'reference_output') == mock_suite_cases
 

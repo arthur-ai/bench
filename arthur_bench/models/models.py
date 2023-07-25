@@ -54,7 +54,7 @@ class TestSuiteRequest(BaseModel):
             if isinstance(tc, TestCaseRequest):
                 ref_val = tc.reference_output
             elif isinstance(tc, dict):
-                ref_val = tc['reference_output']
+                ref_val = tc.get('reference_output', None)
             else:
                 raise TypeError(f"Unable to extract reference output value for type '{type(v)}'")
 

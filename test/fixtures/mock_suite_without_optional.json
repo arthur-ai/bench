@@ -3,12 +3,10 @@
     "scoring_method": "bertscore",
     "test_cases": [
         {
-            "input": "this is test input to a language model",
-            "reference_output": "this is test output from a language model"
+            "input": "this is test input to a language model"
         },
         {
-            "input": "this is another test prompt",
-            "reference_output": "this is a test response"
+            "input": "this is another test prompt"
         }
     ],
     "created_by": "arthur",
