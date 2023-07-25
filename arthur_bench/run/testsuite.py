@@ -131,12 +131,12 @@ class TestSuite:
 		# ref outputs should be None if any items are None (we validate nullness must be all-or-none)
 		ref_outputs: Optional[List[str]] = []
 		if ref_outputs is not None:
-			for ref_output in ref_outputs:
-				if ref_output is None:
+			for case in self.suite.test_cases:
+				if case.reference_output is None:
 					ref_outputs = None
 					break
 				else:
-					ref_outputs.append(ref_output)
+					ref_outputs.append(case.reference_output)
 		try:
 			all_scores = scoring_method.run(candidate_output_list, ref_outputs, inputs, context_list,
 											batch_size=batch_size)

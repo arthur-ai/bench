@@ -78,6 +78,7 @@ CONTEXT_WINDOW_MAP = {
 }
 EVALUATOR_MODEL = 'gpt-3.5-turbo'
 TIKTOKEN_ENCODER = tiktoken.get_encoding("cl100k_base")
+TIKTOKEN_ERROR_PADDING = 150
 LLM_CHOICE_OPTIONS = {'0': 0.0, '1': 1.0, 'tie': 0.5}
 
 
@@ -94,7 +95,7 @@ def truncate_input_text(input_text, ref_output, cand_output) -> Tuple[str, bool]
     llm_prompt_untruncated = COMPARE.format(text=input_text, summary_A=ref_output, summary_B=cand_output)
     input_text_tokens = TIKTOKEN_ENCODER.encode(input_text)
     llm_prompt_tokens = TIKTOKEN_ENCODER.encode(llm_prompt_untruncated)
-    num_to_truncate_from_input_text_tokens = len(llm_prompt_tokens) - CONTEXT_WINDOW_MAP[EVALUATOR_MODEL]
+    num_to_truncate_from_input_text_tokens = len(llm_prompt_tokens) - CONTEXT_WINDOW_MAP[EVALUATOR_MODEL] + TIKTOKEN_ERROR_PADDING
     truncated = False
     if num_to_truncate_from_input_text_tokens > 0:
         input_text_tokens_truncated = input_text_tokens[:-num_to_truncate_from_input_text_tokens]
