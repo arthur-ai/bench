@@ -4,18 +4,17 @@ import pandas as pd
 from typing import List, Optional, Union
 from pathlib import Path
 
+from tqdm import tqdm
+
 from arthur_bench.scoring import ScoringMethod, load_scoring_method
 from arthur_bench.models.models import TestSuiteRequest, ScoringMethod as ScoringEnum, TestCaseOutput
 from arthur_bench.client.exceptions import UserValueError, ArthurInternalError
 from arthur_bench.run.testrun import TestRun
 from arthur_bench.run.utils import _create_test_suite_dir, _initialize_metadata, _test_suite_dir, \
 	_create_run_dir, _clean_up_run, _load_suite_from_args, _load_run_data_from_args, _get_suite_if_exists, _get_scoring_method
-
+from arthur_bench.scoring.scoring_method import SINGLE_ITEM_BATCH_DEFAULT
 
 logger = logging.getLogger(__name__)
-
-
-DEFAULT_BATCH_SIZE = 32
 
 
 class TestSuite:
@@ -83,7 +82,7 @@ class TestSuite:
 			context_column: Optional[str] = None,
 			context_list: Optional[List[str]] = None,
 			save: bool = True,
-			batch_size: int = DEFAULT_BATCH_SIZE,
+			batch_size: int = SINGLE_ITEM_BATCH_DEFAULT,
 			model_name: Optional[str] = None,
 			model_version: Optional[str] = None,
 			foundation_model: Optional[str] = None,
@@ -121,36 +120,26 @@ class TestSuite:
 		if len(candidate_output_list) != len(self.suite.test_cases):
 			raise UserValueError(
 				f"candidate data has {len(candidate_output_list)} tests but expected {len(self.suite.test_cases)} tests")
-			
-
-		scoring_method: ScoringMethod = load_scoring_method(self.suite.scoring_method)
 
 		run_dir = None
 		if save:
 			run_dir = _create_run_dir(self.suite.name, run_name)
 
+		scoring_method: ScoringMethod = load_scoring_method(self.suite.scoring_method)
+
+		inputs = [case.input for case in self.suite.test_cases]
+		# ref outputs should be None if any items are None (we validate nullness must be all-or-none)
+		ref_outputs: Optional[List[str]] = []
+		if ref_outputs is not None:
+			for case in self.suite.test_cases:
+				if case.reference_output is None:
+					ref_outputs = None
+					break
+				else:
+					ref_outputs.append(case.reference_output)
 		try:
-			all_scores = []
-			for i in range(0, len(self.suite.test_cases), batch_size):
-				# TODO: make suite iterable: https://arthurai.atlassian.net/browse/LLM-250
-				batch = [(case.input, case.reference_output) for case in self.suite.test_cases[i:i+batch_size]]
-				input_batch, ref_batch = zip(*batch)
-
-				if context_list is not None:  
-					scores = scoring_method.run_batch(
-						list(ref_batch),
-						candidate_output_list[i:i+batch_size],
-						list(input_batch), 
-						context_list[i:i+batch_size]
-					)
-				else: 
-					scores = scoring_method.run_batch(
-						list(ref_batch),
-						candidate_output_list[i:i+batch_size],
-						list(input_batch)
-					)
-
-				all_scores.extend(scores)
+			all_scores = scoring_method.run(candidate_output_list, ref_outputs, inputs, context_list,
+											batch_size=batch_size)
 		except Exception as e:
 			logger.error(f"failed to create run: {e}")
 			if run_dir:

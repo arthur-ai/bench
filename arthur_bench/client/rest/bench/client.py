@@ -74,7 +74,7 @@ class ArthurBenchClient:
 
         parsed_resp = cast(Dict, self.http_client.post(
             f"/bench/test_suites",
-            json=json_body.dict(),
+            json=json_body.dict(exclude={'created_at', 'created_by', 'bench_version'}),
             validation_response_code=HTTPStatus.CREATED,
         ))
         return TestSuiteResponse(**parsed_resp)
@@ -159,7 +159,7 @@ class ArthurBenchClient:
 
         parsed_resp = cast(Dict, self.http_client.post(
             f"/bench/test_suites/{test_suite_id}/runs",
-            files=json_body.dict(),
+            json=json_body.json(),
             validation_response_code=HTTPStatus.CREATED,
         ))
         return CreateRunResponse(**parsed_resp)

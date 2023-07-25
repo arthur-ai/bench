@@ -3,166 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <title>Test Runs</title>
+    <link rel="stylesheet" href="/assets/styles.css">
 </head>
 <body>
-<a
+<div>
+    <a
       href="http://www.arthur.ai"
-      style="
-        box-sizing: border-box;
-        text-decoration: underline;
-      "
+      class="logo"
       >
       <img
         src="https://arthurai-assets.s3.amazonaws.com/logo-black-transparent.png"
         height="38"
         alt="Arthur"
-        style="
-      -ms-interpolation-mode: bicubic;
-      margin-left: 30px;
-      margin-top: 30px;
-    "
+        class="logo"
       />
-</a>
+    </a>
+    <a class="back-home" href="/test_suites">All Test Suites</a>
+</div>
+
 <h2
   class="align-center"
-  style="
-    font-family: 'Helvetica Neue', Helvetica, Arial,
-      'Lucida Grande', sans-serif;
-    font-weight: 400;
-    line-height: 56px;
-    margin: 0;
-    margin-bottom: 30px;
-    font-size: 36px;
-    text-transform: capitalize;
-    text-align: left;
-    color: #1A0016 !important;
-    margin-top: 30px;
-  "
 >
   Test Runs for {{test_suite_name}} Suite
 </h2>
 {% for run in runs %}
 <table
-    style="
-      box-sizing: border-box;
-      mso-table-lspace: 0pt;
-      mso-table-rspace: 0pt;
-      width: 100%;
-      border-collapse: separate !important;
-      border: 1px solid #e9e9e9;
-      padding: 16px;
-    "
+    class="itemCard"
     width="100%"
   >
     <tr>
-      <td
-        style="
-          box-sizing: border-box;
-          font-family: 'Helvetica Neue', Helvetica,
-            Arial, 'Lucida Grande', sans-serif;
-          font-size: 14px;
-          vertical-align: top;
-        "
-        valign="top"
-      >
+      <td>
 <table
-  style="
-  box-sizing: border-box;
-  mso-table-lspace: 0pt;
-  mso-table-rspace: 0pt;
-  width: 100%;
-  border-collapse: separate !important;"
+  class="itemCardHeader"
 >
   <tr>
     <td>
-      <h3
-      style="font-size: 18px; color: #1A0016; margin-top: 0;"
-    >
-    {{run.name}} <span style="font-size: 12px; color: #1A0016; font-weight: normal">[{{run.model_name}}]</span>
+      <h3>
+    {{run.name}} <span class="detailNormal">[{% if run.model_name is none or run.model_name | trim == "" %} (no model) {% else %}{{run.model_name}}{% endif %}]</span>
     </h3>
     </td>
     <td>
-      <div style="
-         font-size: 12px;
-         color: #1A0016;
-        ">
+      <div class="detail">
         {{run.created_at}}
       </div>
     </td>
   </tr>
 
 </table>
-<div
-  style="font-size: 12px;
-  color: #1A0016;"
->
+<div class="detail">
     Description:
 </div>
 <div>
-  {{run.description}}
+    {% if run.description is none or run.description | trim == "" %}(no description)
+    {% else %}{{run.description}}{% endif %}
 </div>
 </td>
 </tr>
 <tr>
 <td
 align="left"
-style="
-  box-sizing: border-box;
-  font-family: 'Helvetica Neue', Helvetica,
-    Arial, 'Lucida Grande', sans-serif;
-  font-size: 14px;
-  vertical-align: top;
-  padding-bottom: 15px;
-"
+class="viewDetails"
 valign="top"
 >
 <table
   cellpadding="0"
   cellspacing="0"
-  style="
-    box-sizing: border-box;
-    mso-table-lspace: 0pt;
-    mso-table-rspace: 0pt;
-    width: auto;
-    border-collapse: separate !important;
-  "
+  class="viewDetails"
 >
   <tr>
-    <td
-      style="
-        box-sizing: border-box;
-        font-family: 'Helvetica Neue', Helvetica,
-          Arial, 'Lucida Grande', sans-serif;
-        font-size: 14px;
-        vertical-align: top;
-        background-color: #ffffff;
-        border-radius: 5px;
-        text-align: center;
-      "
-      valign="top"
-      bgcolor="#348eda"
-      align="center"
-    >
+    <td class="viewDetails">
       <a
         href="/test_suites/{{test_suite_name}}/runs/{{run.name}}"
-        style="
-          box-sizing: border-box;
-          border-color: #B536FB;
-          text-decoration: none;
-          background-color: #B536FB;
-          border: solid 1px #B536FB;
-          border-radius: 5px;
-          cursor: pointer;
-          color: #ffffff;
-          font-size: 14px;
-          font-weight: bold;
-          margin: 0;
-          padding: 12px 25px;
-          text-transform: capitalize;
-          display: inline-block;
-          margin-top:20px;
-        "
-        >View Test Run Results</a
+        class="buttonLink">
+        View Test Run Results</a
       >
     </td>
   </tr>

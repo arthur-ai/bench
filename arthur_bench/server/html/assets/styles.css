@@ -1,0 +1,166 @@
+/* ALL PAGES */
+
+body {
+    font-family: 'Helvetica Neue', Helvetica, Arial,
+    'Lucida Grande', sans-serif;
+}
+
+a.logo {
+    box-sizing: border-box;
+    text-decoration: underline;
+}
+img.logo {
+    -ms-interpolation-mode: bicubic;
+    margin-left: 1.6%;
+    margin-top: 30px;
+}
+
+a.back-home {
+    text-align: center;
+    float: right;
+    margin-right: 20px;
+    margin-top: 40px;
+    font-weight: 500;
+    font-size: 18px;
+    /*text-decoration: none;*/
+    color: black;
+}
+
+h2 {
+    font-weight: 400;
+    line-height: 56px;
+    margin: 0;
+    margin-bottom: 30px;
+    font-size: 36px;
+    text-transform: capitalize;
+    text-align: left;
+    color: #1A0016 !important;
+    margin-top: 30px;
+    margin-left: 1.7%;
+}
+
+h3 {
+    font-size: 18px;
+    color: #1A0016;
+    margin-top: 0;
+}
+
+/* text */
+.detail {
+    font-size: 12px;
+    color: #1A0016;
+}
+.detailNormal {
+    font-size: 12px;
+    color: #1A0016;
+    font-weight: normal
+}
+
+/* OVERVIEW PAGES */
+
+/* a box holding details of a test suite, run, etc. */
+table.itemCard {
+    box-sizing: border-box;
+    mso-table-lspace: 0pt;
+    mso-table-rspace: 0pt;
+    width: 100%;
+    border-collapse: separate !important;
+    border: 1px solid #e9e9e9;
+    padding: 16px;
+    margin-bottom: 12px;
+    max-width: 97%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+table.itemCard td {
+    box-sizing: border-box;
+    font-size: 14px;
+    vertical-align: top;
+}
+
+table.itemCardHeader {
+    box-sizing: border-box;
+    mso-table-lspace: 0pt;
+    mso-table-rspace: 0pt;
+    width: 100%;
+    border-collapse: separate !important;
+}
+
+/* title of run/suite to left of timestamp */
+table.itemCardHeader tr td:first-child {
+    width: 70%;
+}
+
+/* table cell, inner table, and button links in view details section in bottom half of item card*/
+td.viewDetails {
+    box-sizing: border-box;
+    font-size: 14px;
+    vertical-align: top;
+    padding-bottom: 15px;
+}
+table.viewDetails {
+    box-sizing: border-box;
+    mso-table-lspace: 0pt;
+    mso-table-rspace: 0pt;
+    width: auto;
+    border-collapse: separate !important;
+}
+/* button link e.g. "View Test Runs", "View Test Run Results" */
+a.buttonLink {
+    box-sizing: border-box;
+          border-color: #B536FB;
+          text-decoration: none;
+          background-color: #B536FB;
+          border: solid 1px #B536FB;
+          border-radius: 5px;
+          cursor: pointer;
+          color: #ffffff;
+          font-size: 14px;
+          font-weight: bold;
+          margin: 0;
+          padding: 12px 25px;
+          text-transform: capitalize;
+          display: inline-block;
+          margin-top:20px;
+}
+
+
+/* RUN DETAIL PAGE */
+
+table.runTable {
+    box-sizing: border-box;
+    mso-table-lspace: 0;
+    mso-table-rspace: 0;
+    width: 95%;
+    border: 1px solid black;
+    border-collapse: collapse;
+    padding: 4px;
+    margin-bottom: 30px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+table.runTable td,th {
+    border: 1px solid black;
+    border-collapse: collapse;
+    padding: 4px;
+}
+table.runTable th {
+    text-align: left;
+    font-size: 14px;
+    font-weight: bold;
+}
+table.runTable th.score {
+    min-width: 5%;
+}
+table.runTable th.output {
+    min-width: 20%;
+}
+
+table.runTable tbody {
+    box-sizing: border-box;
+    font-size: 14px;
+    vertical-align: top;
+}
+

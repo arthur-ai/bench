@@ -7,6 +7,8 @@ try:
     from fastapi import FastAPI, Request
     from fastapi.responses import HTMLResponse, RedirectResponse
     from fastapi.templating import Jinja2Templates
+    from fastapi.staticfiles import StaticFiles
+
 except ImportError as e:
     raise ImportError("Can't run Bench Server without server dependencies, to install run: "
                       "pip install arthur-bench[server]") from e
@@ -14,6 +16,11 @@ except ImportError as e:
 from arthur_bench.run.utils import _bench_root_dir
 
 app = FastAPI()
+HTML_PATH = Path(__file__).parent / "html"
+app.mount("/assets", StaticFiles(directory=HTML_PATH / "assets"), name="assets")
+
+templates = Jinja2Templates(directory=HTML_PATH)
+
 
 templates = Jinja2Templates(directory=Path(__file__).parent / "html")
 
