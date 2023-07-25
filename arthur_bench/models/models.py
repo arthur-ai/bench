@@ -9,8 +9,9 @@ from enum import Enum
 from typing import List, Optional
 from uuid import UUID
 
+from arthur_bench.client.exceptions import UserValueError
 from arthur_bench.models.client import Page, PageSize, TotalCount, TotalPages
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 
 class ScoringMethod(str, Enum):
     BERTScore = 'bertscore'
@@ -40,11 +41,36 @@ class TestSuiteRequest(BaseModel):
     name: str
     description: Optional[str] = None
     scoring_method: ScoringMethod
-    # TODO: validation on not some-null reference outputs
     test_cases: List[TestCaseRequest] = Field(..., min_items=1)
     created_by: str
     bench_version: str
     created_at: datetime
+
+    @validator('test_cases')
+    def null_reference_outputs_all_or_none(cls, v):
+        last_ref_output_null = None
+        for tc in v:
+            # get ref output value
+            if isinstance(tc, TestCaseRequest):
+                ref_val = tc.reference_output
+            elif isinstance(tc, dict):
+                ref_val = tc['reference_output']
+            else:
+                raise TypeError(f"Unable to extract reference output value for type '{type(v)}'")
+
+            # check it matches what we've been seeing
+            if ref_val is None and last_ref_output_null is False:
+                raise UserValueError("Test Suite has both null and non-null reference outputs. Reference outputs for "
+                                     "test cases within a suite should be all null or all non-null.")
+            if ref_val is not None and last_ref_output_null is True:
+                raise UserValueError("Test Suite has both null and non-null reference outputs. Reference outputs for "
+                                     "test cases within a suite should be all null or all non-null.")
+            if ref_val is None:
+                last_ref_output_null = True
+            else:
+                last_ref_output_null = False
+
+        return v
 
 
 class TestSuite(BaseModel):
