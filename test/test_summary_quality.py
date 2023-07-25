@@ -47,7 +47,6 @@ def mock_summary_data():
 def test_run_batch(mock_openai_function_call, mock_summary_data):
     with patch('arthur_bench.scoring.summary_quality.compare_summaries', return_value=mock_openai_function_call):
 
-
             # create summary quality scoring method
             summary_quality = SummaryQuality()
 
@@ -60,10 +59,10 @@ def test_run_batch(mock_openai_function_call, mock_summary_data):
 
             # assert LLMChain called with correct parameters
             for i in range(len(mock_summary_data)):
-                mock_openai_function_call.assert_any_call({
+                mock_openai_function_call.assert_any_call(
                     mock_summary_data['source'][i],
                     mock_summary_data['summary'][i],
-                    mock_summary_data['candidate_summary'][i]})
+                    mock_summary_data['candidate_summary'][i])
 
             # assert correct return values for mock LLMChain outputs
             assert result == [0.0] * len(mock_summary_data)
