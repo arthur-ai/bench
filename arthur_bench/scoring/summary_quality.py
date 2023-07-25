@@ -37,7 +37,7 @@ def compare_summaries(input_text: str, summary_0: str, summary_1: str):
             'required': ['comparison'],
             'type': 'object'}}],
         messages=[
-            {"role": "system", "content": "I'm going to ask for the better summary of the input_text between two options. Use SummaryComparison.openai_schema to parse this data"},
+            {"role": "system", "content": "I'm going to ask for the better summary of the input_text between two options. Use SummaryComparison to parse this data"},
             {"role": "user", "content": """
             Text: (The Hollywood Reporter)Add another fan-favorite
             character to the cast of next year's X-Men: Apocalypse, with director Bryan Singer announcing
