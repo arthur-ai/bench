@@ -5,10 +5,17 @@ from arthur_bench.run.utils import load_suite_from_json, load_suite_from_datafra
 
 @pytest.mark.parametrize('filepath, expected', [
     ('mock_suite.json', 'mock_suite_request'),
-    ('mock_suite_without_optional.json', 'mock_suite_request_optional')
+    ('mock_suite_without_optional.json', 'mock_suite_request_optional'),
+    ('mock_suite_mixed_null_refs.json', ValueError)
 ])
 def test_load_suite_from_json(filepath, expected, request):
-    assert load_suite_from_json(FIXTURE_FILE_DIR / filepath) == request.getfixturevalue(expected)
+    if isinstance(expected, str):
+        assert load_suite_from_json(FIXTURE_FILE_DIR / filepath) == request.getfixturevalue(expected)
+    elif issubclass(expected, Exception):
+        with pytest.raises(expected):
+            load_suite_from_json(FIXTURE_FILE_DIR / filepath)
+    else:
+        raise RuntimeError("bad test structure")
 
 def test_load_suite_from_csv(mock_suite_cases):
     assert load_suite_from_csv(FIXTURE_FILE_DIR / 'mock_suite.csv', 'input', 'reference_output') == mock_suite_cases
@@ -31,4 +38,3 @@ def test_load_suite_from_df(mock_suite_cases):
 ])
 def test_suite_serialization(object, expected, request):
     assert request.getfixturevalue(object).json() == request.getfixturevalue(expected)
-

@@ -62,7 +62,7 @@ def _validate_dataframe(data: pd.DataFrame, column: str):
         raise UserValueError(f"column {column} not found in dataset")
 
 
-def load_suite_from_dataframe(data: pd.DataFrame, input_column: str, reference_column: Optional[str]) -> List[TestCaseRequest]:
+def load_suite_from_dataframe(data: pd.DataFrame, input_column: str, reference_column: Optional[str] = None) -> List[TestCaseRequest]:
     """
     Load test case data from a pandas dataframe.
 
@@ -81,7 +81,7 @@ def load_suite_from_dataframe(data: pd.DataFrame, input_column: str, reference_c
     return [TestCaseRequest(**row) for row in suite.to_dict('records')]
 
 
-def load_suite_from_csv(filepath: Union[str, os.PathLike], input_column: str, reference_column: Optional[str]) -> List[TestCaseRequest]:
+def load_suite_from_csv(filepath: Union[str, os.PathLike], input_column: str, reference_column: Optional[str] = None) -> List[TestCaseRequest]:
     """
     Load test case data from csv file.
 
