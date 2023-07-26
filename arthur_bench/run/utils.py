@@ -9,6 +9,7 @@ from datetime import datetime
 from arthur_bench import __version__
 from arthur_bench.models.models import TestCaseRequest, TestSuiteRequest, ScoringMethod, TestSuiteResponse
 from arthur_bench.client.exceptions import UserValueError
+from arthur_bench.client.bench_client import BenchClient
 
 BENCH_FILE_DIR_KEY = 'BENCH_FILE_DIR'
 DEFAULT_BENCH_FILE_DIR = Path(os.getcwd()) / "bench"
@@ -166,14 +167,15 @@ def _load_run_data_from_args(
                          "candidate_data_path csv, or candidate_output_list strings")
 
 
-def _get_suite_if_exists(client, name: str) -> Optional[TestSuiteRequest]:
+def _get_suite_if_exists(client: BenchClient, name: str) -> Optional[TestSuiteRequest]:
     """
     TODO: add version validation
     """
     test_suite_resp = client.get_test_suites(name=name)
     if len(test_suite_resp.test_suites) > 0:
         # we enforce name validation, so there should ever only be one
-        return TestSuiteResponse(**test_suite_resp.test_suites[0].dict())
+        suite = client.get_test_suite(test_suite_resp.test_suites[0].id, page_size=100) # TODO: can we enforce this?
+        return TestSuiteResponse(**suite.dict())
     return None
 
 def _get_scoring_method(scoring_method: Union[str, ScoringMethod]) -> ScoringMethod:

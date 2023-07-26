@@ -36,7 +36,6 @@ class LocalBenchClient(BenchClient):
 
     def _get_suite_name_from_id(self, id: str) -> str:
         suite_index = json.load(open(self.root_dir / SUITE_INDEX_FILE))
-        print(suite_index)
         if id not in suite_index:
             return None
         return suite_index[id]
@@ -89,7 +88,6 @@ class LocalBenchClient(BenchClient):
                                  **json_body.dict())
     
     def create_new_test_run(self, test_suite_id: str, json_body: CreateRunRequest) -> CreateRunResponse:
-        print(test_suite_id)
         test_suite_name = self._get_suite_name_from_id(test_suite_id)
         if test_suite_name is None:
             raise NotFoundError()

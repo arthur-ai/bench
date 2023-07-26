@@ -1,15 +1,13 @@
+import os
 import logging
-import json
 import pandas as pd
 from typing import List, Optional, Union
-from pathlib import Path
-
-from tqdm import tqdm
 
 from arthur_bench.scoring import ScoringMethod, load_scoring_method
 from arthur_bench.models.models import TestSuiteRequest, TestSuiteResponse, ScoringMethod as ScoringEnum, TestCaseOutput, CreateRunRequest
-from arthur_bench.client.exceptions import UserValueError, ArthurInternalError
+from arthur_bench.client.exceptions import UserValueError, ArthurInternalError, MissingParameterError
 from arthur_bench.client.local.client import LocalBenchClient
+from arthur_bench.client.rest.client import ArthurClient
 from arthur_bench.run.testrun import TestRun
 from arthur_bench.run.utils import _initialize_metadata, _load_suite_from_args, _load_run_data_from_args, _get_suite_if_exists, _get_scoring_method
 from arthur_bench.scoring.scoring_method import SINGLE_ITEM_BATCH_DEFAULT
@@ -44,7 +42,14 @@ class TestSuite:
 			input_text_list: Optional[List[str]] = None,
 			reference_output_list: Optional[List[str]] = None
 	):
-		self.client = LocalBenchClient()
+		url = os.getenv('ARTHUR_API_URL')
+		if url:  # if remote url is specified use remote client
+			api_key = os.getenv('ARTHUR_API_KEY')
+			if api_key is None:
+				raise MissingParameterError("You must provide an api key when using remote url")
+			self.client = ArthurClient(url=url, api_key=api_key).bench
+		else:
+			self.client = LocalBenchClient()
 		self.suite: TestSuiteResponse = _get_suite_if_exists(self.client, name) # type: ignore
 
 		if self.suite is None:
@@ -120,13 +125,10 @@ class TestSuite:
 			raise UserValueError(
 				f"candidate data has {len(candidate_output_list)} tests but expected {len(self.suite.test_cases)} tests")
 
-		# run_dir = None
-		# if save:
-		# 	run_dir = _create_run_dir(self.suite.name, run_name)
-
 		scoring_method: ScoringMethod = load_scoring_method(self.suite.scoring_method)
 
 		inputs = [case.input for case in self.suite.test_cases]
+		ids = [case.id for case in self.suite.test_cases]
 		# ref outputs should be None if any items are None (we validate nullness must be all-or-none)
 		ref_outputs: Optional[List[str]] = []
 		if ref_outputs is not None:
@@ -145,7 +147,7 @@ class TestSuite:
 			# 	_clean_up_run(run_dir=run_dir)
 			raise ArthurInternalError(f"failed to create run {run_name}") from e
 		
-		test_case_outputs = [TestCaseOutput(output=output, score=score) for output, score in zip(candidate_output_list, all_scores)]
+		test_case_outputs = [TestCaseOutput(id=id_, output=output, score=score) for id_, output, score in zip(ids, candidate_output_list, all_scores)]
 		
 		run = CreateRunRequest(
 			name=run_name,
@@ -158,8 +160,6 @@ class TestSuite:
 		)
 
 		if save:
-			# self.save()
-			# run.save()
 			self.client.create_new_test_run(str(self.suite.id), run)
 			
 		return run

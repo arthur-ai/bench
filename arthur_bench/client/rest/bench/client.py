@@ -40,6 +40,8 @@ class ArthurBenchClient:
         name: Optional[str] = None,
         sort: Optional[str] = None,
         scoring_method: Optional[str] = None,
+        page: Optional[int] = 1,
+        page_size: Optional[int] = None
     ) -> PaginatedGetTestSuitesResponse:
         """
                 Gets test suites
@@ -59,6 +61,10 @@ class ArthurBenchClient:
             params["sort"] = sort
         if scoring_method is not None:
             params["scoring_method"] = scoring_method
+        if page is not None:
+            params["page"] = page
+        if page_size is not None:
+            params["page_size"] = page_size
 
         parsed_resp = cast(Dict, self.http_client.get(
             f"/bench/test_suites", params=params, validation_response_code=HTTPStatus.OK
@@ -79,15 +85,25 @@ class ArthurBenchClient:
         ))
         return TestSuiteResponse(**parsed_resp)
 
-    def get_test_suite(self, test_suite_id: str) -> PaginatedGetTestSuiteResponse:
+    def get_test_suite(
+            self, 
+            test_suite_id: str,
+            page: Optional[int] = 1,
+            page_size: Optional[int] = None) -> PaginatedGetTestSuiteResponse:
         """
         Get reference data for an existing test suite
 
         :param test_suite_id:
         """
+        params = {}
+        if page is not None:
+            params["page"] = page
+        if page_size is not None:
+            params["page_size"] = page_size
 
         parsed_resp = cast(Dict, self.http_client.get(
             f"/bench/test_suites/{test_suite_id}",
+            params=params,
             validation_response_code=HTTPStatus.OK,
         ))
         return PaginatedGetTestSuiteResponse(**parsed_resp)
@@ -126,7 +142,11 @@ class ArthurBenchClient:
         return TestSuiteSummaryResponse(**parsed_resp)
 
     def get_runs_for_test_suite(
-        self, test_suite_id: str, sort: Optional[str] = None
+        self, 
+        test_suite_id: str, 
+        sort: Optional[str] = None,
+        page: Optional[int] = 1,
+        page_size: Optional[int] = None,
     ) -> PaginatedGetRunsForTestSuiteResponse:
         """
         Get runs for a particular test suite (identified by test_suite_id)
@@ -138,6 +158,10 @@ class ArthurBenchClient:
         params = {}
         if sort is not None:
             params["sort"] = sort
+        if page is not None:
+            params["page"] = page # type: ignore
+        if page_size is not None:
+            params["page_size"] = page_size # type: ignore
 
         parsed_resp = cast(Dict, self.http_client.get(
             f"/bench/test_suites/{test_suite_id}/runs",
