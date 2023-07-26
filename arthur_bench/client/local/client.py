@@ -3,6 +3,7 @@ from typing import Optional
 import uuid
 from pathlib import Path
 from arthur_bench.client.bench_client import BenchClient
+from arthur_bench.client.exceptions import NotFoundError
 from arthur_bench.models.models import CreateRunRequest, CreateRunResponse, PaginatedGetRunResponse, PaginatedGetRunsForTestSuiteResponse, PaginatedGetTestSuiteResponse, PaginatedGetTestSuitesResponse, TestSuiteRequest, TestSuiteResponse, TestSuiteSummaryResponse
 from arthur_bench.run.utils import _bench_root_dir, load_suite_from_json, _create_test_suite_dir, _create_run_dir
 
@@ -35,6 +36,7 @@ class LocalBenchClient(BenchClient):
 
     def _get_suite_name_from_id(self, id: str) -> str:
         suite_index = json.load(open(self.root_dir / SUITE_INDEX_FILE))
+        print(suite_index)
         if id not in suite_index:
             return None
         return suite_index[id]
@@ -87,7 +89,10 @@ class LocalBenchClient(BenchClient):
                                  **json_body.dict())
     
     def create_new_test_run(self, test_suite_id: str, json_body: CreateRunRequest) -> CreateRunResponse:
+        print(test_suite_id)
         test_suite_name = self._get_suite_name_from_id(test_suite_id)
+        if test_suite_name is None:
+            raise NotFoundError()
         run_dir = _create_run_dir(test_suite_name, json_body.name)
 
         run_file = run_dir / 'run.json'

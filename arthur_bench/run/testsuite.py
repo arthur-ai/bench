@@ -160,7 +160,7 @@ class TestSuite:
 		if save:
 			# self.save()
 			# run.save()
-			self.client.create_new_test_run(self.suite.id, run)
+			self.client.create_new_test_run(str(self.suite.id), run)
 			
 		return run
 
