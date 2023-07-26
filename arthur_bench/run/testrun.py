@@ -1,8 +1,6 @@
-import os
-import json
 import uuid
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 from arthur_bench.models.models import CreateRunRequest
 
 class TestRun(CreateRunRequest):

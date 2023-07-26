@@ -7,11 +7,11 @@ from pathlib import Path
 from tqdm import tqdm
 
 from arthur_bench.scoring import ScoringMethod, load_scoring_method
-from arthur_bench.models.models import TestSuiteRequest, ScoringMethod as ScoringEnum, TestCaseOutput
+from arthur_bench.models.models import TestSuiteRequest, TestSuiteResponse, ScoringMethod as ScoringEnum, TestCaseOutput, CreateRunRequest
 from arthur_bench.client.exceptions import UserValueError, ArthurInternalError
+from arthur_bench.client.local.client import LocalBenchClient
 from arthur_bench.run.testrun import TestRun
-from arthur_bench.run.utils import _create_test_suite_dir, _initialize_metadata, _test_suite_dir, \
-	_create_run_dir, _clean_up_run, _load_suite_from_args, _load_run_data_from_args, _get_suite_if_exists, _get_scoring_method
+from arthur_bench.run.utils import _initialize_metadata, _load_suite_from_args, _load_run_data_from_args, _get_suite_if_exists, _get_scoring_method
 from arthur_bench.scoring.scoring_method import SINGLE_ITEM_BATCH_DEFAULT
 
 logger = logging.getLogger(__name__)
@@ -44,8 +44,8 @@ class TestSuite:
 			input_text_list: Optional[List[str]] = None,
 			reference_output_list: Optional[List[str]] = None
 	):
-		self.id = None
-		self.suite: TestSuiteRequest = _get_suite_if_exists(name) # type: ignore
+		self.client = LocalBenchClient()
+		self.suite: TestSuiteResponse = _get_suite_if_exists(self.client, name) # type: ignore
 
 		if self.suite is None:
 			scoring_method = _get_scoring_method(scoring_method=scoring_method)
@@ -59,18 +59,17 @@ class TestSuite:
 				input_text_list=input_text_list,
 				reference_output_list=reference_output_list
 			)
-			self.suite = TestSuiteRequest(
+			new_suite = TestSuiteRequest(
 				name=name,
 				scoring_method=scoring_method,
 				description=description,
 				test_cases=cases,
 				**_initialize_metadata()
 			)
-			self._test_suite_dir: Path = _create_test_suite_dir(name)
+			self.suite = self.client.create_test_suite(new_suite)
 
 		else:
 			logger.info(f"Found existing test suite with name {name}. Using existing suite")
-			self._test_suite_dir = _test_suite_dir(name)
 
 	def run(
 			self,
@@ -121,9 +120,9 @@ class TestSuite:
 			raise UserValueError(
 				f"candidate data has {len(candidate_output_list)} tests but expected {len(self.suite.test_cases)} tests")
 
-		run_dir = None
-		if save:
-			run_dir = _create_run_dir(self.suite.name, run_name)
+		# run_dir = None
+		# if save:
+		# 	run_dir = _create_run_dir(self.suite.name, run_name)
 
 		scoring_method: ScoringMethod = load_scoring_method(self.suite.scoring_method)
 
@@ -142,27 +141,27 @@ class TestSuite:
 											batch_size=batch_size)
 		except Exception as e:
 			logger.error(f"failed to create run: {e}")
-			if run_dir:
-				_clean_up_run(run_dir=run_dir)
+			# if run_dir:
+			# 	_clean_up_run(run_dir=run_dir)
 			raise ArthurInternalError(f"failed to create run {run_name}") from e
 		
 		test_case_outputs = [TestCaseOutput(output=output, score=score) for output, score in zip(candidate_output_list, all_scores)]
 		
-		run = TestRun(
+		run = CreateRunRequest(
 			name=run_name,
 			test_case_outputs=test_case_outputs,
 			model_name=model_name,
 			model_version=model_version,
 			foundation_model=foundation_model,
 			prompt_template=prompt_template,
-			run_dir=run_dir,
 			**_initialize_metadata()
 		)
 
 		if save:
-			self.save()
-			run.save()
-
+			# self.save()
+			# run.save()
+			self.client.create_new_test_run(self.suite.id, run)
+			
 		return run
 
 	def save(self):

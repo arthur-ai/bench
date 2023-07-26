@@ -7,11 +7,11 @@ from typing import Dict, Any, Optional, List, Tuple, Union
 from datetime import datetime
 
 from arthur_bench import __version__
-from arthur_bench.models.models import TestCaseRequest, TestSuiteRequest, ScoringMethod
+from arthur_bench.models.models import TestCaseRequest, TestSuiteRequest, ScoringMethod, TestSuiteResponse
 from arthur_bench.client.exceptions import UserValueError
 
 BENCH_FILE_DIR_KEY = 'BENCH_FILE_DIR'
-DEFAULT_BENCH_FILE_DIR = str(Path(os.getcwd()) / "bench")
+DEFAULT_BENCH_FILE_DIR = Path(os.getcwd()) / "bench"
 
 
 def get_file_extension(filepath: Union[str, os.PathLike]) -> str:
@@ -19,8 +19,8 @@ def get_file_extension(filepath: Union[str, os.PathLike]) -> str:
     return ext
 
 
-def _bench_root_dir() -> str:
-    return os.environ.get(BENCH_FILE_DIR_KEY, DEFAULT_BENCH_FILE_DIR)
+def _bench_root_dir() -> Path:
+    return Path(os.environ.get(BENCH_FILE_DIR_KEY, DEFAULT_BENCH_FILE_DIR))
 
 
 def _test_suite_dir(test_suite_name: str) -> Path:
@@ -166,13 +166,14 @@ def _load_run_data_from_args(
                          "candidate_data_path csv, or candidate_output_list strings")
 
 
-def _get_suite_if_exists(name: str) -> Optional[TestSuiteRequest]:
+def _get_suite_if_exists(client, name: str) -> Optional[TestSuiteRequest]:
     """
     TODO: add version validation
     """
-    test_suite_dir = _test_suite_dir(name)
-    if test_suite_dir.is_dir():
-        return load_suite_from_json(Path(test_suite_dir / "suite.json"))
+    test_suite_resp = client.get_test_suites(name=name)
+    if len(test_suite_resp.test_suites) > 0:
+        # we enforce name validation, so there should ever only be one
+        return TestSuiteResponse(**test_suite_resp.test_suites[0].dict())
     return None
 
 def _get_scoring_method(scoring_method: Union[str, ScoringMethod]) -> ScoringMethod:

@@ -100,7 +100,7 @@ class ArthurBenchClient:
         page_size: Optional[int] = None,
     ) -> TestSuiteSummaryResponse:
         """
-        Get pagianted summary statistics of a test suite
+        Get paginated summary statistics of a test suite
 
         Defaults to page size of 5.
 
@@ -196,3 +196,37 @@ class ArthurBenchClient:
             validation_response_code=HTTPStatus.OK,
         ))
         return PaginatedGetRunResponse(**parsed_resp)
+    
+    def delete_test_suite(self, test_suite_id: str):
+        """
+        Deletes test suite
+
+        Is idempotent.
+
+        :param test_suite_id:
+        """
+
+        raw_resp = self.http_client.delete(
+            f"/bench/test_suites/{test_suite_id}",
+            validation_response_code=HTTPStatus.NO_CONTENT,
+            return_raw_response=True,
+        )
+        return raw_resp
+    
+    def delete_test_run(self, test_suite_id: str, test_run_id: str):
+        """
+        Deletes a test run
+
+        Is idempotent.
+
+        :param test_suite_id:
+        :param test_run_id:
+        """
+
+        raw_resp = self.http_client.delete(
+            f"/bench/test_suites/{test_suite_id}/runs/{test_run_id}",
+            validation_response_code=HTTPStatus.NO_CONTENT,
+            return_raw_response=True,
+        )
+        return raw_resp
+

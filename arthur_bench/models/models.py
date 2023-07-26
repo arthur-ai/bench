@@ -153,7 +153,7 @@ class PaginatedGetTestSuitesResponse(BaseModel):
     total_count: Optional[TotalCount] = None
 
 
-class TestCaseResponseItem(BaseModel):
+class TestCaseResponse(BaseModel):
     id: Optional[UUID] = None
     input: Optional[str] = None
     """
@@ -185,17 +185,11 @@ class TestSuiteSummaryResponse(BaseModel):
     total_count: Optional[TotalCount] = None
 
 
-class TestSuiteCase(BaseModel):
-    id: Optional[UUID] = None
-    input: Optional[str] = None
-    reference_output: Optional[str] = None
-
-
 class PaginatedGetTestSuiteResponse(BaseModel):
     id: Optional[UUID] = None
     name: Optional[str] = None
     scoring_method: Optional[str] = None
-    test_cases: Optional[List[TestSuiteCase]] = None
+    test_cases: Optional[List[TestCaseResponse]] = None
 
 
 class CreateRunResponse(BaseModel):
@@ -238,7 +232,7 @@ class PaginatedGetRunResponse(BaseModel):
 class TestSuiteResponse(BaseModel):
     id: UUID
     name: str
-    test_cases: List[TestCaseResponseItem] = Field(..., min_items=1)
+    test_cases: List[TestCaseResponse] = Field(..., min_items=1)
     scoring_method: ScoringMethod
     description: Optional[str] = None
     organization_id: Optional[UUID] = None
