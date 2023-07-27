@@ -29,7 +29,6 @@ templates = Jinja2Templates(directory=HTML_PATH)
 templates = Jinja2Templates(directory=Path(__file__).parent / "html")
 
 SERVER_ROOT_DIR: str
-ID_FILE: str = "id.json"
 USER_ID: uuid.UUID
 
 TIMESTAMP_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
@@ -45,7 +44,7 @@ def test_suites(request: Request):
         suites = duckdb.sql(f"SELECT name, description, created_at, scoring_method FROM read_json_auto('{SERVER_ROOT_DIR}/*/suite.json', timestampformat='{TIMESTAMP_FORMAT}')").df().to_dict('records')
     except duckdb.IOException:
         suites = []
-    send_event({"event_type": "test_suites_real", "event_properties": {"num_test_suites_real": len(suites)}}, USER_ID)
+    send_event({"event_type": "test_suites_real", "event_properties": {"num_test_suites_real": len(suites), "test_suites_all": [{"created_at": suite['created_at'], "scoring_method": suite['scoring_method']} for suite in suites]}}, USER_ID)
     return templates.TemplateResponse("test_suite_overview.html", {"request": request,
                                                                    "suites": suites})
 
@@ -58,7 +57,7 @@ def test_runs(request: Request, test_suite_name: str):
     except duckdb.IOException:
         runs = []
         suite = "Unknown"
-    send_event({"event_type": "test_runs_real", "event_properties": {"num_test_runs_for_suite_real": len(runs), "suite_name_real": test_suite_name, "scoring_method_real": suite}}, USER_ID)
+    send_event({"event_type": "test_runs_real", "event_properties": {"test_runs_all": [{"created_at": run['created_at']} for run in runs], "scoring_method_real": suite}}, USER_ID)
     return templates.TemplateResponse("test_run_overview.html", {"request": request,
                                                                  "runs": runs,
                                                                  "test_suite_name": test_suite_name})
@@ -74,7 +73,6 @@ def test_run_results(request: Request, test_suite_name: str, run_name: str):
                         f"SELECT unnest(test_case_outputs) as test_cases from read_json_auto('{SERVER_ROOT_DIR}/{test_suite_name}/{run_name}/run.json',timestampformat='{TIMESTAMP_FORMAT}')))").df().to_dict('records')
     except duckdb.IOException:
         cases = []
-    send_event({"event_type": "test_run_real", "event_properties": {"run_name_real": run_name}}, USER_ID)
     return templates.TemplateResponse("test_run_table.html", {"request": request,
                                                               "cases": cases,
                                                               "test_suite_name": test_suite_name,
