@@ -10,7 +10,6 @@ from typing import List, Optional
 from uuid import UUID
 
 from arthur_bench.client.exceptions import UserValueError
-from arthur_bench.models.client import Page, PageSize, TotalCount, TotalPages
 from pydantic import BaseModel, Field, validator
 
 class ScoringMethod(str, Enum):
@@ -146,16 +145,16 @@ class TestRun(BaseModel):
 
 
 class PaginatedGetTestSuitesResponse(BaseModel):
-    test_suites: Optional[List[TestSuite]] = None
-    page: Optional[Page] = None
-    page_size: Optional[PageSize] = None
-    total_pages: Optional[TotalPages] = None
-    total_count: Optional[TotalCount] = None
+    test_suites: List[TestSuite]
+    page: Optional[int] = None
+    page_size: Optional[int] = None
+    total_pages: Optional[int] = None
+    total_count: Optional[int] = None
 
 
 class TestCaseResponse(BaseModel):
     id: Optional[UUID] = None
-    input: Optional[str] = None
+    input: str
     """
     Input to the test case. Does not include the prompt template.
     """
@@ -179,10 +178,10 @@ class SummaryItem(BaseModel):
 
 class TestSuiteSummaryResponse(BaseModel):
     summary: Optional[List[SummaryItem]] = None
-    page: Optional[Page] = None
-    page_size: Optional[PageSize] = None
-    total_pages: Optional[TotalPages] = None
-    total_count: Optional[TotalCount] = None
+    page: Optional[int] = None
+    page_size: Optional[int] = None
+    total_pages: Optional[int] = None
+    total_count: Optional[int] = None
 
 
 class PaginatedGetTestSuiteResponse(BaseModel):
@@ -210,10 +209,10 @@ class PaginatedGetRunsForTestSuiteResponse(BaseModel):
     """
 
     test_runs: List[TestRun]
-    page: Optional[Page] = None
-    page_size: Optional[PageSize] = None
-    total_pages: Optional[TotalPages] = None
-    total_count: Optional[TotalCount] = None
+    page: Optional[int] = None
+    page_size: Optional[int] = None
+    total_pages: Optional[int] = None
+    total_count: Optional[int] = None
 
 
 class PaginatedGetRunResponse(BaseModel):
@@ -223,10 +222,10 @@ class PaginatedGetRunResponse(BaseModel):
 
     test_case_runs: Optional[List[RunResult]] = None
     test_suite_id: Optional[UUID] = None
-    page: Page
-    page_size: PageSize
-    total_pages: Optional[TotalPages] = None
-    total_count: Optional[TotalCount] = None
+    page: int
+    page_size: int
+    total_pages: Optional[int] = None
+    total_count: Optional[int] = None
 
 
 class TestSuiteResponse(BaseModel):

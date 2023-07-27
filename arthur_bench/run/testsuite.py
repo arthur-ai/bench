@@ -6,6 +6,7 @@ from typing import List, Optional, Union
 from arthur_bench.scoring import ScoringMethod, load_scoring_method
 from arthur_bench.models.models import TestSuiteRequest, TestSuiteResponse, ScoringMethod as ScoringEnum, TestCaseOutput, CreateRunRequest
 from arthur_bench.client.exceptions import UserValueError, ArthurInternalError, MissingParameterError
+from arthur_bench.client.bench_client import BenchClient
 from arthur_bench.client.local.client import LocalBenchClient
 from arthur_bench.client.rest.client import ArthurClient
 from arthur_bench.run.testrun import TestRun
@@ -43,6 +44,7 @@ class TestSuite:
 			reference_output_list: Optional[List[str]] = None
 	):
 		url = os.getenv('ARTHUR_API_URL')
+		self.client: BenchClient
 		if url:  # if remote url is specified use remote client
 			api_key = os.getenv('ARTHUR_API_KEY')
 			if api_key is None:
@@ -92,7 +94,7 @@ class TestSuite:
 			foundation_model: Optional[str] = None,
 			prompt_template: Optional[str] = None
 
-	) -> TestRun:
+	) -> CreateRunRequest:
 		"""
 		Score a test run on candidate outputs.
 
@@ -143,8 +145,6 @@ class TestSuite:
 											batch_size=batch_size)
 		except Exception as e:
 			logger.error(f"failed to create run: {e}")
-			# if run_dir:
-			# 	_clean_up_run(run_dir=run_dir)
 			raise ArthurInternalError(f"failed to create run {run_name}") from e
 		
 		test_case_outputs = [TestCaseOutput(id=id_, output=output, score=score) for id_, output, score in zip(ids, candidate_output_list, all_scores)]

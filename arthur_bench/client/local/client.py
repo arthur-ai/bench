@@ -35,23 +35,23 @@ class LocalBenchClient(BenchClient):
         self.root_dir = _bench_root_dir()
         _write_suite_index(self.root_dir)
 
-    def _get_suite_name_from_id(self, id: str) -> str:
+    def _get_suite_name_from_id(self, id: str) -> Optional[str]:
         suite_index = json.load(open(self.root_dir / SUITE_INDEX_FILE))
         if id not in suite_index:
             return None
         return suite_index[id]
     
     @staticmethod
-    def _update_index(filepath: Path, id: uuid, name: str):
+    def _update_index(filepath: Path, id: uuid.UUID, name: str):
         suite_index = json.load(open(filepath))
         suite_index[str(id)] = name
         json.dump(suite_index, open(filepath, "w"))
 
-    def _update_suite_index(self, id: uuid, name: str):
+    def _update_suite_index(self, id: uuid.UUID, name: str):
         suite_index_path = self.root_dir / SUITE_INDEX_FILE
         LocalBenchClient._update_index(suite_index_path, id, name)
 
-    def _update_run_index(self, test_suite_name: str, id: uuid, name: str):
+    def _update_run_index(self, test_suite_name: str, id: uuid.UUID, name: str):
         run_index_path = self.root_dir / test_suite_name / RUN_INDEX_FILE
         LocalBenchClient._update_index(run_index_path, id, name)
 

@@ -62,9 +62,9 @@ class ArthurBenchClient:
         if scoring_method is not None:
             params["scoring_method"] = scoring_method
         if page is not None:
-            params["page"] = page
+            params["page"] = page # type: ignore
         if page_size is not None:
-            params["page_size"] = page_size
+            params["page_size"] = page_size # type: ignore
 
         parsed_resp = cast(Dict, self.http_client.get(
             f"/bench/test_suites", params=params, validation_response_code=HTTPStatus.OK
@@ -97,9 +97,9 @@ class ArthurBenchClient:
         """
         params = {}
         if page is not None:
-            params["page"] = page
+            params["page"] = page # type: ignore
         if page_size is not None:
-            params["page_size"] = page_size
+            params["page_size"] = page_size # type: ignore
 
         parsed_resp = cast(Dict, self.http_client.get(
             f"/bench/test_suites/{test_suite_id}",
@@ -208,9 +208,9 @@ class ArthurBenchClient:
 
         params = {}
         if page is not None:
-            params["page"] = page
+            params["page"] = page # type: ignore
         if page_size is not None:
-            params["page_size"] = page_size
+            params["page_size"] = page_size # type: ignore
         if sort is not None:
             params["sort"] = sort
 

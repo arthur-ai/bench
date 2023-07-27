@@ -122,6 +122,15 @@ def load_suite_from_json(filepath: Union[str, os.PathLike]) -> TestSuiteRequest:
     return TestSuiteRequest.parse_file(filepath) # type: ignore
 
 
+def _load_suite_with_optional_id(filepath: Union[str, os.PathLike]) -> Optional[TestSuiteResponse]:
+    if get_file_extension(filepath) != '.json':
+        raise UserValueError("filepath must be json file")
+    suite = json.load(open(filepath))
+    if 'id' in suite:
+        return TestSuiteResponse.parse_obj(suite)
+    return None
+
+
 def _load_suite_from_args(
         reference_data: Optional[pd.DataFrame] = None,
         reference_data_path: Optional[str] = None,
@@ -167,14 +176,14 @@ def _load_run_data_from_args(
                          "candidate_data_path csv, or candidate_output_list strings")
 
 
-def _get_suite_if_exists(client: BenchClient, name: str) -> Optional[TestSuiteRequest]:
+def _get_suite_if_exists(client: BenchClient, name: str) -> Optional[TestSuiteResponse]:
     """
     TODO: add version validation
     """
     test_suite_resp = client.get_test_suites(name=name)
     if len(test_suite_resp.test_suites) > 0:
         # we enforce name validation, so there should ever only be one
-        suite = client.get_test_suite(test_suite_resp.test_suites[0].id, page_size=100) # TODO: can we enforce this?
+        suite = client.get_test_suite(str(test_suite_resp.test_suites[0].id), page_size=100) # TODO: can we enforce test suite length
         return TestSuiteResponse(**suite.dict())
     return None
 

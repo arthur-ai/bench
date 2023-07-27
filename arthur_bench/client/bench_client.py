@@ -21,7 +21,7 @@ class BenchClient(ABC):
         name: Optional[str] = None,
         sort: Optional[str] = None,
         scoring_method: Optional[str] = None,
-        page: Optional[int] = 1,
+        page: int = 1,
         page_size: Optional[int] = None
     ) -> PaginatedGetTestSuitesResponse:
         raise NotImplementedError
