@@ -20,12 +20,13 @@ os.environ['ARTHUR_API_KEY'] = 'YOUR API KEY'
 ```
 
 ### Creating an initial test suite
-We recommend creating a test suite with target  examples as close to production performance as possible. For the news summarization case, we will assume we have sampled news articles from the past week as inputs. Reference outputs can be hard to find, so will initialize a baseline using gpt3.5.
+We recommend creating a test suite with target  examples as close to production performance as possible. For the news summarization case, we will assume we have sampled news articles from the past week as inputs. Reference outputs can be hard to find, so will initialize a baseline using gpt3.5. You can download the summaries file from our Github.
 
 ```
 import pandas as pd
-from langchain.llms import Cohere, HuggingFacePipeline, OpenAI
+from langchain.llms import OpenAI
 from langchain.chains import LLMChain
+from langchain.prompts import PromptTemplate
 
 
 articles = pd.read_csv('example_summaries.csv)['input_text']
@@ -42,17 +43,18 @@ model = LLMChain(llm=summary_llm, prompt=PromptTemplate(
 ))
 
 for article in articles:
-    reference_summaries.append(model({"text": artcile})["text"])
-
+    reference_summaries.append(model({"text": article[:3000]})["text"])
 ```
 
-
+Now that we have a set of input articles and reference summaries we can create a test suite for benchmarking.
 
 ```
 from arthur_bench.run.testsuite import TestSuite
 
-suite = TestSuite(name='news_summary', scoring_method='summary_quality')
+suite = TestSuite(name='news_summary', scoring_method='summary_quality', input_text_list=articles, reference_output_list=reference_summaries)
 ```
+
+If you have previous generations you'd like to use for creating a test suite, please see our documentation for all compatible data formats.
 
 ### Running the test suite
 For the first run, we will evaluate the performance of an open source model relative to the generations of gpt3. In this example we will use a t5 model trained on book summarization available on the huggingface hub:
@@ -77,3 +79,11 @@ suite.run(candidate_output_list=candidate_generations)
 ```
 
 ### Viewing and analyzing the results
+
+Log in to your Arthur account to view in depth run result tables, test run distributions, and averages.
+TODO: screenshots with exampels of high scores and low scores
+
+To get test suite statistics locally run:
+```
+statistics = suite.client.get_summary_statistics(suite.id)
+```
