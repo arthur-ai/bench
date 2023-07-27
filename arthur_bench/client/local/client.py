@@ -4,8 +4,9 @@ import uuid
 from pathlib import Path
 from arthur_bench.client.bench_client import BenchClient
 from arthur_bench.client.exceptions import NotFoundError
-from arthur_bench.models.models import CreateRunRequest, CreateRunResponse, PaginatedGetRunResponse, PaginatedGetRunsForTestSuiteResponse, PaginatedGetTestSuiteResponse, PaginatedGetTestSuitesResponse, TestSuiteRequest, TestSuiteResponse, TestSuiteSummaryResponse
-from arthur_bench.run.utils import _bench_root_dir, load_suite_from_json, _create_test_suite_dir, _create_run_dir
+from arthur_bench.models.models import CreateRunRequest, CreateRunResponse, PaginatedGetRunResponse, PaginatedGetRunsForTestSuiteResponse, \
+    PaginatedGetTestSuiteResponse, PaginatedGetTestSuitesResponse, TestSuiteRequest, TestSuiteResponse, TestSuiteSummaryResponse, TestSuite
+from arthur_bench.run.utils import _bench_root_dir, load_suite_from_json, _create_test_suite_dir, _create_run_dir, _load_suite_with_optional_id
 
 SUITE_INDEX_FILE = 'suite_id_to_name.json'
 RUN_INDEX_FILE = 'run_id_to_name.json'
@@ -60,15 +61,32 @@ class LocalBenchClient(BenchClient):
             return PaginatedGetTestSuiteResponse()
         else:
             suite_file = self.root_dir / suite_index[test_suite_id] / "suite.json"
-            suite = load_suite_from_json(suite_file)
+            suite = TestSuiteResponse.parse_file(suite_file)
             # TODO: pagination
-            return PaginatedGetTestSuiteResponse(**suite)
+            return PaginatedGetTestSuiteResponse(**suite.dict())
         
-    def get_test_suites(self, name: Optional[str] = None, sort: Optional[str] = None, scoring_method: Optional[str] = None, page: int = 1, page_size: Optional[int] = None) -> PaginatedGetTestSuitesResponse:
+    def get_test_suites(
+            self, 
+            name: Optional[str] = None, 
+            sort: Optional[str] = None, 
+            scoring_method: Optional[str] = None, 
+            page: int = 1, 
+            page_size: Optional[int] = None) -> PaginatedGetTestSuitesResponse:
         if name is not None:
             test_suite_dir = self.root_dir / name
             if test_suite_dir.is_dir():
-                return load_suite_from_json(test_suite_dir / "suite.json")
+                suite = _load_suite_with_optional_id(test_suite_dir / "suite.json")
+                if suite is None:
+                    suite = self.get_test_suite_by_name(name)
+                return PaginatedGetTestSuitesResponse(test_suites=[
+                    TestSuite(
+                        id=suite.id,
+                        name=suite.name,
+                        scoring_method=suite.scoring_method,
+                        description=suite.description,
+                        created_at=suite.created_at
+                    )
+                ], page=1, page_size=1, total_pages=1, total_count=1)
             else:
                 # TODO: pagination
                 return PaginatedGetTestSuitesResponse(test_suites=[])
@@ -83,10 +101,12 @@ class LocalBenchClient(BenchClient):
         self._update_suite_index(test_suite_id, json_body.name)
         _write_run_index(self.root_dir, json_body.name)
 
-        suite_file.write_text(json_body.json())
-        return TestSuiteResponse(id=test_suite_id,
+        resp = TestSuiteResponse(id=test_suite_id,
                                  **json_body.dict())
-    
+
+        suite_file.write_text(resp.json())
+        return resp
+        
     def create_new_test_run(self, test_suite_id: str, json_body: CreateRunRequest) -> CreateRunResponse:
         test_suite_name = self._get_suite_name_from_id(test_suite_id)
         if test_suite_name is None:
@@ -119,3 +139,20 @@ class LocalBenchClient(BenchClient):
     def delete_test_run(self, test_suite_id: str, test_run_id: str):
         # TODO:
         return super().delete_test_run(test_suite_id, test_run_id)
+    
+    def get_test_suite_by_name(self, test_suite_name: str) -> TestSuiteResponse:
+        """
+        Additional getter to maintain backwards compatibility with non-identified local files
+        """
+        suite_file = self.root_dir / test_suite_name / "suite.json"
+        suite = load_suite_from_json(suite_file)
+
+        # override file with index
+        id_ = uuid.uuid4()
+        resp = TestSuiteResponse(id=id_,
+                                 **suite.dict())
+        suite_file.write_text(resp.json())
+        self._update_suite_index(id_, test_suite_name)
+        _write_run_index(self.root_dir, test_suite_name)
+
+        return resp

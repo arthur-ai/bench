@@ -238,6 +238,8 @@ class TestSuiteResponse(BaseModel):
     organization_id: Optional[UUID] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+    created_by: Optional[str] = None
+    bench_version: Optional[str] = None
     """
     JSON object containing test case data for the test suite.
     """
