@@ -27,7 +27,7 @@ def set_track_usage_data(cfg: TelemetryConfig):
         TRACK_USAGE_DATA = Telemetry.OFF
 
     if TRACK_USAGE_DATA == Telemetry.ON and cfg.log_notice_of_usage_data:
-        logging.warn("Telemetry data is being collected by Arthur! For more details please see https://github.com/arthur-ai/bench/tree/develop/arthur_bench/telemetry.")
+        logging.warn("Anonymous usage data is being collected by Arthur! For more details please see https://github.com/arthur-ai/bench/tree/develop/arthur_bench/telemetry.")
 
 
 # A no-op if user opts out of data collection.
