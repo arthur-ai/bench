@@ -3,6 +3,7 @@ import logging
 import uuid
 import os
 from enum import Enum
+from arthur_bench.telemetry.config import TelemetryConfig
 
 
 AMPLITUDE_API_KEY = 'bcc009e35e0b79daf089211108eed1de'
@@ -13,10 +14,11 @@ class Telemetry(Enum):
     OFF = 2
     LOG = 3
 
-TRACK_USAGE_DATA: Telemetry = Telemetry.ON
+TRACK_USAGE_DATA: Telemetry
 
-def set_track_usage_data(log_telemetry: bool):
+def set_track_usage_data(cfg: TelemetryConfig):
     global TRACK_USAGE_DATA
+    TRACK_USAGE_DATA = Telemetry.ON if cfg.push_usage_data else Telemetry.OFF
 
     telemetry = os.getenv('BENCH_TELEMETRY_DISABLED', "0")
     if telemetry == "log":
@@ -24,10 +26,8 @@ def set_track_usage_data(log_telemetry: bool):
     elif telemetry != "0":
         TRACK_USAGE_DATA = Telemetry.OFF
 
-    if TRACK_USAGE_DATA == Telemetry.ON and not log_telemetry:
-        logging.warn("""Telemetry data is being collected by Arthur! For more details please see https://github.com/arthur-ai/bench/tree/develop/arthur_bench/telemetry.
-                     To disable, set the environment variable BENCH_TELEMETRY_DISABLED=1.
-                     To disable and also log what would have been pushed, set BENCH_TELEMETRY_DISABLED=log.""")
+    if TRACK_USAGE_DATA == Telemetry.ON and cfg.log_notice_of_usage_data:
+        logging.warn("Telemetry data is being collected by Arthur! For more details please see https://github.com/arthur-ai/bench/tree/develop/arthur_bench/telemetry.")
 
 
 # A no-op if user opts out of data collection.

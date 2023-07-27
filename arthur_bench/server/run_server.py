@@ -1,7 +1,5 @@
 import argparse
 from pathlib import Path
-import os
-import json
 import uuid
 
 
@@ -17,9 +15,9 @@ except ImportError as e:
     raise ImportError("Can't run Bench Server without server dependencies, to install run: "
                       "pip install arthur-bench[server]") from e
 
-from typing import Tuple
 from arthur_bench.run.utils import _bench_root_dir
 from arthur_bench.telemetry.telemetry import send_event, set_track_usage_data
+from arthur_bench.telemetry.config import get_or_persist_id, persist_usage_data
 
 app = FastAPI()
 HTML_PATH = Path(__file__).parent / "html"
@@ -82,24 +80,22 @@ def test_run_results(request: Request, test_suite_name: str, run_name: str):
                                                               "test_suite_name": test_suite_name,
                                                               "run_name": run_name})
 
-def get_or_persist_id() -> Tuple[uuid.UUID, bool]:
-    file_name = os.path.join(SERVER_ROOT_DIR, ID_FILE)
-    if os.path.isfile(file_name):
-        with open(file_name) as f:
-            u = json.loads(f.read())
-            return u['id'], u['telemetry_log']
-
-    os.makedirs(os.path.dirname(file_name), exist_ok=True)
-    id = uuid.uuid4()
-    with open(file_name, 'w+') as f:
-        f.write(json.dumps({'id': str(id), 'telemetry_log': True}))
-    return id, False
 
 def run():
     # parser needs to go in this function for compatibility with packaging
     parser = argparse.ArgumentParser()
     parser.add_argument('--directory', required=False, help="optional directory override to run as root for bench server ")
+
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('--enable_push_usage_data', help="Enable sending anonymous usage data", required=False, action='store_true')
+    group.add_argument('--disable_push_usage_data', help="Disable sending anonymous usage data", required=False, action='store_true')
     args = parser.parse_args()
+    if args.enable_push_usage_data:
+        persist_usage_data(True)
+        return
+    if args.disable_push_usage_data:
+        persist_usage_data(False)
+        return
 
     global SERVER_ROOT_DIR
     SERVER_ROOT_DIR = _bench_root_dir()
@@ -107,8 +103,9 @@ def run():
         SERVER_ROOT_DIR = args.directory
 
     global USER_ID
-    USER_ID, log_telemetry = get_or_persist_id()
-    set_track_usage_data(log_telemetry)
+    config = get_or_persist_id()
+    set_track_usage_data(config)
+    USER_ID = config.user_id
 
     uvicorn.run("arthur_bench.server.run_server:app", host="127.0.0.1", port=8000, log_level="info")
 
