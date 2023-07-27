@@ -29,7 +29,7 @@ from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 
 
-articles = pd.read_csv('example_summaries.csv)['input_text']
+articles = pd.read_csv('example_summaries.csv')['input_text']
 reference_summaries = []
 summary_llm = OpenAI(temperature=0)
 model = LLMChain(llm=summary_llm, prompt=PromptTemplate(
@@ -51,7 +51,7 @@ Now that we have a set of input articles and reference summaries we can create a
 ```
 from arthur_bench.run.testsuite import TestSuite
 
-suite = TestSuite(name='news_summary', scoring_method='summary_quality', input_text_list=articles, reference_output_list=reference_summaries)
+news_summary_test = TestSuite(name='news_summary', scoring_method='summary_quality', input_text_list=articles, reference_output_list=reference_summaries)
 ```
 
 If you have previous generations you'd like to use for creating a test suite, please see our documentation for all compatible data formats.
@@ -72,10 +72,10 @@ def model(text):
 Next, generate a response for each input in the test suite. Run the suite to score each generation.
 ```
 candidate_generations = []
-for test_case in suite.test_cases:
+for test_case in news_summary_test.suite.test_cases:
     candidate_generations.append(model(test_case.input)[0]["summary_text"])
 
-suite.run(candidate_output_list=candidate_generations)
+suite.run(run_name='t5_books', candidate_output_list=candidate_generations, model_name='long-t5-tglobal-base-16384-book-summary')
 ```
 
 ### Viewing and analyzing the results
