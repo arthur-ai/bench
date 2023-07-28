@@ -3,7 +3,7 @@ import pandas as pd
 from typing import List, Optional, Union
 from pathlib import Path
 
-from arthur_bench.scoring import ScoringMethod, scoring_method_class_from_string, ScoringMethodEnum
+from arthur_bench.scoring import ScoringMethod, scoring_method_class_from_string
 from arthur_bench.models.models import TestSuiteRequest, TestCaseOutput, ScoringMethod as ScoringMethodMetadata, \
 	ScoringMethodType
 from arthur_bench.client.exceptions import UserValueError, ArthurInternalError
@@ -15,9 +15,6 @@ from arthur_bench.scoring.scoring_method import SINGLE_ITEM_BATCH_DEFAULT
 
 
 logger = logging.getLogger(__name__)
-
-
-SCORER_FILENAME = "scorer.bin"
 
 
 class TestSuite:

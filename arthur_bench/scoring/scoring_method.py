@@ -1,4 +1,3 @@
-import pickle
 from abc import abstractmethod, ABC
 import sys
 from os import PathLike
