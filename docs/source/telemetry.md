@@ -5,7 +5,7 @@ By default, Arthur is collecting anonymous usage data.
 ## Data being collected
 
 We track usage data in order to best understand what features users like and use.  Specifically, we collect:
-- Scoring method used
+- Scoring methods used
 - Number of runs per test suite
 - Number of test cases for a test run
 
@@ -14,13 +14,11 @@ An example event looks like (user-id is a random identifier, not tied to any per
 ```
 {
     "event_properties": {
-        "num_test_runs_for_suite": 3,
-        "scoring_method": {
-            "scoring_method": "summary_quality"
-        }
+        "num_test_suites_load": 3,
+        "test_suites_all": ["summary_quality", "bertscore", "qa_correctness"]
     },
-    "event_type": "test_runs",
-    "user_id": "efd39923-9f2a-4ad3-bebb-547b8d2cf14a"
+    "event_type": "test_suites_load",
+    "user_id": "fdc73011-2c71-41f3-b174-0d338e2f3f53"
 }
 ```
 

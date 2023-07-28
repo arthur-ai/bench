@@ -58,7 +58,7 @@ def test_runs(request: Request, test_suite_name: str):
     except duckdb.IOException:
         runs = []
         suite = "Unknown"
-    send_event({"event_type": "test_runs_load", "event_properties": {"test_runs_all": [run['created_at'] for run in runs], "scoring_method_real": suite}}, USER_ID)
+    send_event({"event_type": "test_runs_load", "event_properties": {"test_runs_all": [str(run['created_at']) for run in runs], "scoring_method_real": suite}}, USER_ID)
     return templates.TemplateResponse("test_run_overview.html", {"request": request,
                                                                  "runs": runs,
                                                                  "test_suite_name": test_suite_name})
