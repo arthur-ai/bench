@@ -14,12 +14,14 @@ class ScoringMethodEnum(str, Enum):
     BERTScore = 'bertscore'
     SummaryQuality = 'summary_quality'
     QACorrectness = 'qa_correctness'
+    ExactMatch = 'exact_match'
 
 
 SCORING_METHOD_CLASS_MAP: Dict[str, type[ScoringMethod]] = {
     ScoringMethodEnum.BERTScore: BERTScore,
     ScoringMethodEnum.QACorrectness: QAQualityCorrectness,
-    ScoringMethodEnum.SummaryQuality: SummaryQuality
+    ScoringMethodEnum.SummaryQuality: SummaryQuality,
+    ScoringMethodEnum.ExactMatch: ExactMatch
 }
 
 

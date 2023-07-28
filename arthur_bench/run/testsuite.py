@@ -1,10 +1,7 @@
 import logging
-import json
 import pandas as pd
 from typing import List, Optional, Union
 from pathlib import Path
-
-from tqdm import tqdm
 
 from arthur_bench.scoring import ScoringMethod, scoring_method_class_from_string, ScoringMethodEnum
 from arthur_bench.models.models import TestSuiteRequest, TestCaseOutput, ScoringMethod as ScoringMethodMetadata, \
@@ -13,8 +10,8 @@ from arthur_bench.client.exceptions import UserValueError, ArthurInternalError
 from arthur_bench.run.testrun import TestRun
 from arthur_bench.run.utils import _create_test_suite_dir, _initialize_metadata, _test_suite_dir, \
 	_create_run_dir, _clean_up_run, _load_suite_from_args, _load_run_data_from_args, _get_suite_if_exists
-from arthur_bench.scoring.scoring_method import SINGLE_ITEM_BATCH_DEFAULT, _create_run_dir, _clean_up_run, \
-	_load_suite_from_args, _load_run_data_from_args, _get_suite_if_exists, _scoring_method_class_from_string
+from arthur_bench.scoring import scoring_method_class_from_string
+from arthur_bench.scoring.scoring_method import SINGLE_ITEM_BATCH_DEFAULT
 
 
 logger = logging.getLogger(__name__)
@@ -51,7 +48,7 @@ class TestSuite:
 			reference_output_list: Optional[List[str]] = None
 	):
 		self.id = None
-		self.suite: Optional[TestSuiteRequest] = _get_suite_if_exists(name)
+		self.suite: TestSuiteRequest = _get_suite_if_exists(name) # type: ignore 
 
 		# get a scoringMethod class
 		if isinstance(scoring_method, str):
@@ -77,17 +74,15 @@ class TestSuite:
 				**_initialize_metadata()
 			)
 			self._test_suite_dir: Path = _create_test_suite_dir(name)
-			self.scorer = scoring_method()
+			self.scorer: ScoringMethod = scoring_method()
 		else:
 			logger.info(f"Found existing test suite with name {name}. Using existing suite")
 			self._test_suite_dir = _test_suite_dir(name)
-			# TODO: see matching TODO in save()
+			
 			if self.suite.scoring_method.type == ScoringMethodType.Custom:
-				try:
-					self.scorer = scoring_method.load(self._test_suite_dir / SCORER_FILENAME)
-				except FileNotFoundError as e:
-					raise UserValueError(f"Can't find serialized scorer for custom scorer at "
-										 f"{self._test_suite_dir / SCORER_FILENAME}") from e
+				if scoring_method.name != self.suite.scoring_method.name:
+					raise UserValueError()
+				self.scorer = scoring_method()
 			else:
 				scoring_method_class = scoring_method_class_from_string(self.suite.scoring_method.name)
 				self.scorer = scoring_method_class()
@@ -187,10 +182,3 @@ class TestSuite:
 		"""Save a test suite to local file system."""
 		suite_file = self._test_suite_dir / "suite.json"
 		suite_file.write_text(self.suite.json())
-
-		# TODO: align all "scorer" vs "scoring_method" vs other names
-
-		# TODO: serialize all or just builtin? follow up re: casing in exact-match scorer
-		if self.scorer.type() == ScoringMethodType.Custom:
-			scorer_path = self._test_suite_dir / SCORER_FILENAME
-			self.scorer.save(scorer_path)

@@ -76,31 +76,6 @@ class ScoringMethod(ABC):
     
         return all_scores
 
-    def save(self, path: PathLike) -> None:
-        """
-        Serialize this object to the specified path
-
-        This method defaults to pickle serialization, but you may override it to customize. If you do so, be sure to
-        also override load().
-        :param path: the path to save to
-        :return: None
-        """
-        with open(path, 'wb') as f:
-            f.write(pickle.dumps(self))
-
-    @staticmethod
-    def load(path: PathLike) -> TScoringMethod:
-        """
-        Deserialize a new instance of this class from the specified path.
-
-        This method defaults to pickle deserialization, but you may override it to customize. Be sure to only override
-        it if you also supplied a custom implementation of save().
-        :param path: the path to load from
-        :return: the deserialized ScoringMethod
-        """
-        with open(path, 'rb') as f:
-            return pickle.loads(f.read())
-
     @classmethod
     def type(cls) -> ScoringMethodType:
         """
@@ -111,7 +86,12 @@ class ScoringMethod(ABC):
         :return: the type (built-in or custom)
         """
         # TODO confirm this is kosher and works for modules defined in packages, REPL, and scripts
-        if "arthur_bench/scoring" in sys.modules[cls.__module__].__file__:
-            return ScoringMethodType.BuiltIn
-        else:
+        try:
+            module = sys.modules[cls.__module__].__file__
+            if module is not None and "arthur_bench/scoring" in module:
+                return ScoringMethodType.BuiltIn
+            else:
+                return ScoringMethodType.Custom
+        except AttributeError:
             return ScoringMethodType.Custom
+             
