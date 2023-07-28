@@ -1,5 +1,5 @@
+import glob
 import argparse
-import logging
 from pathlib import Path
 import uuid
 
@@ -19,6 +19,7 @@ except ImportError as e:
 from arthur_bench.run.utils import _bench_root_dir
 from arthur_bench.telemetry.telemetry import send_event, set_track_usage_data
 from arthur_bench.telemetry.config import get_or_persist_id, persist_usage_data
+from arthur_bench.models.models import TestSuiteRequest
 
 app = FastAPI()
 HTML_PATH = Path(__file__).parent / "html"
@@ -29,7 +30,7 @@ templates = Jinja2Templates(directory=HTML_PATH)
 
 templates = Jinja2Templates(directory=Path(__file__).parent / "html")
 
-SERVER_ROOT_DIR: str
+SERVER_ROOT_DIR: Path
 USER_ID: uuid.UUID
 
 TIMESTAMP_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
@@ -41,10 +42,12 @@ def home(request: Request):
 
 @app.get("/test_suites", response_class=HTMLResponse)
 def test_suites(request: Request):
-    try:
-        suites = duckdb.sql(f"SELECT name, description, created_at, scoring_method FROM read_json_auto('{SERVER_ROOT_DIR}/*/suite.json', timestampformat='{TIMESTAMP_FORMAT}')").df().to_dict('records')
-    except duckdb.IOException:
-        suites = []
+    suites = []
+    suite_files = glob.glob(f'{SERVER_ROOT_DIR}/*/suite.json')
+    for f in suite_files:
+        suite_obj = TestSuiteRequest.parse_file(f)
+        suites.append(suite_obj.dict())
+    
     send_event({"event_type": "test_suites_load", "event_properties": {"num_test_suites_load": len(suites), "test_suites_all": [suite['scoring_method'] for suite in suites]}}, USER_ID)
     return templates.TemplateResponse("test_suite_overview.html", {"request": request,
                                                                    "suites": suites})
@@ -97,9 +100,10 @@ def run():
         return
 
     global SERVER_ROOT_DIR
-    SERVER_ROOT_DIR = _bench_root_dir()
+    default_root_dir = _bench_root_dir()
     if args.directory:
-        SERVER_ROOT_DIR = args.directory
+        default_root_dir = args.directory
+    SERVER_ROOT_DIR = Path(default_root_dir).resolve()
 
     global USER_ID
     config = get_or_persist_id()
