@@ -22,6 +22,7 @@ Contents
    self
    quickstart.md
    concepts.md
+   guides
    sdk_reference
    contributing.md
 
