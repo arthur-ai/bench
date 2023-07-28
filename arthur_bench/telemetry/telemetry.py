@@ -39,7 +39,7 @@ def send_event(event, user_id: uuid.UUID):
         logger.info(BaseEvent(user_id=str(user_id),**event))
         return
 
-    logger.info("Pushing usage data to Arthur.")
+    logger.debug("Pushing usage data to Arthur.")
     amplitude.track(
         BaseEvent(
             user_id=str(user_id),

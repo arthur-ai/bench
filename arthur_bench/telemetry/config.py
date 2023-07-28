@@ -1,8 +1,9 @@
-import os
 import json
 import uuid
 from pathlib import Path
 from pydantic import BaseModel
+
+import logging
 
 class TelemetryConfig(BaseModel):
     user_id: str
@@ -36,14 +37,16 @@ def persist_usage_data(push_usage_data: bool):
     # Create directory if it does not exist.
     config_file.parent.mkdir(exist_ok=True)
 
+    msg = f"Successfully set Bench anonymous usage data collection to {push_usage_data}"
+
     if config_file.exists():
         cfg = TelemetryConfig(**json.loads(config_file.open().read()))
         cfg.push_usage_data = push_usage_data
         config_file.open('w+').write(cfg.json())
+        print(msg)
         return
 
     id = uuid.uuid4()
     new_config = TelemetryConfig(user_id=str(id), log_notice_of_usage_data=False, push_usage_data=push_usage_data)
     config_file.open('w+').write(new_config.json())
-
-
+    print(msg)

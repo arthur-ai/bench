@@ -26,7 +26,6 @@ dependencies = [
     'sentencepiece==0.1.99',
     'bert_score~=0.3.13',
     'tqdm~=4.65.0',
-    'amplitude-analytics==1.1.1',
     'pydantic>=1.10.0,<2.0',
     'pyjwt<3,>=2.6',
     'requests==2.28.2',
@@ -38,7 +37,8 @@ dependencies = [
 server = [
     'duckdb~=0.8.1',
     'fastapi~=0.99.1',
-    'uvicorn~=0.22.0'
+    'uvicorn~=0.22.0',
+    'amplitude-analytics==1.1.1'
 ]
 docs = [
     'sphinx',
