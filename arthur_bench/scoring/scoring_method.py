@@ -14,7 +14,6 @@ SINGLE_ITEM_BATCH_DEFAULT = 1
 TScoringMethod = TypeVar("TScoringMethod", bound="ScoringMethod")
 
 
-# TODO: Scorer? to differentiate from ScoringMethod enum?
 class ScoringMethod(ABC):
     """
     Base class for all scoring methods.     

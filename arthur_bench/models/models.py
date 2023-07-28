@@ -16,7 +16,7 @@ from pydantic import BaseModel, Field, validator
 
 
 class ScoringMethodType(str, Enum):
-    BuiltIn = 'built_in'  # TODO: best term for this?
+    BuiltIn = 'built_in' 
     Custom = 'custom'
 
 

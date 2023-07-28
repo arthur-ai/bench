@@ -80,8 +80,9 @@ class TestSuite:
 			self._test_suite_dir = _test_suite_dir(name)
 			
 			if self.suite.scoring_method.type == ScoringMethodType.Custom:
-				if scoring_method.name != self.suite.scoring_method.name:
-					raise UserValueError()
+				if scoring_method.name() != self.suite.scoring_method.name:
+					raise UserValueError(f"Test suite was originally created with scoring method: {self.suite.scoring_method.name} \
+			  			but provided scoring method has name: {scoring_method.name()}")
 				self.scorer = scoring_method()
 			else:
 				scoring_method_class = scoring_method_class_from_string(self.suite.scoring_method.name)
