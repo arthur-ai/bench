@@ -9,7 +9,6 @@ from .exact_match import ExactMatch
 from ..client.exceptions import UserValueError
 
 
-# TODO: naming
 class ScoringMethodEnum(str, Enum):
     BERTScore = 'bertscore'
     SummaryQuality = 'summary_quality'

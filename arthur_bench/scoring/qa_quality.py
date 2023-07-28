@@ -86,6 +86,10 @@ class QAQualityCorrectness(ScoringMethod):
     @staticmethod
     def name() -> str:
         return "qa_correctness"
+    
+    @staticmethod
+    def requires_reference() -> bool:
+        return False
 
     def run_batch(self, candidate_batch: List[str], reference_batch: Optional[List[str]] = None,
                   input_text_batch: Optional[List[str]] = None,

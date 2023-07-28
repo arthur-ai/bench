@@ -55,15 +55,14 @@ class TestSuite:
 			scoring_method = scoring_method_class_from_string(scoring_method)
 
 		if self.suite is None:
-			if scoring_method.name() == ScoringMethodEnum.QACorrectness:
-				reference_column = None
 			cases = _load_suite_from_args(
 				reference_data=reference_data,
 				reference_data_path=reference_data_path,
 				input_column=input_column,
 				reference_column=reference_column,
 				input_text_list=input_text_list,
-				reference_output_list=reference_output_list
+				reference_output_list=reference_output_list,
+				requires_reference=scoring_method.requires_reference()
 			)
 			method_meta = ScoringMethodMetadata(name=scoring_method.name(), type=scoring_method.type())
 			self.suite = TestSuiteRequest(

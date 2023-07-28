@@ -27,6 +27,10 @@ class ScoringMethod(ABC):
         :return: the ScoringMethod name
         """
         raise NotImplementedError
+    
+    @staticmethod
+    def requires_reference() -> bool:
+        return True
 
     @abstractmethod
     def run_batch(self, candidate_batch: List[str], reference_batch: Optional[List[str]] = None,

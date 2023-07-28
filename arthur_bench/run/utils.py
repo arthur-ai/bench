@@ -95,18 +95,22 @@ def load_suite_from_csv(filepath: Union[str, os.PathLike], input_column: str, re
     return load_suite_from_dataframe(pd.read_csv(filepath), input_column, reference_column)
 
 
-def load_suite_from_list(inputs: List[str], reference_outputs: List[str]) -> List[TestCaseRequest]:
+def load_suite_from_list(inputs: List[str], reference_outputs: Optional[List[str]]) -> List[TestCaseRequest]:
     """
     Load test case data from lists of strings.
 
     :param inputs: list of string inputs for each test case
     :param reference_outputs: list of string reference outputs for each input
     """
-    if len(inputs) != len(reference_outputs):
-        raise UserValueError("inputs and reference_outputs must be the same length")
     if len(inputs) < 1:
         raise UserValueError("test suite must have at least 1 test case")
-    return [TestCaseRequest(input=i, reference_output=o) for i, o in zip(inputs, reference_outputs)]
+    
+    if reference_outputs is not None:
+        if len(inputs) != len(reference_outputs):
+            raise UserValueError("inputs and reference_outputs must be the same length")
+        return [TestCaseRequest(input=i, reference_output=o) for i, o in zip(inputs, reference_outputs)]
+   
+    return [TestCaseRequest(input=i, reference_output=None) for i in inputs]
 
 
 def load_suite_from_json(filepath: Union[str, os.PathLike]) -> TestSuiteRequest:
@@ -128,12 +132,19 @@ def _load_suite_from_args(
         input_column: str = "input",
         reference_column: Optional[str] = None,
         input_text_list: Optional[List[str]] = None,
-        reference_output_list: Optional[List[str]] = None) -> List[TestCaseRequest]:
+        reference_output_list: Optional[List[str]] = None,
+        requires_reference: bool = True) -> List[TestCaseRequest]:
+    if requires_reference:
+        if reference_column is None and reference_output_list is None:
+            raise UserValueError("scoring method requires reference data but no reference data was provided")
+    else:
+        reference_column = None
+    
     if reference_data is not None:
         return load_suite_from_dataframe(reference_data, input_column, reference_column)
     elif reference_data_path is not None:
         return load_suite_from_csv(reference_data_path, input_column, reference_column)
-    elif input_text_list is not None and reference_output_list is not None:
+    elif input_text_list is not None:
         return load_suite_from_list(input_text_list, reference_output_list)
     else:
         raise UserValueError("must specify data using either reference_data data frame, " 
