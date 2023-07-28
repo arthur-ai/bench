@@ -44,7 +44,6 @@ def home(request: Request):
 def test_suites(request: Request):
     suites = []
     suite_files = glob.glob(f'{SERVER_ROOT_DIR}/*/suite.json')
-    print('{SERVER_ROOT_DIR}/*/suite.json')
     for f in suite_files:
         suite_obj = TestSuiteRequest.parse_file(f)
         suites.append(suite_obj.dict())
