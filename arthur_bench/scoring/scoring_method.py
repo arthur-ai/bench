@@ -87,7 +87,6 @@ class ScoringMethod(ABC):
         module.
         :return: the type (built-in or custom)
         """
-        # TODO confirm this is kosher and works for modules defined in packages, REPL, and scripts
         try:
             module = sys.modules[cls.__module__].__file__
             if module is not None and "arthur_bench/scoring" in module:
