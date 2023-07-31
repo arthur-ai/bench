@@ -6,6 +6,7 @@ from .bertscore import BERTScore
 from .qa_quality import QAQualityCorrectness
 from .summary_quality import SummaryQuality
 from .exact_match import ExactMatch
+from .hallucination import Hallucination
 from ..client.exceptions import UserValueError
 
 
@@ -14,13 +15,15 @@ class ScoringMethodEnum(str, Enum):
     SummaryQuality = 'summary_quality'
     QACorrectness = 'qa_correctness'
     ExactMatch = 'exact_match'
+    Hallucination = 'hallucination'
 
 
 SCORING_METHOD_CLASS_MAP: Dict[str, type[ScoringMethod]] = {
     ScoringMethodEnum.BERTScore: BERTScore,
     ScoringMethodEnum.QACorrectness: QAQualityCorrectness,
     ScoringMethodEnum.SummaryQuality: SummaryQuality,
-    ScoringMethodEnum.ExactMatch: ExactMatch
+    ScoringMethodEnum.ExactMatch: ExactMatch,
+    ScoringMethodEnum.Hallucination: Hallucination
 }
 
 
