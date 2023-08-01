@@ -1,17 +1,36 @@
 from abc import abstractmethod, ABC
-from typing import List, Optional
+import sys
+from os import PathLike
+from typing import List, Optional, TypeVar
 
 from tqdm import tqdm
 
-from arthur_bench.models.models import TestCaseRequest
+from arthur_bench.models.models import ScoringMethodType
 
 SINGLE_ITEM_BATCH_DEFAULT = 1
+
+
+TScoringMethod = TypeVar("TScoringMethod", bound="ScoringMethod")
 
 
 class ScoringMethod(ABC):
     """
     Base class for all scoring methods.     
     """
+
+    @staticmethod
+    @abstractmethod
+    def name() -> str:
+        """
+        Get the name of this ScoringMethod
+        :return: the ScoringMethod name
+        """
+        raise NotImplementedError
+    
+    @staticmethod
+    def requires_reference() -> bool:
+        return True
+
     @abstractmethod
     def run_batch(self, candidate_batch: List[str], reference_batch: Optional[List[str]] = None,
                   input_text_batch: Optional[List[str]] = None, context_batch: Optional[List[str]] = None) -> List[float]:
@@ -58,3 +77,22 @@ class ScoringMethod(ABC):
                 pbar.update(len(candidate_outputs))
     
         return all_scores
+
+    @classmethod
+    def type(cls) -> ScoringMethodType:
+        """
+        Supplies whether a scoring method is built-in or custom.
+
+        This method is implemented by checking whether the ScoringMethod class is part of the `arthur_bench.scoring`
+        module.
+        :return: the type (built-in or custom)
+        """
+        try:
+            module = sys.modules[cls.__module__].__file__
+            if module is not None and "arthur_bench/scoring" in module:
+                return ScoringMethodType.BuiltIn
+            else:
+                return ScoringMethodType.Custom
+        except AttributeError:
+            return ScoringMethodType.Custom
+             

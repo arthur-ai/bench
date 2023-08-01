@@ -2,9 +2,10 @@ import os
 import logging
 import pandas as pd
 from typing import List, Optional, Union
-
-from arthur_bench.scoring import ScoringMethod, load_scoring_method
-from arthur_bench.models.models import TestSuiteRequest, TestSuiteResponse, ScoringMethod as ScoringEnum, TestCaseOutput, CreateRunRequest
+from pathlib import Path
+from arthur_bench.scoring import ScoringMethod, scoring_method_class_from_string
+from arthur_bench.models.models import TestSuiteRequest, TestSuiteResponse, TestCaseOutput, CreateRunRequest, ScoringMethod as ScoringMethodMetadata, \
+	ScoringMethodType
 from arthur_bench.client.exceptions import UserValueError, ArthurInternalError, MissingParameterError
 from arthur_bench.client.bench_client import BenchClient
 from arthur_bench.client.local.client import LocalBenchClient
@@ -12,6 +13,7 @@ from arthur_bench.client.rest.client import ArthurClient
 from arthur_bench.run.testrun import TestRun
 from arthur_bench.run.utils import _initialize_metadata, _load_suite_from_args, _load_run_data_from_args, _get_suite_if_exists, _get_scoring_method
 from arthur_bench.scoring.scoring_method import SINGLE_ITEM_BATCH_DEFAULT
+
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +23,7 @@ class TestSuite:
 		Reusable pipeline for running a test suite built from reference_data and evaluated using metric
 
 		:param name: name of the test suite
-		:param scoring_method: scoring method to use to evaluate the results of a test run
+		:param scoring_method: scoring method to use to evaluate the results of a test run, as a string/enum or class
 		:param description: short description of the task tested by this suite
 		:param reference_data: dataframe of prompts and reference outputs
 		:param reference_data_path: filepath to csv of prompts and reference outputs,
@@ -34,12 +36,12 @@ class TestSuite:
 	def __init__(
 			self,
 			name: str,
-			scoring_method: Union[ScoringEnum, str],
+			scoring_method: Union[str, type[ScoringMethod]],
 			description: Optional[str] = None,
 			reference_data: Optional[pd.DataFrame] = None,
 			reference_data_path: Optional[str] = None,
 			input_column: str = "input",
-			reference_column: str = "reference_output", 
+			reference_column: str = "reference_output",
 			input_text_list: Optional[List[str]] = None,
 			reference_output_list: Optional[List[str]] = None
 	):
@@ -54,29 +56,42 @@ class TestSuite:
 			self.client = LocalBenchClient()
 		self.suite: TestSuiteResponse = _get_suite_if_exists(self.client, name) # type: ignore
 
+		# get a scoringMethod class
+		if isinstance(scoring_method, str):
+			scoring_method = scoring_method_class_from_string(scoring_method)
+
 		if self.suite is None:
-			scoring_method = _get_scoring_method(scoring_method=scoring_method)
-			if scoring_method == ScoringEnum.QACorrectness:
-				reference_column = None
 			cases = _load_suite_from_args(
 				reference_data=reference_data,
 				reference_data_path=reference_data_path,
 				input_column=input_column,
 				reference_column=reference_column,
 				input_text_list=input_text_list,
-				reference_output_list=reference_output_list
+				reference_output_list=reference_output_list,
+				requires_reference=scoring_method.requires_reference()
 			)
+			method_meta = ScoringMethodMetadata(name=scoring_method.name(), type=scoring_method.type())
 			new_suite = TestSuiteRequest(
 				name=name,
-				scoring_method=scoring_method,
+				scoring_method=method_meta,
 				description=description,
 				test_cases=cases,
 				**_initialize_metadata()
 			)
 			self.suite = self.client.create_test_suite(new_suite)
+      self.scorer: ScoringMethod = scoring_method()
 
 		else:
 			logger.info(f"Found existing test suite with name {name}. Using existing suite")
+			
+			if self.suite.scoring_method.type == ScoringMethodType.Custom:
+				if scoring_method.name() != self.suite.scoring_method.name:
+					raise UserValueError(f"Test suite was originally created with scoring method: {self.suite.scoring_method.name} \
+			  			but provided scoring method has name: {scoring_method.name()}")
+				self.scorer = scoring_method()
+			else:
+				scoring_method_class = scoring_method_class_from_string(self.suite.scoring_method.name)
+				self.scorer = scoring_method_class()
 
 	def run(
 			self,
@@ -127,8 +142,6 @@ class TestSuite:
 			raise UserValueError(
 				f"candidate data has {len(candidate_output_list)} tests but expected {len(self.suite.test_cases)} tests")
 
-		scoring_method: ScoringMethod = load_scoring_method(self.suite.scoring_method)
-
 		inputs = [case.input for case in self.suite.test_cases]
 		ids = [case.id for case in self.suite.test_cases]
 		# ref outputs should be None if any items are None (we validate nullness must be all-or-none)
@@ -141,8 +154,8 @@ class TestSuite:
 				else:
 					ref_outputs.append(case.reference_output)
 		try:
-			all_scores = scoring_method.run(candidate_output_list, ref_outputs, inputs, context_list,
-											batch_size=batch_size)
+			all_scores = self.scorer.run(candidate_output_list, ref_outputs, inputs, context_list,
+										 batch_size=batch_size)
 		except Exception as e:
 			logger.error(f"failed to create run: {e}")
 			raise ArthurInternalError(f"failed to create run {run_name}") from e

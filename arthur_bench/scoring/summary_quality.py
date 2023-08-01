@@ -81,7 +81,6 @@ TIKTOKEN_ENCODER = tiktoken.get_encoding("cl100k_base")
 TIKTOKEN_ERROR_PADDING = 150
 LLM_CHOICE_OPTIONS = {'0': 0.0, '1': 1.0, 'tie': 0.5}
 
-
 logger = logging.getLogger(__name__)
 
 def truncate_input_text(input_text, ref_output, cand_output) -> Tuple[str, bool]:
@@ -111,6 +110,10 @@ class SummaryQuality(ScoringMethod):
 
     def __init__(self):
         self.summary_compare = LLMChain(llm=ChatOpenAI(temperature=0), prompt=COMPARE)  # type: ignore
+
+    @staticmethod
+    def name() -> str:
+        return "summary_quality"
 
     def run(self, candidate_outputs: List[str], reference_outputs: Optional[List[str]] = None,
             inputs: Optional[List[str]] = None, contexts: Optional[List[str]] = None,
@@ -164,5 +167,4 @@ class SummaryQuality(ScoringMethod):
                 res.append(LLM_CHOICE_OPTIONS.get(choice["text"][:3], -1.0))
             else:
                 res.append(-1.0)
-                
         return res
