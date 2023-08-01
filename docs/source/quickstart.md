@@ -21,7 +21,7 @@ Suites can be viewed in browser by running `bench` from the command line.
 
 #### Logging to your remote Arthur organization
 
-First, create an Arthur Bench account and obtain an API key.
+You will need an Arthur Bench account and API key to use the Arthur platform. To obtain an API key, send an email to rowan@arthur.ai.
 
 To log results to the platform, you just need to set the remote url and api key environment variables before creating and running suites. For example,  
 ```

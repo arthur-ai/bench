@@ -1,5 +1,7 @@
 ## Evaluating LLM generated summaries with Bench
 
+This guide provides a step by step tutorial on LLM evaluation with the Bench SaaS platform. To get started with key bench concepts like test suites, test runs, and scoring methods, check out [this page](concepts.md) first. 
+
 In this example, we will use the bench library to get started evaluating different LLMs for news article summarization and log the results to the Arthur Bench platform. We will walk through the following steps:
 
 1) Configuring your python environment for logging results.
@@ -21,6 +23,11 @@ os.environ['ARTHUR_API_KEY'] = 'YOUR API KEY'
 
 ### Creating an initial test suite
 We recommend creating a test suite with target  examples as close to production performance as possible. For the news summarization case, we will assume we have sampled news articles from the past week as inputs. Reference outputs can be hard to find, so will initialize a baseline using gpt3.5. You can download the summaries file from our Github.
+
+To generate the reference outputs
+	1) Load the input articles from csv to Pandas DataFrame
+	2) Use LangChain to define a prompt template and manage requests to OpenAI
+	3) Generate and save summaries for each article
 
 ```
 import pandas as pd
@@ -54,7 +61,7 @@ from arthur_bench.run.testsuite import TestSuite
 news_summary_test = TestSuite(name='news_summary', scoring_method='summary_quality', input_text_list=articles, reference_output_list=reference_summaries)
 ```
 
-If you have previous generations you'd like to use for creating a test suite, please see our documentation for all compatible data formats.
+If you have previous generations you'd like to use for creating a test suite, please see our {class}`documentation <arthur_bench.run.testsuite.TestSuite>` for all compatible data formats.
 
 ### Running the test suite
 For the first run, we will evaluate the performance of an open source model relative to the generations of gpt3. In this example we will use a t5 model trained on book summarization available on the huggingface hub:
