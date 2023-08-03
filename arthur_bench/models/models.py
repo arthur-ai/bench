@@ -85,7 +85,7 @@ class TestSuiteRequest(BaseModel):
 class TestSuite(BaseModel):
     id: UUID
     name: str
-    scoring_method: str
+    scoring_method: ScoringMethod
     last_run_time: Optional[datetime] = None
     description: Optional[str] = None
     created_at: Optional[datetime] = None
@@ -197,7 +197,7 @@ class TestSuiteSummaryResponse(BaseModel):
 class PaginatedGetTestSuiteResponse(BaseModel):
     id: Optional[UUID] = None
     name: Optional[str] = None
-    scoring_method: Optional[str] = None
+    scoring_method: Optional[ScoringMethod] = None
     test_cases: Optional[List[TestCaseResponse]] = None
 
 

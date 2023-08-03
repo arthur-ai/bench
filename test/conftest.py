@@ -1,7 +1,9 @@
 import pytest
 import pandas as pd
-from arthur_bench.models.models import TestSuiteRequest, TestCaseRequest, TestCaseOutput
+from unittest.mock import Mock
+from arthur_bench.models.models import TestSuiteRequest, TestCaseRequest, TestCaseOutput, TestSuiteResponse, TestSuite, PaginatedGetTestSuitesResponse, PaginatedGetTestSuiteResponse
 from arthur_bench.run.testrun import TestRun
+from arthur_bench.client.bench_client import BenchClient
 
 
 @pytest.fixture(scope='session')
