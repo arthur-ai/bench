@@ -1,12 +1,16 @@
+import os
 import json
-from typing import Optional
+from typing import Optional, Union
 import uuid
 from pathlib import Path
 from arthur_bench.client.bench_client import BenchClient
-from arthur_bench.client.exceptions import NotFoundError
+from arthur_bench.client.exceptions import NotFoundError, ArthurError, UserValueError
 from arthur_bench.models.models import CreateRunRequest, CreateRunResponse, PaginatedGetRunResponse, PaginatedGetRunsForTestSuiteResponse, \
     PaginatedGetTestSuiteResponse, PaginatedGetTestSuitesResponse, TestSuiteRequest, TestSuiteResponse, TestSuiteSummaryResponse, TestSuite
-from arthur_bench.run.utils import _bench_root_dir, load_suite_from_json, _create_test_suite_dir, _create_run_dir, _load_suite_with_optional_id
+from arthur_bench.run.utils import load_suite_from_json, get_file_extension
+
+BENCH_FILE_DIR_KEY = 'BENCH_FILE_DIR'
+DEFAULT_BENCH_FILE_DIR = Path(os.getcwd()) / "bench"
 
 SUITE_INDEX_FILE = 'suite_id_to_name.json'
 RUN_INDEX_FILE = 'run_id_to_name.json'
@@ -24,6 +28,41 @@ def _write_run_index(root_dir: Path, test_suite: str):
     if run_index_path.is_file():
         return
     json.dump({}, open(run_index_path, "w"))
+    return None
+
+
+def _bench_root_dir() -> Path:
+    return Path(os.environ.get(BENCH_FILE_DIR_KEY, DEFAULT_BENCH_FILE_DIR))
+
+
+def _test_suite_dir(test_suite_name: str) -> Path:
+    return Path(_bench_root_dir()) / test_suite_name
+
+
+def _create_test_suite_dir(test_suite_name: str) -> Path:
+    if not os.path.exists(_bench_root_dir()):
+        os.mkdir(_bench_root_dir())
+    test_suite_dir = _test_suite_dir(test_suite_name)
+    if test_suite_dir.is_dir():
+        raise UserValueError(f"test_suite {test_suite_name} already exists")
+    os.mkdir(test_suite_dir)
+    return test_suite_dir
+
+
+def _create_run_dir(test_suite_name: str, run_name: str) -> Path:
+    run_dir = _test_suite_dir(test_suite_name) / run_name 
+    if os.path.exists(run_dir):
+        raise UserValueError(f"run {run_name} already exists")
+    os.mkdir(run_dir)
+    return run_dir
+
+
+def _load_suite_with_optional_id(filepath: Union[str, os.PathLike]) -> Optional[TestSuiteResponse]:
+    if get_file_extension(filepath) != '.json':
+        raise UserValueError("filepath must be json file")
+    suite = json.load(open(filepath))
+    if 'id' in suite:
+        return TestSuiteResponse.parse_obj(suite)
     return None
 
 
@@ -78,6 +117,7 @@ class LocalBenchClient(BenchClient):
                 suite = _load_suite_with_optional_id(test_suite_dir / "suite.json")
                 if suite is None:
                     suite = self.get_test_suite_by_name(name)
+                # TODO: pagination
                 return PaginatedGetTestSuitesResponse(test_suites=[
                     TestSuite(
                         id=suite.id,
@@ -88,9 +128,11 @@ class LocalBenchClient(BenchClient):
                     )
                 ], page=1, page_size=1, total_pages=1, total_count=1)
             else:
-                # TODO: pagination
-                return PaginatedGetTestSuitesResponse(test_suites=[])
-        # TODO: finish this method
+                return PaginatedGetTestSuitesResponse(test_suites=[], page=1, page_size=0, total_pages=1, total_count=0)
+        if sort is not None:
+            raise ArthurError("sort is not supported in local mode yet")
+        if scoring_method is not None:
+            raise ArthurError("filtering by scoring method is not supported in local mode")
         return PaginatedGetTestSuitesResponse(test_suites=[])
         
     def create_test_suite(self, json_body: TestSuiteRequest) -> TestSuiteResponse:
@@ -121,24 +163,22 @@ class LocalBenchClient(BenchClient):
         return CreateRunResponse(id=run_id)
     
     def get_runs_for_test_suite(self, test_suite_id: str, sort: Optional[str] = None, page: int = 1, page_size: Optional[int] = None) -> PaginatedGetRunsForTestSuiteResponse:
-        # TODO:
-        return super().get_runs_for_test_suite(test_suite_id, sort, page, page_size)
-    
+        raise ValueError("get runs is not support in local mode yet")
+
     def get_summary_statistics(self, test_suite_id: str, run_id: Optional[str] = None, page: int = 1, page_size: Optional[int] = None) -> TestSuiteSummaryResponse:
-        # TODO: 
-        return super().get_summary_statistics(test_suite_id, run_id, page, page_size)
+        raise ValueError("summary statistics are not supported in local mode yet")
     
     def get_test_run(self, test_suite_id: str, test_run_id: str, page: int = 1, page_size: Optional[int] = None, sort: Optional[bool] = None) -> PaginatedGetRunResponse:
         # TODO:
-        return super().get_test_run(test_suite_id, test_run_id, page, page_size, sort)
+        raise ValueError("get test run is not supported in local mode yet")
     
     def delete_test_suite(self, test_suite_id: str):
         # TODO
-        return super().delete_test_suite(test_suite_id)
+        return ValueError("delete test suite is not supported in local mode yet")
     
     def delete_test_run(self, test_suite_id: str, test_run_id: str):
         # TODO:
-        return super().delete_test_run(test_suite_id, test_run_id)
+        return ValueError("delete test run is not supported in local mode yet")
     
     def get_test_suite_by_name(self, test_suite_name: str) -> TestSuiteResponse:
         """

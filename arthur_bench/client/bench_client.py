@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, TypeVar
 from abc import ABC, abstractmethod
 
 from arthur_bench.models.models import (
@@ -12,6 +12,9 @@ from arthur_bench.models.models import (
     PaginatedGetTestSuiteResponse,
     TestSuiteSummaryResponse,
 )
+
+TBenchClient = TypeVar("TBenchClient", bound="BenchClient")
+
 
 class BenchClient(ABC):
 

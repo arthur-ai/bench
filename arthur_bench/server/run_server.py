@@ -16,7 +16,7 @@ except ImportError as e:
     raise ImportError("Can't run Bench Server without server dependencies, to install run: "
                       "pip install arthur-bench[server]") from e
 
-from arthur_bench.run.utils import _bench_root_dir
+from arthur_bench.client.local.client import _bench_root_dir
 from arthur_bench.telemetry.telemetry import send_event, set_track_usage_data
 from arthur_bench.telemetry.config import get_or_persist_id, persist_usage_data
 from arthur_bench.models.models import TestSuiteRequest

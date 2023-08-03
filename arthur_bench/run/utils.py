@@ -11,31 +11,10 @@ from arthur_bench.models.models import TestCaseRequest, TestSuiteRequest, Scorin
 from arthur_bench.client.exceptions import UserValueError
 from arthur_bench.client.bench_client import BenchClient
 
-BENCH_FILE_DIR_KEY = 'BENCH_FILE_DIR'
-DEFAULT_BENCH_FILE_DIR = Path(os.getcwd()) / "bench"
-
 
 def get_file_extension(filepath: Union[str, os.PathLike]) -> str:
     _, ext = os.path.splitext(filepath)
     return ext
-
-
-def _bench_root_dir() -> Path:
-    return Path(os.environ.get(BENCH_FILE_DIR_KEY, DEFAULT_BENCH_FILE_DIR))
-
-
-def _test_suite_dir(test_suite_name: str) -> Path:
-    return Path(_bench_root_dir()) / test_suite_name
-
-
-def _create_test_suite_dir(test_suite_name: str) -> Path:
-    if not os.path.exists(_bench_root_dir()):
-        os.mkdir(_bench_root_dir())
-    test_suite_dir = _test_suite_dir(test_suite_name)
-    if test_suite_dir.is_dir():
-        raise UserValueError(f"test_suite {test_suite_name} already exists")
-    os.mkdir(test_suite_dir)
-    return test_suite_dir
 
 
 def _initialize_metadata() -> Dict[str, Any]:
@@ -44,18 +23,6 @@ def _initialize_metadata() -> Dict[str, Any]:
         "bench_version": __version__,
         "created_by": getpass.getuser()
     }
-
-
-def _create_run_dir(test_suite_name: str, run_name: str) -> Path:
-    run_dir = _test_suite_dir(test_suite_name) / run_name 
-    if os.path.exists(run_dir):
-        raise UserValueError(f"run {run_name} already exists")
-    os.mkdir(run_dir)
-    return run_dir
-
-
-def _clean_up_run(run_dir: Path):
-    run_dir.rmdir()
 
 
 def _validate_dataframe(data: pd.DataFrame, column: str):
@@ -124,15 +91,6 @@ def load_suite_from_json(filepath: Union[str, os.PathLike]) -> TestSuiteRequest:
     if isinstance(filepath, str):
         filepath = Path(filepath)
     return TestSuiteRequest.parse_file(filepath)  # type: ignore
-
-
-def _load_suite_with_optional_id(filepath: Union[str, os.PathLike]) -> Optional[TestSuiteResponse]:
-    if get_file_extension(filepath) != '.json':
-        raise UserValueError("filepath must be json file")
-    suite = json.load(open(filepath))
-    if 'id' in suite:
-        return TestSuiteResponse.parse_obj(suite)
-    return None
 
 
 def _load_suite_from_args(

@@ -3,7 +3,7 @@ from typing import List, Optional
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts.chat import ChatPromptTemplate, SystemMessagePromptTemplate, AIMessagePromptTemplate, \
-    HumanMessagePromptTemplate, BasePromptTemplate
+    HumanMessagePromptTemplate
 
 from arthur_bench.scoring import ScoringMethod
 from arthur_bench.client.exceptions import UserValueError

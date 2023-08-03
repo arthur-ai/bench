@@ -10,7 +10,6 @@ from arthur_bench.client.exceptions import UserValueError, ArthurInternalError, 
 from arthur_bench.client.bench_client import BenchClient
 from arthur_bench.client.local.client import LocalBenchClient
 from arthur_bench.client.rest.client import ArthurClient
-from arthur_bench.run.testrun import TestRun
 from arthur_bench.run.utils import _initialize_metadata, _load_suite_from_args, _load_run_data_from_args, _get_suite_if_exists
 from arthur_bench.scoring.scoring_method import SINGLE_ITEM_BATCH_DEFAULT
 
@@ -44,18 +43,18 @@ class TestSuite:
 			reference_column: str = "reference_output",
 			input_text_list: Optional[List[str]] = None,
 			reference_output_list: Optional[List[str]] = None,
-			client: BenchClient = None
+			client: Optional[type[BenchClient]] = None
 	):
 		url = os.getenv('ARTHUR_API_URL')
-		self.client = client
-		if self.client is None:
+		if client is None:
 			if url:  # if remote url is specified use remote client
 				api_key = os.getenv('ARTHUR_API_KEY')
 				if api_key is None:
 					raise MissingParameterError("You must provide an api key when using remote url")
-				self.client = ArthurClient(url=url, api_key=api_key).bench
+				client = ArthurClient(url=url, api_key=api_key).bench # type: ignore
 			else:
-				self.client = LocalBenchClient()
+				client = LocalBenchClient() # type: ignore
+		self.client: BenchClient = client # type: ignore
 		self.suite: TestSuiteResponse = _get_suite_if_exists(self.client, name) # type: ignore
 
 		# get a scoringMethod class
@@ -175,7 +174,7 @@ class TestSuite:
 		)
 
 		if save:
-			self.client.create_new_test_run(str(self.suite.id), run)
+			self.client.create_new_test_run(test_suite_id=str(self.suite.id), json_body=run)
 			
 		return run
 

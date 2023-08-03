@@ -4,6 +4,7 @@ from requests.cookies import RequestsCookieJar
 
 # import http client
 from arthur_bench.client.http.requests import HTTPClient
+from arthur_bench.client.bench_client import BenchClient
 
 from arthur_bench.models.models import (
     PaginatedGetTestSuitesResponse,
@@ -21,7 +22,7 @@ from arthur_bench.models.models import (
 PATH_PREFIX = "/api/v3"
 
 
-class ArthurBenchClient:
+class ArthurBenchClient(BenchClient):
     """
     A Python client to interact with the Arthur Bench API
     """
