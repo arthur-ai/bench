@@ -145,13 +145,13 @@ class CreateRunRequest(BaseModel):
 
 
 class TestRun(BaseModel):
-    id: Optional[UUID] = None
-    name: Optional[str] = None
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
+    id: UUID
+    name: str = None
+    created_at: datetime
+    updated_at: datetime
+    avg_score: Optional[float] = None
     model_version: Optional[str] = None
     prompt_template: Optional[str] = None
-    avg_score: Optional[float] = None
 
 
 class PaginatedGetTestSuitesResponse(BaseModel):
@@ -182,12 +182,13 @@ class HistogramItem(BaseModel):
 
 class SummaryItem(BaseModel):
     id: Optional[UUID] = None
-    avg_score: Optional[float] = None
-    histogram: Optional[List[HistogramItem]] = None
+    avg_score: float
+    histogram: List[HistogramItem]
 
 
 class TestSuiteSummaryResponse(BaseModel):
-    summary: Optional[List[SummaryItem]] = None
+    summary: List[SummaryItem]
+    name: str
     page: Optional[int] = None
     page_size: Optional[int] = None
     total_pages: Optional[int] = None
@@ -230,7 +231,7 @@ class PaginatedGetRunResponse(BaseModel):
     Paginated list of prompts, reference outputs, and model outputs for a particular run.
     """
 
-    test_case_runs: Optional[List[RunResult]] = None
+    test_case_runs: List[RunResult]
     test_suite_id: Optional[UUID] = None
     page: int
     page_size: int
