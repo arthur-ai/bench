@@ -15,7 +15,7 @@ from pydantic import BaseModel, Field, validator
 
 
 class ScoringMethodType(str, Enum):
-    BuiltIn = 'built_in' 
+    BuiltIn = 'built_in'
     Custom = 'custom'
 
 
@@ -75,7 +75,7 @@ class TestSuiteRequest(BaseModel):
                 last_ref_output_null = False
 
         return v
-    
+
     @validator('scoring_method', pre=True)
     def scoring_method_backwards_compatible(cls, v):
         if isinstance(v, str):
@@ -156,14 +156,14 @@ class TestRun(BaseModel):
 
 class PaginatedGetTestSuitesResponse(BaseModel):
     test_suites: List[TestSuite]
-    page: Optional[int] = None
-    page_size: Optional[int] = None
-    total_pages: Optional[int] = None
-    total_count: Optional[int] = None
+    page: int
+    page_size: int
+    total_pages: int
+    total_count: int
 
 
 class TestCaseResponse(BaseModel):
-    id: Optional[UUID] = None
+    id: UUID
     input: str
     """
     Input to the test case. Does not include the prompt template.
@@ -175,31 +175,34 @@ class TestCaseResponse(BaseModel):
 
 
 class HistogramItem(BaseModel):
-    count: Optional[int] = None
-    low: Optional[float] = None
-    high: Optional[float] = None
+    count: int
+    low: float
+    high: float
 
 
 class SummaryItem(BaseModel):
-    id: Optional[UUID] = None
+    id: UUID
     avg_score: float
     histogram: List[HistogramItem]
+    name: str
 
 
 class TestSuiteSummaryResponse(BaseModel):
     summary: List[SummaryItem]
-    name: str
-    page: Optional[int] = None
-    page_size: Optional[int] = None
-    total_pages: Optional[int] = None
-    total_count: Optional[int] = None
+    page: int
+    page_size: int
+    total_pages: int
+    total_count: int
+    num_test_cases: int
 
 
 class PaginatedGetTestSuiteResponse(BaseModel):
-    id: Optional[UUID] = None
-    name: Optional[str] = None
-    scoring_method: Optional[ScoringMethod] = None
-    test_cases: Optional[List[TestCaseResponse]] = None
+    id: UUID
+    name: str
+    scoring_method: ScoringMethod
+    test_cases: List[TestCaseResponse]
+    created_at: datetime
+    updated_at: datetime
 
 
 class CreateRunResponse(BaseModel):
