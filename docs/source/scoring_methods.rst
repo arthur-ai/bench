@@ -12,5 +12,5 @@ Scoring Methods
    qa_quality.QAQualityCorrectness
    summary_quality.SummaryQuality
    exact_match.ExactMatch
-   reading_ease.ReadingEase
-   word_count.WordCount
+   readability.Readability
+   word_count_match.WordCountMatch

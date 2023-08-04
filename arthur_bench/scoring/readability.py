@@ -5,7 +5,7 @@ from arthur_bench.scoring.utils import suppress_warnings
 
 
 
-class ReadingEase(ScoringMethod):
+class Readability(ScoringMethod):
     """
     Flesch Reading Ease Score: the higher the score, the easier to read. 
     Scores of 100-90 correlate to a 5th grade reading level, while scores <10 are classified as 

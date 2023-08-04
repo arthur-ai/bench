@@ -18,8 +18,8 @@ class ScoringMethod(str, Enum):
     SummaryQuality = 'summary_quality'
     QACorrectness = 'qa_correctness'
     ExactMatch = 'exact_match'
-    ReadingEase = 'reading_ease'
-    WordCount = 'word_count'
+    Readability = 'readability'
+    WordCountMatch = 'word_count_match'
 
 class TestCaseRequest(BaseModel):
     """
