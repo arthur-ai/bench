@@ -210,11 +210,11 @@ class CreateRunResponse(BaseModel):
 
 
 class RunResult(BaseModel):
-    id: Optional[str] = None
-    input: Optional[str] = None
+    id: str
+    input: str
+    output: str
+    score: float
     reference_output: Optional[str] = None
-    output: Optional[str] = None
-    score: Optional[float] = None
 
 
 class PaginatedGetRunsForTestSuiteResponse(BaseModel):
@@ -223,10 +223,13 @@ class PaginatedGetRunsForTestSuiteResponse(BaseModel):
     """
 
     test_runs: List[TestRun]
-    page: Optional[int] = None
-    page_size: Optional[int] = None
-    total_pages: Optional[int] = None
-    total_count: Optional[int] = None
+    page: int
+    page_size: int
+    total_pages: int
+    total_count: int
+    created_at: datetime
+    updated_at: datetime
+    id: UUID
 
 
 class PaginatedGetRunResponse(BaseModel):
@@ -235,11 +238,14 @@ class PaginatedGetRunResponse(BaseModel):
     """
 
     test_case_runs: List[RunResult]
-    test_suite_id: Optional[UUID] = None
+    test_suite_id: UUID
+    id: UUID
     page: int
     page_size: int
-    total_pages: Optional[int] = None
-    total_count: Optional[int] = None
+    total_pages: int
+    total_count: int
+    updated_at: datetime
+    created_at: datetime
 
 
 class TestSuiteResponse(BaseModel):
