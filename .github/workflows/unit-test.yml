@@ -30,7 +30,7 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: mypy
       run: |
-        mypy arthur_bench --install-types --non-interactive
+        mypy arthur_bench --non-interactive
     - name: Test with pytest
       run: |
         export PYTHONPATH=./
