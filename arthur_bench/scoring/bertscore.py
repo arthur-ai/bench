@@ -19,6 +19,10 @@ class BERTScore(ScoringMethod):
     https://arxiv.org/abs/1904.09675
     """
 
+    @staticmethod
+    def name() -> str:
+        return "bertscore"
+
     def __init__(self):
         with suppress_warnings("transformers"):
             self.scorer = BERTScorer(lang='en', model_type=DEFAULT_MODEL)

@@ -38,7 +38,8 @@ dependencies = [
 server = [
     'duckdb~=0.8.1',
     'fastapi~=0.99.1',
-    'uvicorn~=0.22.0'
+    'uvicorn~=0.22.0',
+    'amplitude-analytics==1.1.1'
 ]
 docs = [
     'sphinx',

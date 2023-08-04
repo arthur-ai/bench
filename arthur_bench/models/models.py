@@ -13,13 +13,12 @@ from arthur_bench.client.exceptions import UserValueError
 from arthur_bench.models.client import Page, PageSize, TotalCount, TotalPages
 from pydantic import BaseModel, Field, validator
 
-class ScoringMethod(str, Enum):
-    BERTScore = 'bertscore'
-    SummaryQuality = 'summary_quality'
-    QACorrectness = 'qa_correctness'
-    ExactMatch = 'exact_match'
-    Readability = 'readability'
-    WordCountMatch = 'word_count_match'
+
+class ScoringMethodType(str, Enum):
+    BuiltIn = 'built_in' 
+    Custom = 'custom'
+
+
 
 class TestCaseRequest(BaseModel):
     """
@@ -35,6 +34,10 @@ class TestCaseRequest(BaseModel):
     Reference or "Golden" output for the given input.
     """
 
+
+class ScoringMethod(BaseModel):
+    name: str
+    type: ScoringMethodType
 
 class TestSuiteRequest(BaseModel):
     """
@@ -73,7 +76,12 @@ class TestSuiteRequest(BaseModel):
                 last_ref_output_null = False
 
         return v
-
+    
+    @validator('scoring_method', pre=True)
+    def scoring_method_backwards_compatible(cls, v):
+        if isinstance(v, str):
+            return ScoringMethod(name=v, type=ScoringMethodType.BuiltIn)
+        return v
 
 class TestSuite(BaseModel):
     id: UUID

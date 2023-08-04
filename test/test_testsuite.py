@@ -76,13 +76,14 @@ def bench_temp_dir(tmpdir_factory):
 
 
 @pytest.fixture(scope="session")
-def test_suite_default(mock_reference_data, bench_temp_dir):
+def test_suite_default(mock_reference_data, bench_temp_dir, mock_load_scoring):
     with mock.patch.dict(os.environ, {"BENCH_FILE_DIR": bench_temp_dir}):
-        return TestSuite(
-            name="test_suite",
-            scoring_method="bertscore",
-            reference_data=mock_reference_data
-        )
+        with mock.patch('arthur_bench.run.testsuite.scoring_method_class_from_string', mock_load_scoring):
+            return TestSuite(
+                name="test_suite",
+                scoring_method="bertscore",
+                reference_data=mock_reference_data
+            )
 
 
 @pytest.fixture(scope="session")
@@ -90,7 +91,7 @@ def test_suite_custom(custom_reference_data, bench_temp_dir):
     with mock.patch.dict(os.environ, {"BENCH_FILE_DIR": bench_temp_dir}):
         return TestSuite(
             name="test_suite_custom",
-            scoring_method="bertscore",
+            scoring_method=CustomScorer,
             reference_data=custom_reference_data,
             description="test_description",
             input_column="custom_prompt",
@@ -109,21 +110,35 @@ def test_suite_string(mock_input_strings, mock_reference_strings, bench_temp_dir
 
 
 class MockScoringMethod(ScoringMethod):
+    @staticmethod
+    def name():
+        return "bertscore"
+    @staticmethod
+    def type():
+        return "built_in"
     def run_batch(self, reference_batch: List[str], candidate_batch: List[str],
                   input_text_batch: Optional[List[str]] = None, context_batch: Optional[List[str]] = None) -> List[float]:
         return [0.8 for _ in range(len(reference_batch))]
+    
+class CustomScorer(ScoringMethod):
+    @staticmethod
+    def name():
+        return "test_custom_scorer"
+    def run_batch(self, reference_batch: List[str], candidate_batch: List[str],
+                  input_text_batch: Optional[List[str]] = None, context_batch: Optional[List[str]] = None) -> List[float]:
+        return [0.5 for _ in range(len(reference_batch))]
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def mock_load_scoring():
     def load_scoring_method(name):
-        return MockScoringMethod()
+        return MockScoringMethod
     return load_scoring_method
 
 
 @pytest.mark.parametrize('params,expected', [
     ({"name": "test_suite", "scoring_method": "bertscore", "reference_data": "mock_reference_data"}, "test_suite_default"),
-    ({"name": "test_suite_custom", "scoring_method": "bertscore", "description": "test_description",
+    ({"name": "test_suite_custom", "scoring_method": CustomScorer, "description": "test_description",
       "reference_data": "custom_reference_data", "input_column": "custom_prompt", "reference_column": "custom_reference"},
      "test_suite_custom"),
     ({"name": "test_suite_strings", "scoring_method": "bertscore", "input_text_list": "mock_input_strings", 
@@ -142,26 +157,27 @@ def test_create_test_suite(params, expected, request):
             suite = TestSuite(**params)
             expected_suite = request.getfixturevalue(expected)
             assert_test_suite_equal(suite, expected_suite)
+            if expected == "test_suite_custom":
+                assert suite.suite.scoring_method.name == "test_custom_scorer"
+                assert suite.suite.scoring_method.type == "custom"
 
 
 @pytest.mark.parametrize('candidate_column', ['custom_candidate', None])
 def test_run_test_suite(candidate_column, mock_load_scoring, mock_outputs, test_suite_default, bench_temp_dir, mock_test_run):
        with mock.patch.dict(os.environ, {"BENCH_FILE_DIR": bench_temp_dir}):
-            with mock.patch('arthur_bench.run.testsuite.load_scoring_method', mock_load_scoring):
-                if candidate_column:
+            if candidate_column:
                     run = test_suite_default.run(run_name="test_run",
                                                 candidate_data=pd.DataFrame({candidate_column: mock_outputs}),
                                                 candidate_column=candidate_column,
                                                 model_name="my_very_special_gpt",
                                                 save=False)
-
-                else:
+            else:
                     run = test_suite_default.run(run_name="test_run",
                                                 candidate_data=pd.DataFrame({"candidate_output": mock_outputs}),
                                                 model_name="my_very_special_gpt",
                                                 save=False)
 
-                assert_test_run_equal(run, mock_test_run)
+            assert_test_run_equal(run, mock_test_run)
 
 
 @pytest.mark.parametrize('params', [

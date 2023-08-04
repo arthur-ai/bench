@@ -6,6 +6,7 @@ from arthur_bench.run.utils import load_suite_from_json, load_suite_from_datafra
 @pytest.mark.parametrize('filepath, expected', [
     ('mock_suite.json', 'mock_suite_request'),
     ('mock_suite_without_optional.json', 'mock_suite_request_optional'),
+    ('mock_suite_with_typed_score.json', 'mock_suite_request_optional'),
     ('mock_suite_mixed_null_refs.json', ValueError)
 ])
 def test_load_suite_from_json(filepath, expected, request):
