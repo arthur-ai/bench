@@ -21,7 +21,6 @@ except ImportError as e:
 from arthur_bench.client.local.client import _bench_root_dir, LocalBenchClient
 from arthur_bench.telemetry.telemetry import send_event, set_track_usage_data
 from arthur_bench.telemetry.config import get_or_persist_id, persist_usage_data
-from arthur_bench.models.models import TestSuiteRequest
 
 app = FastAPI()
 
@@ -56,9 +55,9 @@ def home(request: Request):
     return RedirectResponse("/test_suites")
 
 @app.get("/api/v3/bench/test_suites")
-def test_suites(request: Request, page: Optional[int] = 1, page_size: Optional[int] = 5):
+def test_suites(request: Request, page: Optional[int] = 1, page_size: Optional[int] = 5, sort: Optional[str] = None, scoring_method: Optional[str] = None, name: Optional[str] = None):
     client = LocalBenchClient(root_dir=SERVER_ROOT_DIR)
-    suite_resp = client.get_test_suites(page=page, page_size=page_size).json()
+    suite_resp = client.get_test_suites(page=page, page_size=page_size, sort=sort, scoring_method=scoring_method, name=name).json()
     suites = json.loads(suite_resp)
     
     send_event({"event_type": "test_suites_load", "event_properties": {"num_test_suites_load": len(suites["test_suites"]), "test_suites_all": [suite['scoring_method'] for suite in suites["test_suites"]]}}, USER_ID)
@@ -77,6 +76,7 @@ def test_runs(request: Request, test_suite_id: uuid.UUID, page: int = 1, page_si
     client = LocalBenchClient(root_dir=SERVER_ROOT_DIR)
     run_resp = client.get_runs_for_test_suite(test_suite_id=str(test_suite_id), page=page, page_size=page_size).json()
     runs = json.loads(run_resp)
+    # TODO: reset amplitude
     # send_event({"event_type": "test_runs_load", "event_properties": {"test_runs_all": [str(run['created_at']) for run in runs], "scoring_method_real": suite}}, USER_ID)
     return runs
 

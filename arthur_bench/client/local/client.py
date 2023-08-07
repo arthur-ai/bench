@@ -3,6 +3,7 @@ import duckdb
 import numpy as np
 import glob
 import json
+from datetime import datetime
 from math import ceil
 from typing import Optional, Union, List
 from dataclasses import dataclass
@@ -22,6 +23,16 @@ SUITE_INDEX_FILE = 'suite_id_to_name.json'
 RUN_INDEX_FILE = 'run_id_to_name.json'
 
 TIMESTAMP_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
+
+
+SORT_QUERY_TO_FUNC = {
+    'last_run_time': lambda x: x.last_run_time if x.last_run_time is not None else x.created_at,
+    'name': lambda x: x.name,
+    'created_at': lambda x: x.created_at,
+    '-last_run_time': lambda x:  x.last_run_time if x.last_run_time is not None else x.created_at,
+    '-name': lambda x: x.name,
+    '-created_at': lambda x: x.created_at
+}
 
 
 def _write_suite_index(root_dir: Path):
@@ -74,6 +85,10 @@ def _load_suite_with_optional_id(filepath: Union[str, os.PathLike]) -> Optional[
         return PaginatedTestSuite.parse_obj(suite)
     return None
 
+def _sort_suites(suites: List[PaginatedTestSuite], sort_key: str):
+    desc = sort_key[0] == "-"
+    return suites.sort(key=SORT_QUERY_TO_FUNC[sort_key], reverse=desc)
+
 
 @dataclass
 class PageInfo:
@@ -125,6 +140,11 @@ class LocalBenchClient(BenchClient):
                                 input=test_case.input,
                                 reference_output=test_case.reference_output)
 
+    def _update_suite_run_time(self, test_suite_name: str, runtime: datetime):
+        suite_file = self.root_dir / test_suite_name / "suite.json"
+        suite = PaginatedTestSuite.parse_file(suite_file)
+        suite.last_run_time = runtime
+        suite_file.write_text(suite.json())
     
     @staticmethod
     def _update_index(filepath: Path, id: uuid.UUID, name: str):
@@ -188,28 +208,25 @@ class LocalBenchClient(BenchClient):
         
         suites = []
         suite_files = glob.glob(f'{self.root_dir}/*/suite.json')
-        # TODO: filter suite files
-        # TODO: sort suite files
-        paginate = _paginate(suite_files, page=page, page_size=page_size)
-        for i in range(paginate.start, paginate.end):
-            filename = suite_files[i]
-            suite = _load_suite_with_optional_id(filename)
+        for f in suite_files:
+            suite = _load_suite_with_optional_id(f)
             if suite is None:
-                suite = self.get_test_suite_by_name(filename.split('/')[-2])
-            # TODO: move filter before pagination
-            # if scoring_method is None or suite.scoring_method.name == scoring_method:
-            suites.append(TestSuiteMetadata(
-                id=suite.id,
-                name=suite.name,
-                scoring_method=suite.scoring_method,
-                description=suite.description,
-                created_at=suite.created_at
-            ))
-        if sort is not None:
-            suites.sort(key=lambda x:x.created_at)
-
-        # TODO: pagination
-        return PaginatedTestSuites(test_suites=suites, page=paginate.page, page_size=paginate.page_size, total_pages=paginate.total_pages, total_count=paginate.total_count)
+                suite = self.get_test_suite_by_name(f.split('/')[-2])
+            if scoring_method is None or suite.scoring_method.name == scoring_method:
+                suites.append(TestSuiteMetadata(
+                    id=suite.id,
+                    name=suite.name,
+                    scoring_method=suite.scoring_method,
+                    description=suite.description,
+                    created_at=suite.created_at
+                ))
+        
+        # default sort by last run time
+        if sort is None:
+            sort = 'last_run_time'
+        _sort_suites(suites, sort)
+        paginate = _paginate(suites, page=page, page_size=page_size)
+        return PaginatedTestSuites(test_suites=suites[paginate.start:paginate.end], page=paginate.page, page_size=paginate.page_size, total_pages=paginate.total_pages, total_count=paginate.total_count)
         
     def create_test_suite(self, json_body: TestSuiteRequest) -> PaginatedTestSuite:
         test_suite_dir = _create_test_suite_dir(json_body.name)
@@ -245,7 +262,7 @@ class LocalBenchClient(BenchClient):
         
         run_file = run_dir / 'run.json'
         run_file.write_text(resp.json())
-
+        self._update_suite_run_time(test_suite_name=test_suite_name, runtime=resp.created_at)
         return CreateRunResponse(id=resp.id)
     
     def get_runs_for_test_suite(self, test_suite_id: str, sort: Optional[str] = None, page: int = 1, page_size: Optional[int] = None) -> PaginatedRuns:
