@@ -243,10 +243,13 @@ class PaginatedRun(BaseModel):
     id: UUID
     name: str
     test_suite_id: UUID
-    test_cases: List[RunResult]
+    test_cases: List[RunResult] = Field(alias='test_case_runs')
     updated_at: datetime
     created_at: datetime
     page: Optional[int] = None
     page_size: Optional[int] = None
     total_pages: Optional[int] = None
     total_count: Optional[int] = None
+
+    class Config:
+        allow_population_by_field_name = True

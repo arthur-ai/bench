@@ -4,6 +4,9 @@ from pathlib import Path
 import uuid
 from typing import Optional
 
+import http.server
+import socketserver
+
 
 try:
     import uvicorn
@@ -25,7 +28,7 @@ from arthur_bench.telemetry.config import get_or_persist_id, persist_usage_data
 app = FastAPI()
 
 origins = [
-    "http://localhost:8080",
+    "http://localhost:8000",
 ]
 
 app.add_middleware(
@@ -36,23 +39,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-HTML_PATH = Path(__file__).parent / "html"
-app.mount("/assets", StaticFiles(directory=HTML_PATH / "assets"), name="assets")
-
-templates = Jinja2Templates(directory=HTML_PATH)
-
-
-templates = Jinja2Templates(directory=Path(__file__).parent / "html")
+FRONT_END_DIRECTORY = Path(__file__).parent / "build"
 
 SERVER_ROOT_DIR: Path
 USER_ID: uuid.UUID
 
-TIMESTAMP_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
-
-
-@app.get("/", response_class=RedirectResponse)
-def home(request: Request):
-    return RedirectResponse("/test_suites")
 
 @app.get("/api/v3/bench/test_suites")
 def test_suites(request: Request, page: Optional[int] = 1, page_size: Optional[int] = 5, sort: Optional[str] = None, scoring_method: Optional[str] = None, name: Optional[str] = None):
@@ -68,13 +59,14 @@ def test_suite(request: Request, test_suite_id: uuid.UUID, page: Optional[int] =
     client = LocalBenchClient(root_dir=SERVER_ROOT_DIR)
     suite_resp = client.get_test_suite(test_suite_id=str(test_suite_id), page=page, page_size=page_size).json()
     suite = json.loads(suite_resp)
+    suite["scoring_method"] = suite["scoring_method"]["name"]
     return suite
 
 
 @app.get("/api/v3/bench/test_suites/{test_suite_id}/runs")
-def test_runs(request: Request, test_suite_id: uuid.UUID, page: int = 1, page_size: int = 5):
+def test_runs(request: Request, test_suite_id: uuid.UUID, page: int = 1, page_size: int = 5, sort: Optional[str] = None):
     client = LocalBenchClient(root_dir=SERVER_ROOT_DIR)
-    run_resp = client.get_runs_for_test_suite(test_suite_id=str(test_suite_id), page=page, page_size=page_size).json()
+    run_resp = client.get_runs_for_test_suite(test_suite_id=str(test_suite_id), page=page, page_size=page_size, sort=sort).json()
     runs = json.loads(run_resp)
     # TODO: reset amplitude
     # send_event({"event_type": "test_runs_load", "event_properties": {"test_runs_all": [str(run['created_at']) for run in runs], "scoring_method_real": suite}}, USER_ID)
@@ -84,7 +76,7 @@ def test_runs(request: Request, test_suite_id: uuid.UUID, page: int = 1, page_si
 @app.get("/api/v3/bench/test_suites/{test_suite_id}/runs/summary")
 def test_suite_summary(request: Request, test_suite_id: uuid.UUID, page: int = 1, page_size: int = 5, run_id: Optional[uuid.UUID] = None):
     client = LocalBenchClient(root_dir=SERVER_ROOT_DIR)
-    summary_resp = client.get_summary_statistics(test_suite_id=str(test_suite_id), page=page, page_size=page_size).json()
+    summary_resp = client.get_summary_statistics(test_suite_id=str(test_suite_id), page=page, page_size=page_size, run_id=run_id).json()
     summary = json.loads(summary_resp)
     return summary
 
@@ -92,9 +84,13 @@ def test_suite_summary(request: Request, test_suite_id: uuid.UUID, page: int = 1
 @app.get("/api/v3/bench/test_suites/{test_suite_id}/runs/{run_id}")
 def test_run_results(request: Request, test_suite_id: uuid.UUID, run_id: uuid.UUID, page: int = 1, page_size: int = 5):
     client = LocalBenchClient(root_dir=SERVER_ROOT_DIR)
-    run_resp = client.get_test_run(test_suite_id=str(test_suite_id), test_run_id=str(run_id), page=page, page_size=page_size).json()
+    run_resp = client.get_test_run(test_suite_id=str(test_suite_id), test_run_id=str(run_id), page=page, page_size=page_size).json(by_alias=True)
     run = json.loads(run_resp)
+    run["metadata"] = None
     return run
+
+
+app.mount("/", StaticFiles(directory=FRONT_END_DIRECTORY, html=True), name="frontend")
 
 
 def run():
@@ -124,6 +120,15 @@ def run():
     config = get_or_persist_id()
     set_track_usage_data(config)
     USER_ID = config.user_id
+
+    # class Handler(http.server.SimpleHTTPRequestHandler):
+    #     def __init__(self, *args, **kwargs):
+    #         super().__init__(*args, directory='~/code/arthur-front-end/packages/dist', **kwargs)
+
+    # # start static http server for front end
+    # with socketserver.TCPServer(("", 8080), Handler) as httpd:
+    #     print("serving Arthur Bench at port", 8080)
+    #     httpd.serve_forever()
 
     uvicorn.run("arthur_bench.server.run_server:app", host="127.0.0.1", port=8000, log_level="info")
 

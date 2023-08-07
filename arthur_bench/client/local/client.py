@@ -13,7 +13,7 @@ from arthur_bench.client.bench_client import BenchClient
 from arthur_bench.client.exceptions import NotFoundError, ArthurError, UserValueError
 from arthur_bench.models.models import CreateRunRequest, CreateRunResponse, PaginatedRun, PaginatedRuns, \
     PaginatedTestSuite, PaginatedTestSuites, TestSuiteRequest, TestSuiteSummary, TestSuiteMetadata, TestRunMetadata, \
-    SummaryItem, HistogramItem, TestCaseRequest, TestCaseResponse
+    SummaryItem, HistogramItem, TestCaseRequest, TestCaseResponse, RunResult
 from arthur_bench.run.utils import load_suite_from_json, get_file_extension
 
 BENCH_FILE_DIR_KEY = 'BENCH_FILE_DIR'
@@ -29,9 +29,13 @@ SORT_QUERY_TO_FUNC = {
     'last_run_time': lambda x: x.last_run_time if x.last_run_time is not None else x.created_at,
     'name': lambda x: x.name,
     'created_at': lambda x: x.created_at,
+    'avg_score': lambda x: x.avg_score,
     '-last_run_time': lambda x:  x.last_run_time if x.last_run_time is not None else x.created_at,
     '-name': lambda x: x.name,
-    '-created_at': lambda x: x.created_at
+    '-created_at': lambda x: x.created_at,
+    '-avg_score': lambda x: x.avg_score,
+    'score': lambda x: x.score,
+    'id': lambda x: x.id
 }
 
 
@@ -85,9 +89,20 @@ def _load_suite_with_optional_id(filepath: Union[str, os.PathLike]) -> Optional[
         return PaginatedTestSuite.parse_obj(suite)
     return None
 
-def _sort_suites(suites: List[PaginatedTestSuite], sort_key: str):
-    desc = sort_key[0] == "-"
-    return suites.sort(key=SORT_QUERY_TO_FUNC[sort_key], reverse=desc)
+
+def _summarize_run(run: PaginatedRun) -> SummaryItem:
+    scores = [o.score for o in run.test_cases]
+    avg_score = np.mean(scores).item()
+    hist, bin_edges = np.histogram(scores, bins=20, range=(0, max(1, np.max(scores))))
+    histogram = []
+    for i in range(len(hist)):
+        hist_item = HistogramItem(
+            count=hist[i],
+            low=bin_edges[i],
+            high=bin_edges[i+1]
+        )
+        histogram.append(hist_item)
+    return SummaryItem(id=run.id, name=run.name, avg_score=avg_score, histogram=histogram)
 
 
 @dataclass
@@ -100,16 +115,18 @@ class PageInfo:
     total_count: int
 
 
-def _paginate(files: List[str], page: int, page_size: int) -> PageInfo:
+def _paginate(objs: List, page: int, page_size: int, sort_key: str) -> PageInfo:
     """Paginate sorted files and return iteration indices and page info"""
+    desc = sort_key[0] == "-"
+    objs.sort(key=SORT_QUERY_TO_FUNC[sort_key], reverse=desc)
     offset = (page - 1) * page_size
     return PageInfo(
         start=offset,
-        end=min(offset + page_size, len(files)),
+        end=min(offset + page_size, len(objs)),
         page=page,
         page_size=page_size,
-        total_count=len(files),
-        total_pages=ceil(len(files) / page_size)
+        total_count=len(objs),
+        total_pages=ceil(len(objs) / page_size)
     )
 
 
@@ -167,7 +184,7 @@ class LocalBenchClient(BenchClient):
         else:
             suite_file = self.root_dir / suite_index[test_suite_id] / "suite.json"
             suite = PaginatedTestSuite.parse_file(suite_file)
-            pagination = _paginate(suite.test_cases, page, page_size)
+            pagination = _paginate(suite.test_cases, page, page_size, sort_key='id')
             return PaginatedTestSuite(id=test_suite_id,
                                       name=suite.name,
                                       scoring_method=suite.scoring_method,
@@ -224,9 +241,12 @@ class LocalBenchClient(BenchClient):
         # default sort by last run time
         if sort is None:
             sort = 'last_run_time'
-        _sort_suites(suites, sort)
-        paginate = _paginate(suites, page=page, page_size=page_size)
-        return PaginatedTestSuites(test_suites=suites[paginate.start:paginate.end], page=paginate.page, page_size=paginate.page_size, total_pages=paginate.total_pages, total_count=paginate.total_count)
+        paginate = _paginate(suites, page=page, page_size=page_size, sort_key=sort)
+        return PaginatedTestSuites(test_suites=suites[paginate.start:paginate.end], 
+                                   page=paginate.page, 
+                                   page_size=paginate.page_size, 
+                                   total_pages=paginate.total_pages, 
+                                   total_count=paginate.total_count)
         
     def create_test_suite(self, json_body: TestSuiteRequest) -> PaginatedTestSuite:
         test_suite_dir = _create_test_suite_dir(json_body.name)
@@ -250,18 +270,17 @@ class LocalBenchClient(BenchClient):
         test_suite_name = self._get_suite_name_from_id(test_suite_id)
         if test_suite_name is None:
             raise NotFoundError()
-        run_dir = _create_run_dir(test_suite_name, json_body.name)
 
-        # TODO: run clean up
         run_id = uuid.uuid4()
-        self._update_run_index(test_suite_name, run_id, json_body.name)
         resp = PaginatedRun(id=run_id,
                             test_suite_id=test_suite_id,
                             updated_at=json_body.created_at, 
                             **json_body.dict())
-        
+                
+        run_dir = _create_run_dir(test_suite_name, json_body.name)
         run_file = run_dir / 'run.json'
         run_file.write_text(resp.json())
+        self._update_run_index(test_suite_name, run_id, json_body.name)
         self._update_suite_run_time(test_suite_name=test_suite_name, runtime=resp.created_at)
         return CreateRunResponse(id=resp.id)
     
@@ -272,15 +291,22 @@ class LocalBenchClient(BenchClient):
         
         runs = []
         run_files = glob.glob(f'{self.root_dir}/{test_suite_name}/*/run.json')
-        pagination = _paginate(run_files, page, page_size)
-        for i in range(pagination.start, pagination.end):
-            filename = run_files[i]
-            run_obj = PaginatedRun.parse_file(filename)
+        for f in run_files:
+            run_obj = PaginatedRun.parse_file(f)
             avg_score = np.mean([o.score for o in run_obj.test_cases])
             run_resp = TestRunMetadata(**run_obj.dict(), avg_score=avg_score)
             runs.append(run_resp)
 
-        return PaginatedRuns(test_suite_id=test_suite_id, test_runs=runs, page_size=pagination.page_size, page=pagination.page, total_pages=pagination.total_pages, total_count=pagination.total_count)
+        if sort is None:
+            sort = 'created_at'
+
+        pagination = _paginate(runs, page, page_size, sort_key=sort)
+        return PaginatedRuns(test_suite_id=test_suite_id, 
+                             test_runs=runs, 
+                             page_size=pagination.page_size, 
+                             page=pagination.page, 
+                             total_pages=pagination.total_pages, 
+                             total_count=pagination.total_count)
 
     def get_summary_statistics(self, test_suite_id: str, run_id: Optional[str] = None, page: int = 1, page_size: Optional[int] = None) -> TestSuiteSummary:
         test_suite_name = self._get_suite_name_from_id(test_suite_id)
@@ -288,26 +314,31 @@ class LocalBenchClient(BenchClient):
             raise NotFoundError()
         
         runs = []
+        run_id_found = False
         run_files = glob.glob(f'{self.root_dir}/{test_suite_name}/*/run.json')
-        pagination = _paginate(run_files, page, page_size)
-        for i in range(pagination.start, pagination.end):
-            filename = run_files[i]
-            run_obj = PaginatedRun.parse_file(filename)
-            scores = [o.score for o in run_obj.test_cases]
-            avg_score = np.mean(scores).item()
-            hist, bin_edges = np.histogram(scores, bins=20, range=(0, max(1, np.max(scores))))
-            histogram = []
-            for i in range(len(hist)):
-                hist_item = HistogramItem(
-                    count=hist[i],
-                    low=bin_edges[i],
-                    high=bin_edges[i+1]
-                )
-                histogram.append(hist_item)
-            runs.append(SummaryItem(id=run_obj.id, name=run_obj.name, avg_score=avg_score, histogram=histogram)) 
-        return TestSuiteSummary(summary=runs, num_test_cases=len(run_obj.test_cases), page_size=pagination.page_size, page=pagination.page, total_pages=pagination.total_pages, total_count=pagination.total_count)
+        for f in run_files:
+            run_obj = PaginatedRun.parse_file(f)
+            runs.append(_summarize_run(run=run_obj))
+            if run_obj.id == run_id:
+                run_id_found = True
+        
+        pagination = _paginate(runs, page, page_size, sort_key='avg_score')
+        paginated_summary = TestSuiteSummary(summary=runs, 
+                                             num_test_cases=len(run_obj.test_cases), 
+                                             page_size=pagination.page_size, 
+                                             page=pagination.page, 
+                                             total_pages=pagination.total_pages, 
+                                             total_count=pagination.total_count)
+
+        if run_id is not None and not run_id_found:
+            run_name = self._get_run_name_from_id(test_suite_name, run_id)
+            if run_name is None:
+                raise NotFoundError()
+            additional_run = PaginatedRun.parse_file(self.root_dir / test_suite_name / run_name / "run.json")
+            paginated_summary.summary.append(_summarize_run(additional_run))
+        return paginated_summary
     
-    def get_test_run(self, test_suite_id: str, test_run_id: str, page: int = 1, page_size: Optional[int] = None, sort: Optional[bool] = None) -> PaginatedRun:
+    def get_test_run(self, test_suite_id: str, test_run_id: str, page: int = 1, page_size: Optional[int] = None, sort: Optional[bool] = True) -> PaginatedRun:
         test_suite_name = self._get_suite_name_from_id(test_suite_id)
         if test_suite_name is None:
             raise NotFoundError()
@@ -325,7 +356,8 @@ class LocalBenchClient(BenchClient):
                                 f"SELECT unnest(test_cases) as test_cases from read_json_auto('{self.root_dir}/{test_suite_name}/{run_name}/run.json',timestampformat='{TIMESTAMP_FORMAT}')))").df().to_dict('records')
         except duckdb.IOException:
             cases = []
-        pagination = _paginate(cases, page, page_size)
+        
+        pagination = _paginate([RunResult.parse_obj(r) for r in cases], page, page_size, sort_key='score')
         return PaginatedRun(
             id=test_run_id,
             name=run_name,
