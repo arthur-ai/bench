@@ -7,7 +7,7 @@ from typing import Dict, Any, Optional, List, Tuple, Union
 from datetime import datetime
 
 from arthur_bench import __version__
-from arthur_bench.models.models import TestCaseRequest, TestSuiteRequest, ScoringMethod, TestSuiteResponse
+from arthur_bench.models.models import TestCaseRequest, TestSuiteRequest, PaginatedTestSuite
 from arthur_bench.client.exceptions import UserValueError
 from arthur_bench.client.bench_client import BenchClient
 
@@ -145,7 +145,7 @@ def _load_run_data_from_args(
                          "candidate_data_path csv, or candidate_output_list strings")
 
 
-def _get_suite_if_exists(client: BenchClient, name: str) -> Optional[TestSuiteResponse]:
+def _get_suite_if_exists(client: BenchClient, name: str) -> Optional[PaginatedTestSuite]:
     """
     TODO: add version validation
     """
@@ -153,5 +153,5 @@ def _get_suite_if_exists(client: BenchClient, name: str) -> Optional[TestSuiteRe
     if len(test_suite_resp.test_suites) > 0:
         # we enforce name validation, so there should ever only be one
         suite = client.get_test_suite(str(test_suite_resp.test_suites[0].id), page_size=100) # TODO: can we enforce test suite length
-        return TestSuiteResponse(**suite.dict())
+        return PaginatedTestSuite(**suite.dict())
     return None

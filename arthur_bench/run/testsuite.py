@@ -4,7 +4,7 @@ import pandas as pd
 from typing import List, Optional, Union
 from pathlib import Path
 from arthur_bench.scoring import ScoringMethod, scoring_method_class_from_string
-from arthur_bench.models.models import TestSuiteRequest, TestSuiteResponse, TestCaseOutput, CreateRunRequest, ScoringMethod as ScoringMethodMetadata, \
+from arthur_bench.models.models import TestSuiteRequest, PaginatedTestSuite, TestCaseOutput, CreateRunRequest, ScoringMethod as ScoringMethodMetadata, \
 	ScoringMethodType
 from arthur_bench.client.exceptions import UserValueError, ArthurInternalError, MissingParameterError
 from arthur_bench.client.bench_client import BenchClient
@@ -55,7 +55,7 @@ class TestSuite:
 			else:
 				client = LocalBenchClient() # type: ignore
 		self.client: BenchClient = client # type: ignore
-		self.suite: TestSuiteResponse = _get_suite_if_exists(self.client, name) # type: ignore
+		self.suite: PaginatedTestSuite = _get_suite_if_exists(self.client, name) # type: ignore
 
 		# get a scoringMethod class
 		if isinstance(scoring_method, str):
@@ -165,7 +165,7 @@ class TestSuite:
 		
 		run = CreateRunRequest(
 			name=run_name,
-			test_case_outputs=test_case_outputs,
+			test_cases=test_case_outputs,
 			model_name=model_name,
 			model_version=model_version,
 			foundation_model=foundation_model,

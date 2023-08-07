@@ -2,15 +2,14 @@ from typing import Optional, TypeVar
 from abc import ABC, abstractmethod
 
 from arthur_bench.models.models import (
-    PaginatedGetTestSuitesResponse,
+    PaginatedTestSuites,
     CreateRunResponse,
     CreateRunRequest,
-    PaginatedGetRunsForTestSuiteResponse,
-    PaginatedGetRunResponse,
-    TestSuiteResponse,
+    PaginatedRuns,
+    PaginatedRun,
     TestSuiteRequest,
-    PaginatedGetTestSuiteResponse,
-    TestSuiteSummaryResponse,
+    PaginatedTestSuite,
+    TestSuiteSummary,
 )
 
 TBenchClient = TypeVar("TBenchClient", bound="BenchClient")
@@ -26,11 +25,11 @@ class BenchClient(ABC):
         scoring_method: Optional[str] = None,
         page: int = 1,
         page_size: Optional[int] = None
-    ) -> PaginatedGetTestSuitesResponse:
+    ) -> PaginatedTestSuites:
         raise NotImplementedError
     
     @abstractmethod
-    def create_test_suite(self, json_body: TestSuiteRequest) -> TestSuiteResponse:
+    def create_test_suite(self, json_body: TestSuiteRequest) -> PaginatedTestSuite:
         raise NotImplementedError
     
     @abstractmethod
@@ -38,7 +37,7 @@ class BenchClient(ABC):
         self, 
         test_suite_id: str,
         page: int = 1,
-        page_size: Optional[int] = None) -> PaginatedGetTestSuiteResponse:
+        page_size: Optional[int] = None) -> PaginatedTestSuite:
         raise NotImplementedError
     
     @abstractmethod
@@ -48,7 +47,7 @@ class BenchClient(ABC):
         sort: Optional[str] = None,
         page: int = 1,
         page_size: Optional[int] = None
-    ) -> PaginatedGetRunsForTestSuiteResponse:
+    ) -> PaginatedRuns:
         raise NotImplementedError
     
     @abstractmethod
@@ -65,7 +64,7 @@ class BenchClient(ABC):
         page: int = 1,
         page_size: Optional[int] = None,
         sort: Optional[bool] = None,
-    ) -> PaginatedGetRunResponse:
+    ) -> PaginatedRun:
         raise NotImplementedError
     
     @abstractmethod
@@ -75,7 +74,7 @@ class BenchClient(ABC):
         run_id: Optional[str] = None,
         page: int = 1,
         page_size: Optional[int] = None,
-    ) -> TestSuiteSummaryResponse:
+    ) -> TestSuiteSummary:
         raise NotImplementedError
     
     @abstractmethod

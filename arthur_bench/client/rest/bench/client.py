@@ -7,15 +7,14 @@ from arthur_bench.client.http.requests import HTTPClient
 from arthur_bench.client.bench_client import BenchClient
 
 from arthur_bench.models.models import (
-    PaginatedGetTestSuitesResponse,
-    CreateRunResponse,
+    PaginatedTestSuites,
+    PaginatedRun,
     CreateRunRequest,
-    PaginatedGetRunsForTestSuiteResponse,
-    PaginatedGetRunResponse,
-    TestSuiteResponse,
+    PaginatedRuns,
     TestSuiteRequest,
-    PaginatedGetTestSuiteResponse,
-    TestSuiteSummaryResponse,
+    PaginatedTestSuite,
+    TestSuiteSummary,
+    CreateRunResponse
 )
 
 
@@ -43,7 +42,7 @@ class ArthurBenchClient(BenchClient):
         scoring_method: Optional[str] = None,
         page: Optional[int] = 1,
         page_size: Optional[int] = None
-    ) -> PaginatedGetTestSuitesResponse:
+    ) -> PaginatedTestSuites:
         """
                 Gets test suites
 
@@ -70,9 +69,9 @@ class ArthurBenchClient(BenchClient):
         parsed_resp = cast(Dict, self.http_client.get(
             f"/bench/test_suites", params=params, validation_response_code=HTTPStatus.OK
         ))
-        return PaginatedGetTestSuitesResponse(**parsed_resp)
+        return PaginatedTestSuites(**parsed_resp)
 
-    def create_test_suite(self, json_body: TestSuiteRequest) -> TestSuiteResponse:
+    def create_test_suite(self, json_body: TestSuiteRequest) -> PaginatedTestSuite:
         """
         Creates a new test suite from reference data using specified scoring_method for scoring
 
@@ -84,13 +83,13 @@ class ArthurBenchClient(BenchClient):
             json=json_body.dict(exclude={'created_at', 'created_by', 'bench_version'}),
             validation_response_code=HTTPStatus.CREATED,
         ))
-        return TestSuiteResponse(**parsed_resp)
+        return PaginatedTestSuite(**parsed_resp)
 
     def get_test_suite(
             self, 
             test_suite_id: str,
             page: Optional[int] = 1,
-            page_size: Optional[int] = None) -> PaginatedGetTestSuiteResponse:
+            page_size: Optional[int] = None) -> PaginatedTestSuite:
         """
         Get reference data for an existing test suite
 
@@ -107,7 +106,7 @@ class ArthurBenchClient(BenchClient):
             params=params,
             validation_response_code=HTTPStatus.OK,
         ))
-        return PaginatedGetTestSuiteResponse(**parsed_resp)
+        return PaginatedTestSuite(**parsed_resp)
 
     def get_summary_statistics(
         self,
@@ -115,7 +114,7 @@ class ArthurBenchClient(BenchClient):
         run_id: Optional[str] = None,
         page: Optional[int] = 1,
         page_size: Optional[int] = None,
-    ) -> TestSuiteSummaryResponse:
+    ) -> TestSuiteSummary:
         """
         Get paginated summary statistics of a test suite
 
@@ -140,7 +139,7 @@ class ArthurBenchClient(BenchClient):
             params=params,
             validation_response_code=HTTPStatus.OK,
         ))
-        return TestSuiteSummaryResponse(**parsed_resp)
+        return TestSuiteSummary(**parsed_resp)
 
     def get_runs_for_test_suite(
         self, 
@@ -148,7 +147,7 @@ class ArthurBenchClient(BenchClient):
         sort: Optional[str] = None,
         page: Optional[int] = 1,
         page_size: Optional[int] = None,
-    ) -> PaginatedGetRunsForTestSuiteResponse:
+    ) -> PaginatedRuns:
         """
         Get runs for a particular test suite (identified by test_suite_id)
 
@@ -169,7 +168,7 @@ class ArthurBenchClient(BenchClient):
             params=params,
             validation_response_code=HTTPStatus.OK,
         ))
-        return PaginatedGetRunsForTestSuiteResponse(**parsed_resp)
+        return PaginatedRuns(**parsed_resp)
 
     def create_new_test_run(
         self, test_suite_id: str, json_body: CreateRunRequest
@@ -196,7 +195,7 @@ class ArthurBenchClient(BenchClient):
         page: Optional[int] = 1,
         page_size: Optional[int] = None,
         sort: Optional[bool] = None,
-    ) -> PaginatedGetRunResponse:
+    ) -> PaginatedRun:
         """
         Get a test run with input, output, and reference data
 
@@ -220,7 +219,7 @@ class ArthurBenchClient(BenchClient):
             params=params,
             validation_response_code=HTTPStatus.OK,
         ))
-        return PaginatedGetRunResponse(**parsed_resp)
+        return PaginatedRun(**parsed_resp)
     
     def delete_test_suite(self, test_suite_id: str):
         """
