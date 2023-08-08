@@ -24,7 +24,7 @@ class BenchClient(ABC):
         sort: Optional[str] = None,
         scoring_method: Optional[str] = None,
         page: int = 1,
-        page_size: Optional[int] = None
+        page_size: int = 5
     ) -> PaginatedTestSuites:
         raise NotImplementedError
     
@@ -37,7 +37,7 @@ class BenchClient(ABC):
         self, 
         test_suite_id: str,
         page: int = 1,
-        page_size: Optional[int] = None) -> PaginatedTestSuite:
+        page_size: int = 5) -> PaginatedTestSuite:
         raise NotImplementedError
     
     @abstractmethod
@@ -46,7 +46,7 @@ class BenchClient(ABC):
         test_suite_id: str, 
         sort: Optional[str] = None,
         page: int = 1,
-        page_size: Optional[int] = None
+        page_size: int = 5
     ) -> PaginatedRuns:
         raise NotImplementedError
     
@@ -62,7 +62,7 @@ class BenchClient(ABC):
         test_suite_id: str,
         test_run_id: str,
         page: int = 1,
-        page_size: Optional[int] = None,
+        page_size: int = 5,
         sort: Optional[bool] = None,
     ) -> PaginatedRun:
         raise NotImplementedError
@@ -73,7 +73,7 @@ class BenchClient(ABC):
         test_suite_id: str,
         run_id: Optional[str] = None,
         page: int = 1,
-        page_size: Optional[int] = None,
+        page_size: int = 5
     ) -> TestSuiteSummary:
         raise NotImplementedError
     

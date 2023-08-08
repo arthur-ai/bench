@@ -23,7 +23,7 @@ SUITE_INDEX_FILE = 'suite_id_to_name.json'
 RUN_INDEX_FILE = 'run_id_to_name.json'
 
 TIMESTAMP_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
-
+DEFAULT_PAGE_SIZE = 5
 
 SORT_QUERY_TO_FUNC = {
     'last_run_time': lambda x: x.last_run_time if x.last_run_time is not None else x.created_at,
@@ -134,7 +134,7 @@ class LocalBenchClient(BenchClient):
     """
     Client for managing local file system test suites and runs
     """
-    def __init__(self, root_dir: Optional[str] = None):
+    def __init__(self, root_dir: Optional[Union[str, Path]] = None):
         if root_dir is None:
             root_dir = _bench_root_dir()
         self.root_dir = Path(root_dir)
@@ -177,7 +177,7 @@ class LocalBenchClient(BenchClient):
         run_index_path = self.root_dir / test_suite_name / RUN_INDEX_FILE
         LocalBenchClient._update_index(run_index_path, id, name)
 
-    def get_test_suite(self, test_suite_id: str, page: int = 1, page_size: Optional[int] = None) -> PaginatedTestSuite:
+    def get_test_suite(self, test_suite_id: str, page: int = 1, page_size: int = DEFAULT_PAGE_SIZE) -> PaginatedTestSuite:
         suite_index = json.load(open(self.root_dir / SUITE_INDEX_FILE))
         if test_suite_id not in suite_index:
             raise NotFoundError()
@@ -185,7 +185,7 @@ class LocalBenchClient(BenchClient):
             suite_file = self.root_dir / suite_index[test_suite_id] / "suite.json"
             suite = PaginatedTestSuite.parse_file(suite_file)
             pagination = _paginate(suite.test_cases, page, page_size, sort_key='id')
-            return PaginatedTestSuite(id=test_suite_id,
+            return PaginatedTestSuite(id=uuid.UUID(test_suite_id),
                                       name=suite.name,
                                       scoring_method=suite.scoring_method,
                                       test_cases=suite.test_cases[pagination.start:pagination.end],
@@ -202,7 +202,7 @@ class LocalBenchClient(BenchClient):
             sort: Optional[str] = None, 
             scoring_method: Optional[str] = None, 
             page: int = 1, 
-            page_size: Optional[int] = None) -> PaginatedTestSuites:
+            page_size: int = DEFAULT_PAGE_SIZE) -> PaginatedTestSuites:
         
         # name uniqueness
         if name is not None:
@@ -273,7 +273,7 @@ class LocalBenchClient(BenchClient):
 
         run_id = uuid.uuid4()
         resp = PaginatedRun(id=run_id,
-                            test_suite_id=test_suite_id,
+                            test_suite_id=uuid.UUID(test_suite_id),
                             updated_at=json_body.created_at, 
                             **json_body.dict())
                 
@@ -284,7 +284,7 @@ class LocalBenchClient(BenchClient):
         self._update_suite_run_time(test_suite_name=test_suite_name, runtime=resp.created_at)
         return CreateRunResponse(id=resp.id)
     
-    def get_runs_for_test_suite(self, test_suite_id: str, sort: Optional[str] = None, page: int = 1, page_size: Optional[int] = None) -> PaginatedRuns:
+    def get_runs_for_test_suite(self, test_suite_id: str, sort: Optional[str] = None, page: int = 1, page_size: int = DEFAULT_PAGE_SIZE) -> PaginatedRuns:
         test_suite_name = self._get_suite_name_from_id(test_suite_id)
         if test_suite_name is None:
             raise NotFoundError()
@@ -294,21 +294,21 @@ class LocalBenchClient(BenchClient):
         for f in run_files:
             run_obj = PaginatedRun.parse_file(f)
             avg_score = np.mean([o.score for o in run_obj.test_cases])
-            run_resp = TestRunMetadata(**run_obj.dict(), avg_score=avg_score)
+            run_resp = TestRunMetadata(**run_obj.dict(), avg_score=avg_score) # type: ignore
             runs.append(run_resp)
 
         if sort is None:
             sort = 'created_at'
 
         pagination = _paginate(runs, page, page_size, sort_key=sort)
-        return PaginatedRuns(test_suite_id=test_suite_id, 
+        return PaginatedRuns(test_suite_id=uuid.UUID(test_suite_id), 
                              test_runs=runs, 
                              page_size=pagination.page_size, 
                              page=pagination.page, 
                              total_pages=pagination.total_pages, 
                              total_count=pagination.total_count)
 
-    def get_summary_statistics(self, test_suite_id: str, run_id: Optional[str] = None, page: int = 1, page_size: Optional[int] = None) -> TestSuiteSummary:
+    def get_summary_statistics(self, test_suite_id: str, run_id: Optional[str] = None, page: int = 1, page_size: int = DEFAULT_PAGE_SIZE) -> TestSuiteSummary:
         test_suite_name = self._get_suite_name_from_id(test_suite_id)
         if test_suite_name is None:
             raise NotFoundError()
@@ -338,7 +338,7 @@ class LocalBenchClient(BenchClient):
             paginated_summary.summary.append(_summarize_run(additional_run))
         return paginated_summary
     
-    def get_test_run(self, test_suite_id: str, test_run_id: str, page: int = 1, page_size: Optional[int] = None, sort: Optional[bool] = True) -> PaginatedRun:
+    def get_test_run(self, test_suite_id: str, test_run_id: str, page: int = 1, page_size: int = DEFAULT_PAGE_SIZE, sort: Optional[bool] = True) -> PaginatedRun:
         test_suite_name = self._get_suite_name_from_id(test_suite_id)
         if test_suite_name is None:
             raise NotFoundError()
@@ -359,12 +359,13 @@ class LocalBenchClient(BenchClient):
         
         pagination = _paginate([RunResult.parse_obj(r) for r in cases], page, page_size, sort_key='score')
         return PaginatedRun(
-            id=test_run_id,
+            id=uuid.UUID(test_run_id),
             name=run_name,
             created_at=created_at,
             updated_at=created_at,
-            test_cases=cases[pagination.start:pagination.end], 
-            test_suite_id=test_suite_id, page=pagination.page, 
+            test_case_runs=cases[pagination.start:pagination.end], 
+            test_suite_id=uuid.UUID(test_suite_id), 
+            page=pagination.page, 
             page_size=pagination.page_size, 
             total_pages=pagination.total_pages, 
             total_count=pagination.total_count)

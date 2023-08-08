@@ -11,8 +11,6 @@ import socketserver
 try:
     import uvicorn
     from fastapi import FastAPI, Request
-    from fastapi.responses import RedirectResponse
-    from fastapi.templating import Jinja2Templates
     from fastapi.staticfiles import StaticFiles
     from fastapi.middleware.cors import CORSMiddleware
 
@@ -46,7 +44,7 @@ USER_ID: uuid.UUID
 
 
 @app.get("/api/v3/bench/test_suites")
-def test_suites(request: Request, page: Optional[int] = 1, page_size: Optional[int] = 5, sort: Optional[str] = None, scoring_method: Optional[str] = None, name: Optional[str] = None):
+def test_suites(request: Request, page: int = 1, page_size: int = 5, sort: Optional[str] = None, scoring_method: Optional[str] = None, name: Optional[str] = None):
     client = LocalBenchClient(root_dir=SERVER_ROOT_DIR)
     suite_resp = client.get_test_suites(page=page, page_size=page_size, sort=sort, scoring_method=scoring_method, name=name).json()
     suites = json.loads(suite_resp)
@@ -55,7 +53,7 @@ def test_suites(request: Request, page: Optional[int] = 1, page_size: Optional[i
     return suites
 
 @app.get("/api/v3/bench/test_suites/{test_suite_id}")
-def test_suite(request: Request, test_suite_id: uuid.UUID, page: Optional[int] = 1, page_size: Optional[int] = 5):
+def test_suite(request: Request, test_suite_id: uuid.UUID, page: int = 1, page_size: int = 5):
     client = LocalBenchClient(root_dir=SERVER_ROOT_DIR)
     suite_resp = client.get_test_suite(test_suite_id=str(test_suite_id), page=page, page_size=page_size).json()
     suite = json.loads(suite_resp)
@@ -76,7 +74,7 @@ def test_runs(request: Request, test_suite_id: uuid.UUID, page: int = 1, page_si
 @app.get("/api/v3/bench/test_suites/{test_suite_id}/runs/summary")
 def test_suite_summary(request: Request, test_suite_id: uuid.UUID, page: int = 1, page_size: int = 5, run_id: Optional[uuid.UUID] = None):
     client = LocalBenchClient(root_dir=SERVER_ROOT_DIR)
-    summary_resp = client.get_summary_statistics(test_suite_id=str(test_suite_id), page=page, page_size=page_size, run_id=run_id).json()
+    summary_resp = client.get_summary_statistics(test_suite_id=str(test_suite_id), page=page, page_size=page_size, run_id=str(run_id)).json()
     summary = json.loads(summary_resp)
     return summary
 
@@ -120,15 +118,6 @@ def run():
     config = get_or_persist_id()
     set_track_usage_data(config)
     USER_ID = config.user_id
-
-    # class Handler(http.server.SimpleHTTPRequestHandler):
-    #     def __init__(self, *args, **kwargs):
-    #         super().__init__(*args, directory='~/code/arthur-front-end/packages/dist', **kwargs)
-
-    # # start static http server for front end
-    # with socketserver.TCPServer(("", 8080), Handler) as httpd:
-    #     print("serving Arthur Bench at port", 8080)
-    #     httpd.serve_forever()
 
     uvicorn.run("arthur_bench.server.run_server:app", host="127.0.0.1", port=8000, log_level="info")
 
