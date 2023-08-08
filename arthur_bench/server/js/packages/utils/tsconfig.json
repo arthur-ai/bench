@@ -1,0 +1,8 @@
+{
+    "compilerOptions": {
+        "esModuleInterop": true
+    },
+    "extends": "tsconfig/react-library.json",
+    "include": ["./**/*"],
+    "exclude": ["node_modules"]
+}

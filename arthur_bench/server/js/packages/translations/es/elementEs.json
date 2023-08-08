@@ -1,0 +1,41 @@
+{
+  "content": {
+    "dashboard": "Element Dashboard"
+  },
+  "header": {
+    "title": "Arthur Element"
+  },
+  "login": {
+    "signupLink": "New to Arthur Element? <1>SIGN UP</1>",
+    "title": "Sign in to Arthur Element",
+    "welcomeMessage": "Hi! Welcome back."
+  },
+  "signup": {
+    "createAnAccount": "CREATE AN ACCOUNT",
+    "firstName": "First name",
+    "getInsights": "Get insights and control",
+    "getInsightsExpanded": "Track performance metrics like accuracy and recall to detecting deeper issues like data drift. Bias detection and mitigation, as well as model explainability tools are also available.",
+    "lastName": "Last name",
+    "liftBurden": "Lift the monitoring burden",
+    "liftBurdenExpanded": "Fast and easy solution to spend less time babysitting production ML and more time solving interesting problems.",
+    "loginLink": "Already have an account? <1>SIGN IN</1>",
+    "organization": "Organization",
+    "signupTitle": "Sign up to Arthur",
+    "termsAndPolicies": "By checking this box and clicking the “Create an account” button below, you acknowledge that you have read and reviewed the <1>Terms of Service</1> and <3>Privacy Policy</3> and agree to be subject to those terms and policies.",
+    "errors": {
+      "allFields": "All fields are required.",
+      "emailMissingError": "Email is a required field.",
+      "existingOrganization": "This organization already exists. Please reach out to your admin to get an invite to your organization or enter a unique organization name to continue.",
+      "existingUser": "A user with this email already exists. You can try to Sign in.",
+      "matchPasswords": "Password fields must match."
+    }
+  },
+  "emailVerification": {
+    "prompt": "Hi {{name}}! We sent a verification link to {{email}}. Please check your email, or click on the button below to verfiy your email address and start using Arthur Element.",
+    "reminderPrompt": "Hi {{name}}! We sent a verification link to {{email}}. Please check your email, or click on the button below to resend the verification email.",
+    "reminderTitle": "It looks like you haven't verified your email yet",
+    "resendEmail": "RESEND EMAIL",
+    "title": "Verify your email address",
+    "verifyEmail": "VERIFY EMAIL"
+  }
+}
