@@ -9,11 +9,13 @@ Bench is built for evaluating LLMs for production use cases. Bench can be used f
 ## Getting started
 
 ### Package installation and environment setup
-Install Bench with minimum dependencies:
-`pip install -e .`
+First download the tar file from the Github releases. Next install the package to your python environment.
 
-Install Bench with optional dependencies for serving results locally:  
-`pip install -e '.[server]'`
+Install Bench with optional dependencies for serving results locally (recommended):  
+`pip install --find-links=./directory_with_tar_file 'arthur-bench[server]'`
+
+Install Bench with minimum dependencies:
+`pip install --find-links=./directory_with_tar_file 'arthur-bench'`
 
 Bench saves test suites and test runs to the directory specified by the `BENCH_FILE_DIR`, which defaults to `./bench`
 

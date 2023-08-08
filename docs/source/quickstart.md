@@ -1,15 +1,16 @@
 ## Quickstart
 ### Package installation and environment setup
+First download the tar file from the Github releases. Next install the package to your python environment.
+
+Install Bench with optional dependencies for serving results locally (recommended):  
+`pip install --find-links=./path_to_tar_file 'arthur-bench[server]'`
+
 Install Bench with minimum dependencies:
-
-`pip install -e .`
-
-Install Bench with optional dependencies for serving results locally:  
-`pip install -e '.[server]'`
+`pip install --find-links=./path_to_tar_file 'arthur-bench'`
 
 Bench has two options for tracking datasets and results:
 
-1) Local only: save data and run server on the same machine that is running the bench package
+1) Local only (default): save data and run server on the same machine that is running the bench package
 
 2) Arthur SaaS Platform: Use the package client to log data and results to the Arthur platform. Arthur manages data storage and persistence and hosts the bench server.
 
@@ -18,6 +19,8 @@ Bench has two options for tracking datasets and results:
 Bench saves test suites and test runs to the directory specified by the `BENCH_FILE_DIR`, which defaults to `./bench`
 
 Suites can be viewed in browser by running `bench` from the command line.
+
+This is the default mode.
 
 #### Logging to your remote Arthur organization
 

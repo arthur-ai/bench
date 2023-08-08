@@ -1,6 +1,6 @@
 ## Evaluating LLM generated summaries with Bench
 
-This guide provides a step by step tutorial on LLM evaluation with the Bench SaaS platform. To get started with key bench concepts like test suites, test runs, and scoring methods, check out [this page](concepts.md) first. 
+This guide provides a step by step tutorial on LLM evaluation with the Bench SaaS platform. It can be run in local mode by skipping step 1, and use the cli to view results. To get started with key bench concepts like test suites, test runs, and scoring methods, check out [this page](concepts.md) first. 
 
 In this example, we will use the bench library to get started evaluating different LLMs for news article summarization and log the results to the Arthur Bench platform. We will walk through the following steps:
 
