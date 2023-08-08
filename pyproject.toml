@@ -53,7 +53,7 @@ bench = "arthur_bench.server.run_server:run"
 url = 'http://arthur.ai'
 
 [tool.setuptools.packages.find]
-exclude = ["test", "examples"]
+exclude = ["docs*", "test*", "examples*"]
 
 [tool.setuptools.dynamic]
 version = {attr = "arthur_bench.__version__"}
