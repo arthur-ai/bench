@@ -11,6 +11,7 @@ DEFAULT_MODEL = "microsoft/deberta-v3-base"
 PRECISION_WEIGHT = 0.1
 RECALL_WEIGHT = 0.9
 
+# [TODO] need to make these editable by user
 DEFAULT_HEDGE = "As an AI language model, I don't have personal opinions, emotions, or beliefs."
 DEFAULT_THRESHOLD = 0.6
 
@@ -24,16 +25,15 @@ class HedgingLanguage(ScoringMethod):
     def requires_reference() -> bool:
         return False
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         with suppress_warnings("transformers"):
             self.scorer = BERTScorer(lang='en', model_type=DEFAULT_MODEL)
 
     def run_batch(self, candidate_batch: List[str], reference_batch: Optional[List[str]] = None,
-                  input_text_batch: Optional[List[str]] = None, context_batch: Optional[List[str]] = None,
-                  reference_hedge: Optional[str] = DEFAULT_HEDGE, bertscore_threshold:  Optional[float] = DEFAULT_THRESHOLD) -> List[float]:
+                  input_text_batch: Optional[List[str]] = None, context_batch: Optional[List[str]] = None) -> List[float]:
 
         # convert reference hedge to list
-        reference_batch = [reference_hedge] * len(candidate_batch)
+        reference_batch = [DEFAULT_HEDGE] * len(candidate_batch)
 
         # get precision, recall, and F1 score from bert_score package
         p, r, f = self.scorer.score(candidate_batch, reference_batch, verbose=False)
@@ -42,6 +42,6 @@ class HedgingLanguage(ScoringMethod):
         list_bertscore = (PRECISION_WEIGHT * p + RECALL_WEIGHT * r).tolist()
 
         # generate list of hedges based on threshold
-        list_hedges = [float(n >= bertscore_threshold) for n in list_bertscore]
+        list_hedges = [float(n >= DEFAULT_THRESHOLD) for n in list_bertscore]
 
         return list_hedges
