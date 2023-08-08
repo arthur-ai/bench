@@ -37,7 +37,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-FRONT_END_DIRECTORY = Path(__file__).parent / "build"
+FRONT_END_DIRECTORY = Path(__file__).parent / "js" / "dist"
 
 SERVER_ROOT_DIR: Path
 USER_ID: uuid.UUID
@@ -65,16 +65,16 @@ def test_suite(request: Request, test_suite_id: uuid.UUID, page: int = 1, page_s
 def test_runs(request: Request, test_suite_id: uuid.UUID, page: int = 1, page_size: int = 5, sort: Optional[str] = None):
     client = LocalBenchClient(root_dir=SERVER_ROOT_DIR)
     run_resp = client.get_runs_for_test_suite(test_suite_id=str(test_suite_id), page=page, page_size=page_size, sort=sort).json()
+    suite_resp = client.get_test_suite(test_suite_id=str(test_suite_id))
     runs = json.loads(run_resp)
-    # TODO: reset amplitude
-    # send_event({"event_type": "test_runs_load", "event_properties": {"test_runs_all": [str(run['created_at']) for run in runs], "scoring_method_real": suite}}, USER_ID)
+    send_event({"event_type": "test_runs_load", "event_properties": {"test_runs_all": [str(run["created_at"]) for run in runs["test_runs"]], "scoring_method_real": suite_resp.scoring_method.name}}, USER_ID)
     return runs
 
 
 @app.get("/api/v3/bench/test_suites/{test_suite_id}/runs/summary")
 def test_suite_summary(request: Request, test_suite_id: uuid.UUID, page: int = 1, page_size: int = 5, run_id: Optional[uuid.UUID] = None):
     client = LocalBenchClient(root_dir=SERVER_ROOT_DIR)
-    summary_resp = client.get_summary_statistics(test_suite_id=str(test_suite_id), page=page, page_size=page_size, run_id=str(run_id)).json()
+    summary_resp = client.get_summary_statistics(test_suite_id=str(test_suite_id), page=page, page_size=page_size, run_id=str(run_id) if run_id is not None else None).json()
     summary = json.loads(summary_resp)
     return summary
 

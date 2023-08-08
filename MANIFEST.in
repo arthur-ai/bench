@@ -1,1 +1,1 @@
-recursive-include arthur_bench/server/html/*
+recursive-include arthur_bench/server/js/dist/*

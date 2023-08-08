@@ -309,6 +309,7 @@ class LocalBenchClient(BenchClient):
                              total_count=pagination.total_count)
 
     def get_summary_statistics(self, test_suite_id: str, run_id: Optional[str] = None, page: int = 1, page_size: int = DEFAULT_PAGE_SIZE) -> TestSuiteSummary:
+        print(test_suite_id)
         test_suite_name = self._get_suite_name_from_id(test_suite_id)
         if test_suite_name is None:
             raise NotFoundError()
@@ -319,7 +320,7 @@ class LocalBenchClient(BenchClient):
         for f in run_files:
             run_obj = PaginatedRun.parse_file(f)
             runs.append(_summarize_run(run=run_obj))
-            if run_obj.id == run_id:
+            if str(run_obj.id) == run_id:
                 run_id_found = True
         
         pagination = _paginate(runs, page, page_size, sort_key='avg_score')

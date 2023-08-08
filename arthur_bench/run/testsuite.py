@@ -2,7 +2,6 @@ import os
 import logging
 import pandas as pd
 from typing import List, Optional, Union
-from pathlib import Path
 from arthur_bench.scoring import ScoringMethod, scoring_method_class_from_string
 from arthur_bench.models.models import TestSuiteRequest, PaginatedTestSuite, TestCaseOutput, CreateRunRequest, ScoringMethod as ScoringMethodMetadata, \
 	ScoringMethodType
@@ -10,6 +9,7 @@ from arthur_bench.client.exceptions import UserValueError, ArthurInternalError, 
 from arthur_bench.client.bench_client import BenchClient
 from arthur_bench.client.local.client import LocalBenchClient
 from arthur_bench.client.rest.client import ArthurClient
+from arthur_bench.run.testrun import TestRun
 from arthur_bench.run.utils import _initialize_metadata, _load_suite_from_args, _load_run_data_from_args, _get_suite_if_exists
 from arthur_bench.scoring.scoring_method import SINGLE_ITEM_BATCH_DEFAULT
 
@@ -110,7 +110,7 @@ class TestSuite:
 			foundation_model: Optional[str] = None,
 			prompt_template: Optional[str] = None
 
-	) -> CreateRunRequest:
+	) -> TestRun:
 		"""
 		Score a test run on candidate outputs.
 
@@ -163,18 +163,20 @@ class TestSuite:
 		
 		test_case_outputs = [TestCaseOutput(id=id_, output=output, score=score) for id_, output, score in zip(ids, candidate_output_list, all_scores)]
 		
-		run = CreateRunRequest(
+		run = TestRun(
 			name=run_name,
 			test_cases=test_case_outputs,
 			model_name=model_name,
 			model_version=model_version,
 			foundation_model=foundation_model,
 			prompt_template=prompt_template,
+			test_suite_id=self.suite.id,
+			client=self.client,
 			**_initialize_metadata()
 		)
 
 		if save:
-			self.client.create_new_test_run(test_suite_id=str(self.suite.id), json_body=run)
+			run.save()
 			
 		return run
 
