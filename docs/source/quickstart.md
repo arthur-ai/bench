@@ -33,6 +33,16 @@ os.environ['ARTHUR_API_URL'] = 'https://app.arthur.ai'
 os.environ['ARTHUR_API_KEY'] = 'FILL ME IN'
 ```
 
+### Exploring the UI
+The following commands will spin up a local UI serving two example test suites we've added
+
+```
+git clone git@github.com:arthur-ai/bench.git
+cd bench/examples  # navigate to bench root directory
+bench
+```
+
+
 ### Creating your first suite
 
 Instantiate a test suite with name, data, and scoring method.
