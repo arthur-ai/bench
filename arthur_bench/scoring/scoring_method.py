@@ -1,6 +1,5 @@
 from abc import abstractmethod, ABC
 import sys
-from os import PathLike
 from typing import List, Optional, TypeVar
 
 from tqdm import tqdm

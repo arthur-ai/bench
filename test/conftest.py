@@ -1,6 +1,6 @@
 import pytest
 import pandas as pd
-from arthur_bench.models.models import TestSuiteRequest, TestCaseRequest, TestCaseOutput
+from arthur_bench.models.models import TestSuiteRequest, TestCaseRequest, TestCaseOutput, PaginatedTestSuite, PaginatedTestSuites
 from arthur_bench.run.testrun import TestRun
 
 

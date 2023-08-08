@@ -1,0 +1,23 @@
+{
+    "header": {
+      "title": "Arthur AI"
+    },
+    "login": {
+      "signupLink": "New to Arthur AI? <1>Sign up</1>",
+      "title": "Iniciar sesión en Arthur AI",
+      "welcomeMessage": "Hi! Welcome back."
+    },
+    "landingPage": {
+      "welcome": "welcome ,",
+      "keyMetrics": "Key Metrics",
+      "keyMetricsOptions": {
+        "modelActivity": "Model Activity",
+        "activeModelGroup": "Active Model Groups",
+        "inferences": "Inferences",
+        "criticalAlerts": "Critical Alerts",
+        "warnings": "Warnings",
+        "insights": "Insights"
+      }
+    }
+  }
+  
