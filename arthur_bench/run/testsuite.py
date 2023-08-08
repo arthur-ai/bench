@@ -1,16 +1,16 @@
+import os
 import logging
 import pandas as pd
 from typing import List, Optional, Union
-from pathlib import Path
-
 from arthur_bench.scoring import ScoringMethod, scoring_method_class_from_string
-from arthur_bench.models.models import TestSuiteRequest, TestCaseOutput, ScoringMethod as ScoringMethodMetadata, \
+from arthur_bench.models.models import TestSuiteRequest, PaginatedTestSuite, TestCaseOutput, CreateRunRequest, ScoringMethod as ScoringMethodMetadata, \
 	ScoringMethodType
-from arthur_bench.client.exceptions import UserValueError, ArthurInternalError
+from arthur_bench.client.exceptions import UserValueError, ArthurInternalError, MissingParameterError
+from arthur_bench.client.bench_client import BenchClient
+from arthur_bench.client.local.client import LocalBenchClient
+from arthur_bench.client.rest.client import ArthurClient
 from arthur_bench.run.testrun import TestRun
-from arthur_bench.run.utils import _create_test_suite_dir, _initialize_metadata, _test_suite_dir, \
-	_create_run_dir, _clean_up_run, _load_suite_from_args, _load_run_data_from_args, _get_suite_if_exists
-from arthur_bench.scoring import scoring_method_class_from_string
+from arthur_bench.run.utils import _initialize_metadata, _load_suite_from_args, _load_run_data_from_args, _get_suite_if_exists
 from arthur_bench.scoring.scoring_method import SINGLE_ITEM_BATCH_DEFAULT
 
 
@@ -42,10 +42,20 @@ class TestSuite:
 			input_column: str = "input",
 			reference_column: str = "reference_output",
 			input_text_list: Optional[List[str]] = None,
-			reference_output_list: Optional[List[str]] = None
+			reference_output_list: Optional[List[str]] = None,
+			client: Optional[type[BenchClient]] = None
 	):
-		self.id = None
-		self.suite: TestSuiteRequest = _get_suite_if_exists(name) # type: ignore 
+		url = os.getenv('ARTHUR_API_URL')
+		if client is None:
+			if url:  # if remote url is specified use remote client
+				api_key = os.getenv('ARTHUR_API_KEY')
+				if api_key is None:
+					raise MissingParameterError("You must provide an api key when using remote url")
+				client = ArthurClient(url=url, api_key=api_key).bench # type: ignore
+			else:
+				client = LocalBenchClient() # type: ignore
+		self.client: BenchClient = client # type: ignore
+		self.suite: PaginatedTestSuite = _get_suite_if_exists(self.client, name) # type: ignore
 
 		# get a scoringMethod class
 		if isinstance(scoring_method, str):
@@ -62,18 +72,18 @@ class TestSuite:
 				requires_reference=scoring_method.requires_reference()
 			)
 			method_meta = ScoringMethodMetadata(name=scoring_method.name(), type=scoring_method.type())
-			self.suite = TestSuiteRequest(
+			new_suite = TestSuiteRequest(
 				name=name,
 				scoring_method=method_meta,
 				description=description,
 				test_cases=cases,
 				**_initialize_metadata()
 			)
-			self._test_suite_dir: Path = _create_test_suite_dir(name)
+			self.suite = self.client.create_test_suite(new_suite)
 			self.scorer: ScoringMethod = scoring_method()
+
 		else:
 			logger.info(f"Found existing test suite with name {name}. Using existing suite")
-			self._test_suite_dir = _test_suite_dir(name)
 			
 			if self.suite.scoring_method.type == ScoringMethodType.Custom:
 				if scoring_method.name() != self.suite.scoring_method.name:
@@ -133,11 +143,8 @@ class TestSuite:
 			raise UserValueError(
 				f"candidate data has {len(candidate_output_list)} tests but expected {len(self.suite.test_cases)} tests")
 
-		run_dir = None
-		if save:
-			run_dir = _create_run_dir(self.suite.name, run_name)
-
 		inputs = [case.input for case in self.suite.test_cases]
+		ids = [case.id for case in self.suite.test_cases]
 		# ref outputs should be None if any items are None (we validate nullness must be all-or-none)
 		ref_outputs: Optional[List[str]] = []
 		if ref_outputs is not None:
@@ -152,27 +159,25 @@ class TestSuite:
 										 batch_size=batch_size)
 		except Exception as e:
 			logger.error(f"failed to create run: {e}")
-			if run_dir:
-				_clean_up_run(run_dir=run_dir)
 			raise ArthurInternalError(f"failed to create run {run_name}") from e
-
-		test_case_outputs = [TestCaseOutput(output=output, score=score) for output, score in zip(candidate_output_list, all_scores)]
-
+		
+		test_case_outputs = [TestCaseOutput(id=id_, output=output, score=score) for id_, output, score in zip(ids, candidate_output_list, all_scores)]
+		
 		run = TestRun(
 			name=run_name,
-			test_case_outputs=test_case_outputs,
+			test_cases=test_case_outputs,
 			model_name=model_name,
 			model_version=model_version,
 			foundation_model=foundation_model,
 			prompt_template=prompt_template,
-			run_dir=run_dir,
+			test_suite_id=self.suite.id,
+			client=self.client,
 			**_initialize_metadata()
 		)
 
 		if save:
-			self.save()
 			run.save()
-
+			
 		return run
 
 	def save(self):

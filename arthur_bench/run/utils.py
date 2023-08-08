@@ -7,35 +7,14 @@ from typing import Dict, Any, Optional, List, Tuple, Union
 from datetime import datetime
 
 from arthur_bench import __version__
-from arthur_bench.models.models import TestCaseRequest, TestSuiteRequest, ScoringMethod as ScoringMethodEnum
+from arthur_bench.models.models import TestCaseRequest, TestSuiteRequest, PaginatedTestSuite
 from arthur_bench.client.exceptions import UserValueError
-from arthur_bench.scoring import BERTScore, QAQualityCorrectness, SummaryQuality, ScoringMethod
-
-BENCH_FILE_DIR_KEY = 'BENCH_FILE_DIR'
-DEFAULT_BENCH_FILE_DIR = str(Path(os.getcwd()) / "bench")
+from arthur_bench.client.bench_client import BenchClient
 
 
 def get_file_extension(filepath: Union[str, os.PathLike]) -> str:
     _, ext = os.path.splitext(filepath)
     return ext
-
-
-def _bench_root_dir() -> str:
-    return os.environ.get(BENCH_FILE_DIR_KEY, DEFAULT_BENCH_FILE_DIR)
-
-
-def _test_suite_dir(test_suite_name: str) -> Path:
-    return Path(_bench_root_dir()) / test_suite_name
-
-
-def _create_test_suite_dir(test_suite_name: str) -> Path:
-    if not os.path.exists(_bench_root_dir()):
-        os.mkdir(_bench_root_dir())
-    test_suite_dir = _test_suite_dir(test_suite_name)
-    if test_suite_dir.is_dir():
-        raise UserValueError(f"test_suite {test_suite_name} already exists")
-    os.mkdir(test_suite_dir)
-    return test_suite_dir
 
 
 def _initialize_metadata() -> Dict[str, Any]:
@@ -44,18 +23,6 @@ def _initialize_metadata() -> Dict[str, Any]:
         "bench_version": __version__,
         "created_by": getpass.getuser()
     }
-
-
-def _create_run_dir(test_suite_name: str, run_name: str) -> Path:
-    run_dir = _test_suite_dir(test_suite_name) / run_name 
-    if os.path.exists(run_dir):
-        raise UserValueError(f"run {run_name} already exists")
-    os.mkdir(run_dir)
-    return run_dir
-
-
-def _clean_up_run(run_dir: Path):
-    run_dir.rmdir()
 
 
 def _validate_dataframe(data: pd.DataFrame, column: str):
@@ -178,11 +145,13 @@ def _load_run_data_from_args(
                          "candidate_data_path csv, or candidate_output_list strings")
 
 
-def _get_suite_if_exists(name: str) -> Optional[TestSuiteRequest]:
+def _get_suite_if_exists(client: BenchClient, name: str) -> Optional[PaginatedTestSuite]:
     """
     TODO: add version validation
     """
-    test_suite_dir = _test_suite_dir(name)
-    if test_suite_dir.is_dir():
-        return load_suite_from_json(Path(test_suite_dir / "suite.json"))
+    test_suite_resp = client.get_test_suites(name=name)
+    if len(test_suite_resp.test_suites) > 0:
+        # we enforce name validation, so there should ever only be one
+        suite = client.get_test_suite(str(test_suite_resp.test_suites[0].id), page_size=100) # TODO: can we enforce test suite length
+        return PaginatedTestSuite(**suite.dict())
     return None

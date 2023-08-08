@@ -148,7 +148,7 @@ class UserResponse(BaseModel):
     """
     The username the user can use to login
     """
-    roles: List[str]
+    roles: Optional[List[str]]
     """
     The user's roles
     """
