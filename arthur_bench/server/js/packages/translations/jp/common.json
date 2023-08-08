@@ -1,0 +1,73 @@
+{
+    "filter": {
+      "error": "Please select detected object."
+    },
+    "inference": {
+      "tabs": {
+        "anomalyScore": "Anomaly Score",
+        "predictions": "Predictions",
+        "nonInput": "Non-Input Attributes",
+        "groundTruth": "Ground Truth",
+        "explanations": "Explanations"
+      }
+    },
+    "home": {
+      "noInferencesToDisplay": "No inferences to display"
+    },
+    "button": {
+      "close": "Close",
+      "loadMore": "Load more",
+      "disable": "Disable",
+      "enable": "Enable",
+      "login": "LOG IN",
+      "signIn": "SIGN IN",
+      "reset": "RESET"
+    },
+    "value": "Value",
+    "attribute": "Attribute",
+    "detectedObjects": "Detected Objects",
+    "condition": "Condition",
+    "pageNotFound": "Page not found",
+    "loading": "Loading",
+    "copyright": "Copyright. All rights reserved.",
+    "itemsPerPage": "Items per page",
+    "orderBy": "Order by",
+    "anomalyScore": "Anomaly score",
+    "timeframe": "Timeframe",
+    "unknownUser": "Unknown User",
+    "login": {
+      "confirmPassword": "Confirm password",
+      "email": "Email",
+      "emailIncorrectError": "The email you entered is incorrect. Please try again.",
+      "emailMissingError": "Email is a required field.",
+      "forgotPassword": "FORGOT PASSWORD?",
+      "password": "Password",
+      "passwordIncorrectError": "The password you entered is incorrect. Please try again.",
+      "passwordMissingError": "Password is a required field.",
+      "passwordResetPrompt": "We'll send a reset link to your inbox.",
+      "rememberOnDevice": "Remember me on this device",
+      "resetPassword": "Reset your password"
+    },
+    "pagination": {
+      "rowsPerPage": "Rows per page:",
+      "pageRange": "{{low}} - {{high}} of {{total}}"
+    },
+    "modelsTable": {
+      "headers": {
+        "modelInfo": "MODEL INFO in japanese",
+        "inferences": "INFERENCES",
+        "health": "HEALTH",
+        "alerts": "ALERTS",
+        "name": "Name",
+        "group": "Group",
+        "createdOn": "Created On",
+        "count": "Count",
+        "activity": "Activity",
+        "accuracy": "Accuracy",
+        "ingestion": "Ingestion",
+        "drift": "Drift",
+        "critical": "Critical"
+      }
+    }
+  }
+  

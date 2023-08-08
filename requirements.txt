@@ -10,3 +10,4 @@ sentencepiece==0.1.99
 tiktoken==0.4.0
 tqdm==4.65.0
 amplitude-analytics==1.1.1
+duckdb~=0.8.1

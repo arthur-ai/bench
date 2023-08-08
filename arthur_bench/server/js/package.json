@@ -1,0 +1,55 @@
+{
+    "name": "arthur-bench",
+    "version": "0.1.0",
+    "private": true,
+    "dependencies": {
+        "@reduxjs/toolkit": "^1.8.3",
+        "@storybook/addon-actions": "^6.5.9",
+        "@types/luxon": "^3.0.0",
+        "@types/react": "^18.0.17",
+        "api": "file:packages/api",
+        "arthur-axios": "file:packages/arthur-axios",
+        "arthur-redux": "file:packages/arthur-redux",
+        "axios": "^0.27.2",
+        "components": "*",
+        "echarts": "^5.3.3",
+        "echarts-for-react": "^3.0.2",
+        "fela": "^12.1.2",
+        "i18next": "^21.8.13",
+        "icomoon-react": "3.0.0",
+        "luxon": "^3.0.1",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "react-fela": "^12.1.2",
+        "react-i18next": "^11.18.0",
+        "react-redux": "^8.0.2",
+        "react-router-dom": "^6.3.0",
+        "react-scripts": "5.0.1",
+        "redux": "^4.2.0",
+        "redux-api-middleware": "^3.2.1",
+        "redux-logger": "^3.0.6",
+        "resources": "file:packages/resources",
+        "ts-loader": "^9.3.0",
+        "tsconfig": "file:packages/tsconfig",
+        "ui": "file:packages/components",
+        "utils": "file:packages/utils",
+        "webpack": "^5.73.0"
+    },
+    "scripts": {
+        "build": "NODE_ENV=production webpack --config=webpack-config/config.js"
+    },
+    "eslintConfig": {
+        "extends": [
+            "react-app",
+            "react-app/jest"
+        ]
+    },
+    "devDependencies": {
+        "@types/jest": "^29.5.3",
+        "@types/lodash.merge": "^4.6.7",
+        "@types/react-dom": "^18.0.6",
+        "@types/redux-api-middleware": "^3.2.3",
+        "@types/uuid": "^9.0.2",
+        "webpack-cli": "^5.1.4"
+    }
+}

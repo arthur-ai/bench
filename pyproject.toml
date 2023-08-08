@@ -20,6 +20,7 @@ classifiers = [
 dynamic = ["version"]
 
 dependencies = [
+    'duckdb~=0.8.1',
     'openai==0.27.0',
     'pandas~=2.0.1',
     'langchain~=0.0.170',
@@ -35,7 +36,6 @@ dependencies = [
 
 [project.optional-dependencies]
 server = [
-    'duckdb~=0.8.1',
     'fastapi~=0.99.1',
     'uvicorn~=0.22.0',
     'amplitude-analytics==1.1.1'

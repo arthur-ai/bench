@@ -1,0 +1,326 @@
+@font-face {
+  font-family: "Mono-Regular";
+  src: url("IBM_Plex_Mono/IBMPlexMono-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Mono-Bold";
+  src: url("IBM_Plex_Mono/IBMPlexMono-Bold.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Mono-ExtraLight";
+  src: url("IBM_Plex_Mono/IBMPlexMono-ExtraLight.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Mono-ExtraLightItalic";
+  src: url("IBM_Plex_Mono/IBMPlexMono-ExtraLightItalic.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Mono-Italic";
+  src: url("IBM_Plex_Mono/IBMPlexMono-Italic.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Mono-Light";
+  src: url("IBM_Plex_Mono/IBMPlexMono-Light.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Mono-LightItalic";
+  src: url("IBM_Plex_Mono/IBMPlexMono-LightItalic.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Mono-Medium";
+  src: url("IBM_Plex_Mono/IBMPlexMono-Medium.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Mono-MediumItalic";
+  src: url("IBM_Plex_Mono/IBMPlexMono-MediumItalic.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Mono-SemiBold";
+  src: url("IBM_Plex_Mono/IBMPlexMono-SemiBold.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Mono-SemiBoldItalic";
+  src: url("IBM_Plex_Mono/IBMPlexMono-SemiBoldItalic.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Mono-Thin";
+  src: url("IBM_Plex_Mono/IBMPlexMono-Thin.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Mono-ThinItalic";
+  src: url("IBM_Plex_Mono/IBMPlexMono-ThinItalic.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Lato-ThinItalic";
+  src: url("Lato/Lato-ThinItalic.ttf") format("truetype");
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Lato-LightItalic";
+  src: url("Lato/Lato-LightItalic.ttf") format("truetype");
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Lato-Bold";
+  src: url("Lato/Lato-Bold.ttf") format("truetype");
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Lato-BoldItalic";
+  src: url("Lato/Lato-BoldItalic.ttf") format("truetype");
+  font-weight: bold;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Lato-BlackItalic";
+  src: url("Lato/Lato-BlackItalic.ttf") format("truetype");
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Lato-Black";
+  src: url("Lato/Lato-Black.ttf") format("truetype");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Lato-Light";
+  src: url("Lato/Lato-Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Lato-Italic";
+  src: url("Lato/Lato-Italic.ttf") format("truetype");
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Lato-Regular";
+  src: url("Lato/Lato-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Graphik BoldItalic';
+  src: url('Graphik/Graphik-BoldItalic.otf') format('otf'), 
+      url('Graphik/Graphik-BoldItalic.woff2') format('woff2'),
+      url('Graphik/Graphik-BoldItalic.woff') format('woff');
+  font-weight: bold;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Graphik Regular';
+  src: url('Graphik/Graphik-Regular.otf') format('otf'), 
+      url('Graphik/Graphik-Regular.woff2') format('woff2'),
+      url('Graphik/Graphik-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Graphik Thin';
+  src: url('Graphik/Graphik-Thin.otf') format('otf'), 
+      url('Graphik/Graphik-Thin.woff2') format('woff2'),
+      url('Graphik/Graphik-Thin.woff') format('woff');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Graphik LightItalic';
+  src: url('Graphik/Graphik-LightItalic.otf') format('otf'), 
+      url('Graphik/Graphik-LightItalic.woff2') format('woff2'),
+      url('Graphik/Graphik-LightItalic.woff') format('woff');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Graphik ThinItalic';
+  src: url('Graphik/Graphik-ThinItalic.otf') format('otf'), 
+      url('Graphik/Graphik-ThinItalic.woff2') format('woff2'),
+      url('Graphik/Graphik-ThinItalic.woff') format('woff');
+  font-weight: 100;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Graphik Semibold';
+  src: url('Graphik/Graphik-Semibold.otf') format('otf'), 
+      url('Graphik/Graphik-Semibold.woff2') format('woff2'),
+      url('Graphik/Graphik-Semibold.woff') format('woff');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Graphik Light';
+  src: url('Graphik/Graphik-Light.otf') format('otf'), 
+      url('Graphik/Graphik-Light.woff2') format('woff2'),
+      url('Graphik/Graphik-Light.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Graphik Medium';
+  src: url('Graphik/Graphik-Medium.otf') format('otf'), 
+      url('Graphik/Graphik-Medium.woff2') format('woff2'),
+      url('Graphik/Graphik-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Graphik ExtralightItalic';
+  src: url('Graphik/Graphik-ExtralightItalic.otf') format('otf'), 
+      url('Graphik/Graphik-ExtralightItalic.woff2') format('woff2'),
+      url('Graphik/Graphik-ExtralightItalic.woff') format('woff');
+  font-weight: 200;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Graphik Extralight';
+  src: url('Graphik/Graphik-Extralight.otf') format('otf'), 
+      url('Graphik/Graphik-Extralight.woff2') format('woff2'),
+      url('Graphik/Graphik-Extralight.woff') format('woff');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Graphik BlackItalic';
+  src: url('Graphik/Graphik-BlackItalic.otf') format('otf'), 
+      url('Graphik/Graphik-BlackItalic.woff2') format('woff2'),
+      url('Graphik/Graphik-BlackItalic.woff') format('woff');
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Graphik Super';
+  src: url('Graphik/Graphik-Super.otf') format('otf'), 
+      url('Graphik/Graphik-Super.woff2') format('woff2'),
+      url('Graphik/Graphik-Super.woff') format('woff');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Graphik MediumItalic';
+  src: url('Graphik/Graphik-MediumItalic.otf') format('otf'), 
+      url('Graphik/Graphik-MediumItalic.woff2') format('woff2'),
+      url('Graphik/Graphik-MediumItalic.woff') format('woff');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Graphik SemiboldItalic';
+  src: url('Graphik/Graphik-SemiboldItalic.otf') format('otf'), 
+      url('Graphik/Graphik-SemiboldItalic.woff2') format('woff2'),
+      url('Graphik/Graphik-SemiboldItalic.woff') format('woff');
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Graphik Bold';
+  src: url('Graphik/Graphik-Bold.otf') format('otf'), 
+      url('Graphik/Graphik-Bold.woff2') format('woff2'),
+      url('Graphik/Graphik-Bold.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Graphik Super';
+  src: url('Graphik/Graphik-SuperItalic.otf') format('otf'), 
+      url('Graphik/Graphik-SuperItalic.woff2') format('woff2'),
+      url('Graphik/Graphik-SuperItalic.woff') format('woff');
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+
