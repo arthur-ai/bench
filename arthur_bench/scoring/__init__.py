@@ -24,7 +24,9 @@ SCORING_METHOD_CLASS_MAP: Dict[str, type[ScoringMethod]] = {
     ScoringMethodEnum.BERTScore: BERTScore,
     ScoringMethodEnum.QACorrectness: QAQualityCorrectness,
     ScoringMethodEnum.SummaryQuality: SummaryQuality,
-    ScoringMethodEnum.ExactMatch: ExactMatch
+    ScoringMethodEnum.ExactMatch: ExactMatch,
+    ScoringMethodEnum.Readability: Readability,
+    ScoringMethodEnum.WordCountMatch: WordCountMatch
 }
 
 
