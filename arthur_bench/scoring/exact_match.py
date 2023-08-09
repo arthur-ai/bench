@@ -9,6 +9,10 @@ class ExactMatch(ScoringMethod):
     Returns 1 if candidate matches reference, 0 if candidate does not match reference.
     """
 
+    @staticmethod
+    def name() -> str:
+        return "exact_match"
+
     def run_batch(self, candidate_batch: List[str], reference_batch: Optional[List[str]] = None,
                   input_text_batch: Optional[List[str]] = None, context_batch: Optional[List[str]] = None) -> List[float]:
         if reference_batch is None:

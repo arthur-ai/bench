@@ -16,6 +16,9 @@ class WordCountMatch(ScoringMethod):
     Utilizes lexicon count, removing punctuations: https://pypi.org/project/textstat/
     
     """
+    @staticmethod
+    def name() -> str:
+        return "word_count_match"
 
     def run_batch(self, candidate_batch: List[str], reference_batch: Optional[List[str]] = None,
                   input_text_batch: Optional[List[str]] = None, context_batch: Optional[List[str]] = None) -> List[float]:

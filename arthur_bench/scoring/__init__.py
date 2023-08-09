@@ -31,6 +31,5 @@ SCORING_METHOD_CLASS_MAP: Dict[str, type[ScoringMethod]] = {
 def scoring_method_class_from_string(method: str) -> type[ScoringMethod]:
     if method in SCORING_METHOD_CLASS_MAP:
         return SCORING_METHOD_CLASS_MAP[method]
-
     else:
         raise UserValueError(f"Unknown ScoringMethod string {method}")
