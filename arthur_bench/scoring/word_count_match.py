@@ -2,6 +2,7 @@ from textstat import lexicon_count
 from typing import List, Optional
 from arthur_bench.scoring import ScoringMethod
 from arthur_bench.scoring.utils import suppress_warnings
+from arthur_bench.client.exceptions import UserTypeError
 
 
 
@@ -32,7 +33,7 @@ class WordCountMatch(ScoringMethod):
             len_cand = lexicon_count(candidate_batch[i], removepunct=True)
             delta = abs(len_ref-len_cand)
             if delta>len_ref: 
-                word_count_match.append(0)
+                word_count_match.append(0.0)
             else: 
                 word_count_match.append((len_ref-delta)/len_ref)
 

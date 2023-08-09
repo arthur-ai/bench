@@ -2,6 +2,7 @@ from bert_score import BERTScorer
 from typing import List, Optional
 from arthur_bench.scoring import ScoringMethod
 from arthur_bench.scoring.utils import suppress_warnings
+from arthur_bench.client.exceptions import UserTypeError
 
 DEFAULT_MODEL = "microsoft/deberta-v3-base"
 
