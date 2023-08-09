@@ -183,7 +183,7 @@ class ArthurBenchClient(BenchClient):
 
         parsed_resp = cast(Dict, self.http_client.post(
             f"/bench/test_suites/{test_suite_id}/runs",
-            json=json_body.json(),
+            json=json_body.json(by_alias=True),
             validation_response_code=HTTPStatus.CREATED,
         ))
         return CreateRunResponse(**parsed_resp)

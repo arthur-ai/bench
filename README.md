@@ -9,7 +9,7 @@ Bench is built for evaluating LLMs for production use cases. Bench can be used f
 ## Getting started
 
 ### Package installation and environment setup
-First download the tar file from the Github releases. Next install the package to your python environment.
+First [download](https://github.com/arthur-ai/bench/releases) the tar file from the Github releases. Next install the package to your python environment.
 
 Install Bench with optional dependencies for serving results locally (recommended):  
 `pip install --find-links=./directory_with_tar_file 'arthur-bench[server]'`
