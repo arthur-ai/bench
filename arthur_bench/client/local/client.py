@@ -137,6 +137,11 @@ class LocalBenchClient(BenchClient):
     def __init__(self, root_dir: Optional[Union[str, Path]] = None):
         if root_dir is None:
             root_dir = _bench_root_dir()
+
+        # if root dir does not exist, create:
+        if not os.path.exists(root_dir):
+            os.mkdir(root_dir)
+        
         self.root_dir = Path(root_dir)
         _write_suite_index(self.root_dir)
 
