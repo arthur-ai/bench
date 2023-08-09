@@ -104,7 +104,7 @@ class CreateRunRequest(BaseModel):
     """
     Name identifier of the run
     """
-    test_cases: List[TestCaseOutput]
+    test_cases: List[TestCaseOutput] = Field(alias='test_case_outputs')
     """
     List of outputs and scores for all cases in the test suite
     """
@@ -131,6 +131,9 @@ class CreateRunRequest(BaseModel):
     """
     Optional model version identifying the version of the model used to generate outputs
     """
+
+    class Config:
+        allow_population_by_field_name = True
 
 
 ## RESPONSES
