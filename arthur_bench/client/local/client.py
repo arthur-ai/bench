@@ -139,7 +139,7 @@ class LocalBenchClient(BenchClient):
             root_dir = _bench_root_dir()
 
         # if root dir does not exist, create:
-        if not os.path.exists(root_dir)):
+        if not os.path.exists(root_dir):
             os.mkdir(root_dir)
         
         self.root_dir = Path(root_dir)
