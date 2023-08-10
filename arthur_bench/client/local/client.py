@@ -353,22 +353,27 @@ class LocalBenchClient(BenchClient):
         if run_name is None:
             raise NotFoundError()
         
-        created_at = PaginatedRun.parse_file(self.root_dir / test_suite_name / run_name / "run.json").created_at
-        try:
-            cases = duckdb.sql(f"SELECT * FROM ("
-                                f"SELECT test_cases.id, test_cases.input, test_cases.reference_output FROM ("
-                                f"SELECT unnest(test_cases) as test_cases from read_json_auto('{self.root_dir}/{test_suite_name}/suite.json', timestampformat='{TIMESTAMP_FORMAT}'))) "
-                                f"POSITIONAL JOIN (SELECT test_cases.output, test_cases.score FROM ("
-                                f"SELECT unnest(test_cases) as test_cases from read_json_auto('{self.root_dir}/{test_suite_name}/{run_name}/run.json',timestampformat='{TIMESTAMP_FORMAT}')))").df().to_dict('records')
-        except duckdb.IOException:
-            cases = []
-        
+        # Join test suite and run data together
+        run_data = PaginatedRun.parse_file(self.root_dir / test_suite_name / run_name / "run.json")
+        suite_data = self.get_test_suite(test_suite_id)
+        cases = []
+
+        for index, test_case in enumerate(suite_data.test_cases):
+            cases.append({
+                "id": test_case.id,
+                "input": test_case.input,
+                "reference_output": test_case.reference_output,
+                "output": run_data.test_cases[index].output,
+                "score": run_data.test_cases[index].score,
+                "context": run_data.test_cases[index].context
+            })
+
         pagination = _paginate([RunResult.parse_obj(r) for r in cases], page, page_size, sort_key='score')
         return PaginatedRun(
             id=uuid.UUID(test_run_id),
             name=run_name,
-            created_at=created_at,
-            updated_at=created_at,
+            created_at=run_data.created_at,
+            updated_at=run_data.created_at,
             test_case_runs=cases[pagination.start:pagination.end], 
             test_suite_id=uuid.UUID(test_suite_id), 
             page=pagination.page, 

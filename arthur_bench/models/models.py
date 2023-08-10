@@ -98,7 +98,8 @@ class TestCaseOutput(BaseModel):
     """
     Score assigned to output
     """
-    
+
+
 class CreateRunRequest(BaseModel):
     name: str
     """
@@ -116,6 +117,10 @@ class CreateRunRequest(BaseModel):
     Optional description of the run
     """
     model_name: Optional[str] = None
+    """
+    Optional list of contexts
+    """
+    context_lists: Optional[List[str]] = None
     """
     Optional model name identifying the model used to generate outputs
     """
@@ -237,6 +242,7 @@ class RunResult(BaseModel):
     score: float
     input: Optional[str] = None
     reference_output: Optional[str] = None
+    context: Optional[str] = None
 
 
 class PaginatedRun(BaseModel):

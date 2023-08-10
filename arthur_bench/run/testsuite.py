@@ -166,6 +166,7 @@ class TestSuite:
 		run = TestRun(
 			name=run_name,
 			test_case_outputs=test_case_outputs,
+			context_list=context_list,
 			model_name=model_name,
 			model_version=model_version,
 			foundation_model=foundation_model,
