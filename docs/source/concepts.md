@@ -101,4 +101,6 @@ The Readability metric evaluates the reading ease of the candidate output accord
 
 For scenarios where there is a preferred output length, `word_count_match` calculates a corresponding score on the scale of 0 to 1. Specifically, this scoring method calculates how similar the number of words in the candidate output is to the number of words in the reference output, where a score of 1.0 indicates that there are the same number of words in the candidate output as in the reference output. Scores less than 1.0 are calculated as ((len_reference-delta)/len_reference) where delta is the absolute difference in word lengths between the candidate and reference outputs. All negative computed values are truncated to 0. 
     
-    
+#### `hedging_language`
+
+The Hedging Language scoring method evaluates whether a candidate response is similar to generic hedging language used by an LLM ("As an AI language model, I don't have personal opinions, emotions, or beliefs"). Each row of the Test Run will receive a binary 0, indicating hedging language *not* used, or 1, indicating hedging language used.
