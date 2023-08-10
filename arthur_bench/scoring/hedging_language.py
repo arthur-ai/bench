@@ -5,15 +5,9 @@ from arthur_bench.scoring.utils import suppress_warnings
 
 DEFAULT_MODEL = "microsoft/deberta-v3-base"
 
-# weight precision and recall differently
-# for now, we have observed in experiments that
-# recall is much more correlated with human judgment than precision
-PRECISION_WEIGHT = 0.1
-RECALL_WEIGHT = 0.9
-
 # [TODO] need to make these editable by user
 DEFAULT_HEDGE = "As an AI language model, I don't have personal opinions, emotions, or beliefs."
-DEFAULT_THRESHOLD = 0.6
+DEFAULT_THRESHOLD = 0.5
 
 class HedgingLanguage(ScoringMethod):
 
@@ -38,8 +32,8 @@ class HedgingLanguage(ScoringMethod):
         # get precision, recall, and F1 score from bert_score package
         p, r, f = self.scorer.score(candidate_batch, reference_batch, verbose=False)
 
-        # return a BERTScore using our weighting of precision and recall (instead of F1 which weights them equally)
-        list_bertscore = (PRECISION_WEIGHT * p + RECALL_WEIGHT * r).tolist()
+        # return a BERTScore using F1
+        list_bertscore = f.tolist()
 
         # generate list of hedges based on threshold
         list_hedges = [float(n >= DEFAULT_THRESHOLD) for n in list_bertscore]
