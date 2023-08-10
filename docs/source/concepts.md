@@ -75,7 +75,7 @@ A **Scoring Method** is the criteria used to judge the candidate outputs for eac
 | QA Correctness (`qa_correctness`) | Question-Answering| Input, Candidate Output, Context|
 | Exact Match (`exact_match`)       | any | Reference Output, Candidate Output|
 | Readability (`readability`)       | any | Candidate Output |
-| Word Count Match (`word_count_match`)   | any | Candidate Output |
+| Word Count Match (`word_count_match`)   | any | Reference Output, Candidate Output |
 
 #### `bertscore`
 
