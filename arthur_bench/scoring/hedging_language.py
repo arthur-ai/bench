@@ -7,9 +7,14 @@ DEFAULT_MODEL = "microsoft/deberta-v3-base"
 
 # [TODO] need to make these editable by user
 DEFAULT_HEDGE = "As an AI language model, I don't have personal opinions, emotions, or beliefs."
-DEFAULT_THRESHOLD = 0.5
 
 class HedgingLanguage(ScoringMethod):
+    """
+    Given an input question and model output, determine if the output contains hedging language 
+    such as "As an AI language model, I don't have personal opinions, emotions, or beliefs". 
+    The values returned are a similarity score (BERTScore), with higher values corresponding to
+    higher likelihood of hedging language being present in the model output.
+    """
 
     @staticmethod
     def name() -> str:
@@ -35,7 +40,4 @@ class HedgingLanguage(ScoringMethod):
         # return a BERTScore using F1
         list_bertscore = f.tolist()
 
-        # generate list of hedges based on threshold
-        list_hedges = [float(n >= DEFAULT_THRESHOLD) for n in list_bertscore]
-
-        return list_hedges
+        return list_bertscore

@@ -53,6 +53,6 @@ def test_run_hedging_language(mock_hedging_langauge_data, mock_scorer):
             )
 
             # assert return correct values
-            expected = [0.0, 0.0, 1.0]
+            expected = [0.4106, 0.4818, 0.5379]
             for i, result in enumerate(hedging_language_run_result):
                 assert torch.isclose(torch.tensor(result), torch.tensor(expected[i]), atol=1e-5)
