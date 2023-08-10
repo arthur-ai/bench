@@ -98,6 +98,10 @@ class TestCaseOutput(BaseModel):
     """
     Score assigned to output
     """
+    context: Optional[str]
+    """
+    Optional context provided
+    """
 
 
 class CreateRunRequest(BaseModel):
@@ -117,10 +121,6 @@ class CreateRunRequest(BaseModel):
     Optional description of the run
     """
     model_name: Optional[str] = None
-    """
-    Optional list of contexts
-    """
-    context_lists: Optional[List[str]] = None
     """
     Optional model name identifying the model used to generate outputs
     """

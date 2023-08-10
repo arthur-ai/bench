@@ -1,5 +1,6 @@
 import json
 import argparse
+import os
 from pathlib import Path
 import uuid
 from typing import Optional
@@ -49,7 +50,6 @@ def test_suites(request: Request, page: int = 1, page_size: int = 5, sort: Optio
     client = LocalBenchClient(root_dir=SERVER_ROOT_DIR)
     suite_resp = client.get_test_suites(page=page, page_size=page_size, sort=sort, scoring_method=scoring_method, name=name).json()
     suites = json.loads(suite_resp)
-    
     send_event({"event_type": "test_suites_load", "event_properties": {"num_test_suites_load": len(suites["test_suites"]), "test_suites_all": [suite['scoring_method'] for suite in suites["test_suites"]]}}, USER_ID)
     return suites
 
@@ -89,7 +89,8 @@ def test_run_results(request: Request, test_suite_id: uuid.UUID, run_id: uuid.UU
     return run
 
 
-app.mount("/", StaticFiles(directory=FRONT_END_DIRECTORY, html=True), name="frontend")
+if os.path.exists(FRONT_END_DIRECTORY):
+    app.mount("/", StaticFiles(directory=FRONT_END_DIRECTORY, html=True), name="frontend")
 
 
 def run():
