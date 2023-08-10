@@ -359,16 +359,16 @@ class LocalBenchClient(BenchClient):
         cases = []
 
         for index, test_case in enumerate(suite_data.test_cases):
-            cases.append({
+            cases.append(RunResult.parse_obj({
                 "id": test_case.id,
                 "input": test_case.input,
                 "reference_output": test_case.reference_output,
                 "output": run_data.test_cases[index].output,
                 "score": run_data.test_cases[index].score,
                 "context": run_data.test_cases[index].context
-            })
+            }))
 
-        pagination = _paginate([RunResult.parse_obj(r) for r in cases], page, page_size, sort_key='score')
+        pagination = _paginate([r for r in cases], page, page_size, sort_key='score')
         return PaginatedRun(
             id=uuid.UUID(test_run_id),
             name=run_name,

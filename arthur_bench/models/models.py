@@ -98,7 +98,7 @@ class TestCaseOutput(BaseModel):
     """
     Score assigned to output
     """
-    context: Optional[str]
+    context: Optional[str] = None
     """
     Optional context provided
     """

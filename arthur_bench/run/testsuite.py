@@ -160,9 +160,14 @@ class TestSuite:
 		except Exception as e:
 			logger.error(f"failed to create run: {e}")
 			raise ArthurInternalError(f"failed to create run {run_name}") from e
-		
-		test_case_outputs = [TestCaseOutput(id=id_, output=output, score=score, context=context) for id_, output, score, context in zip(ids, candidate_output_list, all_scores, context_list)]
-		
+
+		if context_list:
+			test_case_outputs = [TestCaseOutput(id=id_, output=output, score=score, context=context) for id_, output, score, context in zip(ids, candidate_output_list, all_scores, context_list)]
+		else:
+			test_case_outputs = [TestCaseOutput(id=id_, output=output, score=score) for id_, output, score in zip(ids, candidate_output_list, all_scores)]
+
+
+
 		run = TestRun(
 			name=run_name,
 			test_case_outputs=test_case_outputs,

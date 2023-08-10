@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Dict
+from typing import Dict, Type, Union
 
 from .scoring_method import ScoringMethod
 from .bertscore import BERTScore
@@ -16,7 +16,8 @@ class ScoringMethodEnum(str, Enum):
     ExactMatch = 'exact_match'
 
 
-SCORING_METHOD_CLASS_MAP: Dict[str, type[ScoringMethod]] = {
+SCORING_METHOD_CLASS_MAP: Dict[str, Union[Type[BERTScore], Type[QAQualityCorrectness],
+Type[SummaryQuality], Type[ExactMatch]]] = {
     ScoringMethodEnum.BERTScore: BERTScore,
     ScoringMethodEnum.QACorrectness: QAQualityCorrectness,
     ScoringMethodEnum.SummaryQuality: SummaryQuality,
@@ -24,7 +25,7 @@ SCORING_METHOD_CLASS_MAP: Dict[str, type[ScoringMethod]] = {
 }
 
 
-def scoring_method_class_from_string(method: str) -> type[ScoringMethod]:
+def scoring_method_class_from_string(method: str) -> Type[ScoringMethod]:
     if method in SCORING_METHOD_CLASS_MAP:
         return SCORING_METHOD_CLASS_MAP[method]
     else:
