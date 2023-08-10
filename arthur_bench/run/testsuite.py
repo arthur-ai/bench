@@ -3,14 +3,15 @@ import logging
 import pandas as pd
 from typing import List, Optional, Union
 from arthur_bench.scoring import ScoringMethod, scoring_method_class_from_string
-from arthur_bench.models.models import TestSuiteRequest, PaginatedTestSuite, TestCaseOutput, CreateRunRequest, ScoringMethod as ScoringMethodMetadata, \
+from arthur_bench.models.models import TestSuiteRequest, PaginatedTestSuite, TestCaseOutput, ScoringMethod as ScoringMethodMetadata, \
 	ScoringMethodType
 from arthur_bench.client.exceptions import UserValueError, ArthurInternalError, MissingParameterError
 from arthur_bench.client.bench_client import BenchClient
 from arthur_bench.client.local.client import LocalBenchClient
 from arthur_bench.client.rest.client import ArthurClient
 from arthur_bench.run.testrun import TestRun
-from arthur_bench.run.utils import _initialize_metadata, _load_suite_from_args, _load_run_data_from_args, _get_suite_if_exists
+from arthur_bench.run.utils import _initialize_metadata, _load_suite_from_args, _load_run_data_from_args, _get_suite_if_exists, \
+	  _initialize_scoring_method
 from arthur_bench.scoring.scoring_method import SINGLE_ITEM_BATCH_DEFAULT
 
 
@@ -35,7 +36,7 @@ class TestSuite:
 	def __init__(
 			self,
 			name: str,
-			scoring_method: Union[str, type[ScoringMethod]],
+			scoring_method: Union[str, ScoringMethod],
 			description: Optional[str] = None,
 			reference_data: Optional[pd.DataFrame] = None,
 			reference_data_path: Optional[str] = None,
@@ -56,12 +57,11 @@ class TestSuite:
 				client = LocalBenchClient() # type: ignore
 		self.client: BenchClient = client # type: ignore
 		self.suite: PaginatedTestSuite = _get_suite_if_exists(self.client, name) # type: ignore
-
-		# get a scoringMethod class
-		if isinstance(scoring_method, str):
-			scoring_method = scoring_method_class_from_string(scoring_method)
+		self.scorer: ScoringMethod
 
 		if self.suite is None:
+			# TODO: separate load functionality? so large models aren't getting loaded unecessarily if test suite creation fails
+			self.scorer = _initialize_scoring_method(scoring_method_arg=scoring_method)
 			cases = _load_suite_from_args(
 				reference_data=reference_data,
 				reference_data_path=reference_data_path,
@@ -69,9 +69,9 @@ class TestSuite:
 				reference_column=reference_column,
 				input_text_list=input_text_list,
 				reference_output_list=reference_output_list,
-				requires_reference=scoring_method.requires_reference()
+				requires_reference=self.scorer.requires_reference()
 			)
-			method_meta = ScoringMethodMetadata(name=scoring_method.name(), type=scoring_method.type())
+			method_meta = ScoringMethodMetadata(name=self.scorer.name(), type=self.scorer.type(), config=self.scorer.to_dict())
 			new_suite = TestSuiteRequest(
 				name=name,
 				scoring_method=method_meta,
@@ -80,19 +80,21 @@ class TestSuite:
 				**_initialize_metadata()
 			)
 			self.suite = self.client.create_test_suite(new_suite)
-			self.scorer: ScoringMethod = scoring_method()
 
 		else:
 			logger.info(f"Found existing test suite with name {name}. Using existing suite")
 			
 			if self.suite.scoring_method.type == ScoringMethodType.Custom:
-				if scoring_method.name() != self.suite.scoring_method.name:
+				if isinstance(scoring_method, str):
+					raise UserValueError("cannot reference custom scoring method by string. please provide instantiated scoring method")
+				if self.scorer.name() != self.suite.scoring_method.name:
 					raise UserValueError(f"Test suite was originally created with scoring method: {self.suite.scoring_method.name} \
 			  			but provided scoring method has name: {scoring_method.name()}")
-				self.scorer = scoring_method()
+				if self.scorer.to_dict() != self.suite.scoring_method.config:
+					logger.warning("scoring method configuration has changed from test suite creation.")
+				self.scorer = scoring_method
 			else:
-				scoring_method_class = scoring_method_class_from_string(self.suite.scoring_method.name)
-				self.scorer = scoring_method_class()
+				self.scorer = _initialize_scoring_method(self.suite.scoring_method.name, self.suite.scoring_method.config)
 
 	def run(
 			self,

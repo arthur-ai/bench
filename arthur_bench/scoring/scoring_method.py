@@ -1,10 +1,17 @@
 from abc import abstractmethod, ABC
 import sys
+import json
+import logging
+from os import PathLike
 from typing import List, Optional, TypeVar
+from inspect import signature
 
 from tqdm import tqdm
-
 from arthur_bench.models.models import ScoringMethodType
+
+
+logger = logging.getLogger(__name__)
+
 
 SINGLE_ITEM_BATCH_DEFAULT = 1
 
@@ -55,7 +62,7 @@ class ScoringMethod(ABC):
         :param inputs: input strings being tested
         :param contexts: optional corresponding contexts, if needed by scoring method
         :param batch_size: size of batches
-        :return:
+        :return: array of scores for batch
         """
         all_scores = []
         with tqdm(total=len(candidate_outputs)) as pbar:
@@ -76,6 +83,43 @@ class ScoringMethod(ABC):
                 pbar.update(len(candidate_outputs))
     
         return all_scores
+
+    def to_dict(self):
+        """
+        Provides a json serializable representation of the scoring method.
+        """
+        config = self.__dict__
+        valid_args = [p for p in signature(self.__init__).parameters.keys()]
+
+        # warn if arguments missing from initialization for reloading
+        for arg in valid_args:
+            if arg not in config:
+                logger.warning(f"scoring method accepts argument {arg} but argument is not included in json representation")
+
+        jsonable_config = {}
+        # remove non serializable args
+        for key, val in config.items():
+            try:
+                _ = json.dumps(val)
+                jsonable_config[key] = val
+            except TypeError as e:
+                # TODO: str rep instead?
+                logger.warning(f"not included attribute {val} in config as it is not json serializable")
+        return jsonable_config
+
+    @classmethod
+    def from_dict(cls, config: dict):
+        """
+        Load a scoring method from a json configuration file. 
+        """
+        valid_args = [p for p in signature(cls.__init__).parameters.keys()]
+
+        init_config = {}
+        for key, value in config.items():
+            if key in valid_args:
+                init_config[key] = value
+        return cls(**init_config)
+
 
     @classmethod
     def type(cls) -> ScoringMethodType:

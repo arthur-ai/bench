@@ -314,7 +314,6 @@ class LocalBenchClient(BenchClient):
                              total_count=pagination.total_count)
 
     def get_summary_statistics(self, test_suite_id: str, run_id: Optional[str] = None, page: int = 1, page_size: int = DEFAULT_PAGE_SIZE) -> TestSuiteSummary:
-        print(test_suite_id)
         test_suite_name = self._get_suite_name_from_id(test_suite_id)
         if test_suite_name is None:
             raise NotFoundError()

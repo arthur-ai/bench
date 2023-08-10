@@ -1,6 +1,8 @@
 import pytest
 import pandas as pd
 from helpers import FIXTURE_FILE_DIR
+from fixtures.mock_responses import MOCK_SUITE, MOCK_SUITE_JSON, MOCK_SUITE_WITH_NULL, MOCK_SUITE_WITH_NULL_JSON,\
+        MOCK_SUITE_WITH_SCORING_CONFIG, MOCK_SUITE_WITH_SCORING_JSON
 from arthur_bench.run.utils import load_suite_from_json, load_suite_from_dataframe, load_suite_from_list, load_suite_from_csv
 
 @pytest.mark.parametrize('filepath, expected', [
@@ -34,8 +36,9 @@ def test_load_suite_from_df(mock_suite_cases):
     assert load_suite_from_dataframe(df, "input", "reference_output") == mock_suite_cases
 
 @pytest.mark.parametrize('object, expected', [
-    ('mock_suite_request', 'mock_suite_request_json'),
-    ('mock_suite_request_optional', 'mock_suite_request_optional_json')
+    (MOCK_SUITE, MOCK_SUITE_JSON),
+    (MOCK_SUITE_WITH_NULL, MOCK_SUITE_WITH_NULL_JSON),
+    (MOCK_SUITE_WITH_SCORING_CONFIG, MOCK_SUITE_WITH_SCORING_JSON)
 ])
-def test_suite_serialization(object, expected, request):
-    assert request.getfixturevalue(object).json() == request.getfixturevalue(expected)
+def test_suite_serialization(object, expected):
+    assert object.json() == expected

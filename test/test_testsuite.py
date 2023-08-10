@@ -20,7 +20,7 @@ def mock_client():
 
 @pytest.fixture
 def test_suite_default(mock_load_scoring, mock_client):
-    with mock.patch('arthur_bench.run.testsuite.scoring_method_class_from_string', mock_load_scoring):
+    with mock.patch('arthur_bench.run.testsuite._initialize_scoring_method', mock_load_scoring):
         return TestSuite(
             name="test_suite",
             scoring_method="bertscore",
@@ -41,6 +41,9 @@ class MockScoringMethod(ScoringMethod):
         return [0.8 for _ in range(len(reference_batch))]
     
 class CustomScorer(ScoringMethod):
+    def __init__(self, custom_name = "param_name"):
+        self.custom_name = custom_name
+    
     @staticmethod
     def name():
         return "test_custom_scorer"
@@ -51,14 +54,14 @@ class CustomScorer(ScoringMethod):
 
 @pytest.fixture(scope="session")
 def mock_load_scoring():
-    def load_scoring_method(name):
-        return MockScoringMethod
+    def load_scoring_method(scoring_method_arg):
+        return MockScoringMethod()
     return load_scoring_method
 
 
 @pytest.mark.parametrize('params,expected', [
     ({"name": "test_suite", "scoring_method": "bertscore", "reference_data": MOCK_DATAFRAME}, MOCK_SUITE),
-    ({"name": "test_suite_custom", "scoring_method": CustomScorer, "description": "test_description",
+    ({"name": "test_suite_custom", "scoring_method": CustomScorer(), "description": "test_description",
       "reference_data": MOCK_CUSTOM_DATAFRAME, "input_column": "custom_prompt", "reference_column": "custom_reference"},
      MOCK_SUITE_CUSTOM),
     ({"name": "test_suite", "scoring_method": "bertscore", "input_text_list": MOCK_INPUTS, 

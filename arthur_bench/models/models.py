@@ -19,6 +19,7 @@ class ScoringMethodType(str, Enum):
 class ScoringMethod(BaseModel):
     name: str
     type: ScoringMethodType
+    config: dict = {}
 
 
 ## REQUESTS
