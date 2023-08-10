@@ -166,8 +166,6 @@ class TestSuite:
 		else:
 			test_case_outputs = [TestCaseOutput(id=id_, output=output, score=score) for id_, output, score in zip(ids, candidate_output_list, all_scores)]
 
-
-
 		run = TestRun(
 			name=run_name,
 			test_case_outputs=test_case_outputs,
