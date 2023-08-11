@@ -11,7 +11,7 @@ def mock_hallucination_request():
 
 # Test the run_batch method
 def test_run_batch(mock_hallucination_request, mock_summary_data):
-    with patch('arthur_bench.scoring.hallucination.Hallucination.client.bench.score_hallucination', return_value=mock_hallucination_request):
+    with patch('Hallucination.client.bench.score_hallucination', return_value=mock_hallucination_request):
 
         # create summary quality scoring method
         hallucination_score = Hallucination()
