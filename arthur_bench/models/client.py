@@ -4,8 +4,7 @@
 
 from __future__ import annotations
 
-from enum import Enum
-from typing import Dict, List, Optional, Union
+from typing import Dict, Optional, Union
 
 from pydantic import BaseModel, Extra, Field
 
