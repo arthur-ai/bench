@@ -29,7 +29,7 @@ SCORING_METHOD_CLASS_MAP: Dict[str, type[ScoringMethod]] = {
     ScoringMethodEnum.QACorrectness: QAQualityCorrectness,
     ScoringMethodEnum.SummaryQuality: SummaryQuality,
     ScoringMethodEnum.ExactMatch: ExactMatch,
-    ScoringMethodEnum.Hallucination: Hallucination
+    ScoringMethodEnum.Hallucination: Hallucination,
     ScoringMethodEnum.Readability: Readability,
     ScoringMethodEnum.WordCountMatch: WordCountMatch,
     ScoringMethodEnum.HedgingLanguage: HedgingLanguage
