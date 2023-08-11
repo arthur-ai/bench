@@ -14,7 +14,7 @@ class Hallucination(ScoringMethod):
     def name() -> str:
         return "hallucination"
 
-    def run_batch(self, reference_batch: List[str], candidate_batch: List[str],
+    def run_batch(self, candidate_batch: List[str], reference_batch: Optional[List[str]] = None, 
                   input_text_batch: Optional[List[str]] = None, context_batch: Optional[List[str]] = None) -> List[float]:
         if context_batch is None:
             raise ArthurUserError("context is required for hallucination scoring")
