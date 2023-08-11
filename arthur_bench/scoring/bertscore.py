@@ -2,6 +2,7 @@ from bert_score import BERTScorer
 from typing import List, Optional
 from arthur_bench.scoring import ScoringMethod
 from arthur_bench.scoring.utils import suppress_warnings
+from arthur_bench.client.exceptions import UserTypeError
 
 DEFAULT_MODEL = "microsoft/deberta-v3-base"
 
@@ -29,7 +30,10 @@ class BERTScore(ScoringMethod):
 
     def run_batch(self, candidate_batch: List[str], reference_batch: Optional[List[str]] = None,
                   input_text_batch: Optional[List[str]] = None, context_batch: Optional[List[str]] = None) -> List[float]:
-
+        if reference_batch is None:
+            raise UserTypeError("Reference Outputs must be provided for BERTScore scorer. Please provide "
+                                "reference outputs to the test suite")
+                                
         # get precision, recall, and F1 score from bert_score package
         p, r, f = self.scorer.score(candidate_batch, reference_batch, verbose=False)
 

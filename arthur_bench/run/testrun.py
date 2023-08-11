@@ -1,17 +1,17 @@
 import uuid
-from pathlib import Path
-from typing import Optional
 from arthur_bench.models.models import CreateRunRequest
+from arthur_bench.client.bench_client import BenchClient
 
 
 class TestRun(CreateRunRequest):
-    test_suite_id: Optional[uuid.UUID] = None
-    run_dir: Optional[Path] = None
+    test_suite_id: uuid.UUID
+    client: BenchClient # type: ignore
+
+    class Config:
+        arbitrary_types_allowed = True
+
 
     def save(self):
         """Save a test run to local file system."""
-        if self.run_dir is not None:
-            run_file = self.run_dir / 'run.json'
-            run_file.write_text(self.json(exclude={'test_suite_id', 'run_dir'}))
-
-        # TODO: in client MR, update for if run dir is None
+        return self.client.create_new_test_run(test_suite_id=str(self.test_suite_id), 
+                                               json_body=CreateRunRequest(**self.dict()))

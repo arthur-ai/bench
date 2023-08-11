@@ -1,0 +1,11 @@
+{
+  "name": "resources",
+  "version": "1.0.0",
+  "description": "Collection of static Arthur resources",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Arthur AI",
+  "license": "UNLICENSED"
+}

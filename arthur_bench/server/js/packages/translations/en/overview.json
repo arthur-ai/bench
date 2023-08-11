@@ -1,0 +1,18 @@
+{
+    "fairness": {
+        "title": "Fairness",
+        "missingState": "Enable Bias Monitoring for your model to activate the Fairness visualizations.",
+        "LLM": "Fairness visualizations for Generative Text models coming soon.",
+        "subtitle": "Ensure that your model is not systematically off the mark for a particular group",
+        "metricSelection": "Metric Selection",
+        "threshold": "Fairness Threshold Toggle",
+        "tableHeaders": {
+            "attribute": "Attribute",
+            "baseline": "Baseline",
+            "disparity": "Largest Disparity",
+            "status": "Fairness Status"
+        },
+        "errorIconToolTip": "Above the {{threshold}}% Fairness Threshold",
+        "successIconToolTip": "Below the {{threshold}}% Fairness Threshold"
+    }
+}

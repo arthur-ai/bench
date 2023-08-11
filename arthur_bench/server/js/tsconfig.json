@@ -1,0 +1,16 @@
+{
+    "extends": "./packages/tsconfig/base.json",
+    "compilerOptions": {
+      "baseUrl": ".",
+      "paths": {
+        "@src/*": ["./src/*"],
+        "@core/*": ["./packages/components/core/*"],
+        "@compound/*": ["./packages/components/compound/*"]
+    },
+      "jsx": "react",
+      "isolatedModules": false,
+    },
+    "include": ["**/*.ts", "**/*.tsx"],
+    "exclude": ["node_modules", "**/*.cy.ts"]
+  }
+  

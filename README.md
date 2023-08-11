@@ -9,19 +9,28 @@ Bench is built for evaluating LLMs for production use cases. Bench can be used f
 ## Getting started
 
 ### Package installation and environment setup
-Install Bench with minimum dependencies:
-`pip install -e .`
+First [download](https://github.com/arthur-ai/bench/releases) the tar file from the Github releases. Next install the package to your python environment.
 
-Install Bench with optional dependencies for serving results locally:  
-`pip install -e '.[server]'`
+Install Bench with optional dependencies for serving results locally (recommended):  
+`pip install --find-links=./directory_with_tar_file 'arthur-bench[server]'`
+
+Install Bench with minimum dependencies:
+`pip install --find-links=./directory_with_tar_file 'arthur-bench'`
 
 Bench saves test suites and test runs to the directory specified by the `BENCH_FILE_DIR`, which defaults to `./bench`
 
-#### Viewing Examples
-To explore Bench suites and runs for an example datasets, run `bench --directory examples/bench`. This will spin up a server where you can view sample created Test Suites and evaluate Runs across different model and prompt configurations.
+#### Exploring the UI with Examples
+The following commands will spin up a local UI serving two example test suites we've added
+
+```
+git clone git@github.com:arthur-ai/bench.git
+cd bench/examples  # navigate to bench root directory
+bench
+```
+This will spin up a server where you can view sample created Test Suites and evaluate Runs across different model and prompt configurations.
 
 In the `examples/` folder, you will find demo notebooks used to generate the Test Suites and Run results recorded in the directory. 
-**Running these notebooks directly, without deleting the pre-existing results from the directory, will result in errors.** Please use these as a a reference in creating your own Test Suites and Runs.
+**To run these notebooks directly, configure the BENCH_FILE_DIR to a new file system in the top cell of the notebook.** Please use these as a a reference in creating your own Test Suites and Runs.
 
 ## Key Concepts
 

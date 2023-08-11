@@ -1,4 +1,5 @@
 import pytest
+from fixtures.mock_requests import MOCK_RUN, MOCK_RUN_JSON
 
-def test_run_serialization(mock_test_run, mock_test_run_json):
-    assert mock_test_run.json(exclude={'test_suite_id', 'run_dir'}) == mock_test_run_json
+def test_run_serialization():
+    assert MOCK_RUN.json() == MOCK_RUN_JSON

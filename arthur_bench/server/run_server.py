@@ -1,86 +1,95 @@
-import glob
+import json
 import argparse
 from pathlib import Path
 import uuid
+from typing import Optional
+
+import http.server
+import socketserver
 
 
 try:
-    import duckdb
     import uvicorn
     from fastapi import FastAPI, Request
-    from fastapi.responses import HTMLResponse, RedirectResponse
-    from fastapi.templating import Jinja2Templates
     from fastapi.staticfiles import StaticFiles
+    from fastapi.middleware.cors import CORSMiddleware
+
 
 except ImportError as e:
     raise ImportError("Can't run Bench Server without server dependencies, to install run: "
                       "pip install arthur-bench[server]") from e
 
-from arthur_bench.run.utils import _bench_root_dir
+from arthur_bench.client.local.client import _bench_root_dir, LocalBenchClient
 from arthur_bench.telemetry.telemetry import send_event, set_track_usage_data
 from arthur_bench.telemetry.config import get_or_persist_id, persist_usage_data
-from arthur_bench.models.models import TestSuiteRequest
 
 app = FastAPI()
-HTML_PATH = Path(__file__).parent / "html"
-app.mount("/assets", StaticFiles(directory=HTML_PATH / "assets"), name="assets")
 
-templates = Jinja2Templates(directory=HTML_PATH)
+origins = [
+    "http://localhost:8000",
+    "http://127.0.0.1:8000"
+]
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-templates = Jinja2Templates(directory=Path(__file__).parent / "html")
+FRONT_END_DIRECTORY = Path(__file__).parent / "js" / "dist"
 
 SERVER_ROOT_DIR: Path
 USER_ID: uuid.UUID
 
-TIMESTAMP_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
 
-
-@app.get("/", response_class=RedirectResponse)
-def home(request: Request):
-    return RedirectResponse("/test_suites")
-
-@app.get("/test_suites", response_class=HTMLResponse)
-def test_suites(request: Request):
-    suites = []
-    suite_files = glob.glob(f'{SERVER_ROOT_DIR}/*/suite.json')
-    for f in suite_files:
-        suite_obj = TestSuiteRequest.parse_file(f)
-        suites.append(suite_obj.dict())
+@app.get("/api/v3/bench/test_suites")
+def test_suites(request: Request, page: int = 1, page_size: int = 5, sort: Optional[str] = None, scoring_method: Optional[str] = None, name: Optional[str] = None):
+    client = LocalBenchClient(root_dir=SERVER_ROOT_DIR)
+    suite_resp = client.get_test_suites(page=page, page_size=page_size, sort=sort, scoring_method=scoring_method, name=name).json()
+    suites = json.loads(suite_resp)
     
-    send_event({"event_type": "test_suites_load", "event_properties": {"num_test_suites_load": len(suites), "test_suites_all": [suite['scoring_method'] for suite in suites]}}, USER_ID)
-    return templates.TemplateResponse("test_suite_overview.html", {"request": request,
-                                                                   "suites": suites})
+    send_event({"event_type": "test_suites_load", "event_properties": {"num_test_suites_load": len(suites["test_suites"]), "test_suites_all": [suite['scoring_method'] for suite in suites["test_suites"]]}}, USER_ID)
+    return suites
+
+@app.get("/api/v3/bench/test_suites/{test_suite_id}")
+def test_suite(request: Request, test_suite_id: uuid.UUID, page: int = 1, page_size: int = 5):
+    client = LocalBenchClient(root_dir=SERVER_ROOT_DIR)
+    suite_resp = client.get_test_suite(test_suite_id=str(test_suite_id), page=page, page_size=page_size).json()
+    suite = json.loads(suite_resp)
+    suite["scoring_method"] = suite["scoring_method"]["name"]
+    return suite
 
 
-@app.get("/test_suites/{test_suite_name}/runs", response_class=HTMLResponse)
-def test_runs(request: Request, test_suite_name: str):
-    try:
-        runs = duckdb.sql(f"SELECT name, created_at, model_name FROM read_json_auto('{SERVER_ROOT_DIR}/{test_suite_name}/*/run.json',timestampformat='{TIMESTAMP_FORMAT}')").df().to_dict('records')
-        suite = duckdb.sql(f"SELECT scoring_method FROM read_json_auto('{SERVER_ROOT_DIR}/{test_suite_name}/suite.json', timestampformat='{TIMESTAMP_FORMAT}')").df().to_dict('records')[0]
-    except duckdb.IOException:
-        runs = []
-        suite = "Unknown"
-    send_event({"event_type": "test_runs_load", "event_properties": {"test_runs_all": [str(run['created_at']) for run in runs], "scoring_method_real": suite}}, USER_ID)
-    return templates.TemplateResponse("test_run_overview.html", {"request": request,
-                                                                 "runs": runs,
-                                                                 "test_suite_name": test_suite_name})
+@app.get("/api/v3/bench/test_suites/{test_suite_id}/runs")
+def test_runs(request: Request, test_suite_id: uuid.UUID, page: int = 1, page_size: int = 5, sort: Optional[str] = None):
+    client = LocalBenchClient(root_dir=SERVER_ROOT_DIR)
+    run_resp = client.get_runs_for_test_suite(test_suite_id=str(test_suite_id), page=page, page_size=page_size, sort=sort).json()
+    suite_resp = client.get_test_suite(test_suite_id=str(test_suite_id))
+    runs = json.loads(run_resp)
+    send_event({"event_type": "test_runs_load", "event_properties": {"test_runs_all": [str(run["created_at"]) for run in runs["test_runs"]], "scoring_method_real": suite_resp.scoring_method.name}}, USER_ID)
+    return runs
 
 
-@app.get("/test_suites/{test_suite_name}/runs/{run_name}", response_class=HTMLResponse)
-def test_run_results(request: Request, test_suite_name: str, run_name: str):
-    try:
-        cases = duckdb.sql(f"SELECT * FROM ("
-                        f"SELECT test_cases.input, test_cases.reference_output FROM ("
-                        f"SELECT unnest(test_cases) as test_cases from read_json_auto('{SERVER_ROOT_DIR}/{test_suite_name}/suite.json', timestampformat='{TIMESTAMP_FORMAT}'))) "
-                        f"POSITIONAL JOIN (SELECT test_cases.output, test_cases.score FROM ("
-                        f"SELECT unnest(test_case_outputs) as test_cases from read_json_auto('{SERVER_ROOT_DIR}/{test_suite_name}/{run_name}/run.json',timestampformat='{TIMESTAMP_FORMAT}')))").df().to_dict('records')
-    except duckdb.IOException:
-        cases = []
-    return templates.TemplateResponse("test_run_table.html", {"request": request,
-                                                              "cases": cases,
-                                                              "test_suite_name": test_suite_name,
-                                                              "run_name": run_name})
+@app.get("/api/v3/bench/test_suites/{test_suite_id}/runs/summary")
+def test_suite_summary(request: Request, test_suite_id: uuid.UUID, page: int = 1, page_size: int = 5, run_id: Optional[uuid.UUID] = None):
+    client = LocalBenchClient(root_dir=SERVER_ROOT_DIR)
+    summary_resp = client.get_summary_statistics(test_suite_id=str(test_suite_id), page=page, page_size=page_size, run_id=str(run_id) if run_id is not None else None).json()
+    summary = json.loads(summary_resp)
+    return summary
+
+
+@app.get("/api/v3/bench/test_suites/{test_suite_id}/runs/{run_id}")
+def test_run_results(request: Request, test_suite_id: uuid.UUID, run_id: uuid.UUID, page: int = 1, page_size: int = 5):
+    client = LocalBenchClient(root_dir=SERVER_ROOT_DIR)
+    run_resp = client.get_test_run(test_suite_id=str(test_suite_id), test_run_id=str(run_id), page=page, page_size=page_size).json(by_alias=True)
+    run = json.loads(run_resp)
+    run["metadata"] = None
+    return run
+
+
+app.mount("/", StaticFiles(directory=FRONT_END_DIRECTORY, html=True), name="frontend")
 
 
 def run():
@@ -100,6 +109,7 @@ def run():
         return
 
     global SERVER_ROOT_DIR
+    # TODO: how to maintain state on fast api server
     default_root_dir = _bench_root_dir()
     if args.directory:
         default_root_dir = args.directory
