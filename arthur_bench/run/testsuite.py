@@ -21,6 +21,7 @@ from arthur_bench.run.utils import (
     _load_run_data_from_args,
     _initialize_scorer,
 )
+from arthur_bench.models.config import LMConfig
 
 from arthur_bench.scoring.scorer import SINGLE_ITEM_BATCH_DEFAULT
 
@@ -254,6 +255,39 @@ class TestSuite:
             run.save()
 
         return run
+
+    def run_with_generate(
+        self,
+        run_name: str,
+        generation_config: LMConfig,
+        save: bool = True,
+        batch_size: int = SINGLE_ITEM_BATCH_DEFAULT,
+        model_name: Optional[str] = None,
+        model_version: Optional[str] = None,
+        foundation_model: Optional[str] = None,
+        prompt_template: Optional[str] = None,
+    ) -> TestRun:
+        model = generation_config.to_evaluator()
+
+        candidates: List[str] = []
+        for case in self.suite.test_cases:
+            resp = model(case.input)
+            if isinstance(resp, dict):
+                resp = resp.get("text")
+                if resp is None:
+                    raise ValueError("expected model response to contain text")
+            candidates.append(resp)
+
+        return self.run(
+            run_name=run_name,
+            candidate_output_list=candidates,
+            save=save,
+            batch_size=batch_size,
+            model_name=model_name,
+            model_version=model_version,
+            foundation_model=foundation_model,
+            prompt_template=prompt_template,
+        )
 
     def save(self):
         """Save a test suite to local file system."""
