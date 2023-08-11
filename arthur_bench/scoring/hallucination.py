@@ -13,6 +13,10 @@ class Hallucination(ScoringMethod):
     @staticmethod
     def name() -> str:
         return "hallucination"
+    
+    @staticmethod
+    def requires_reference() -> bool:
+        return False
 
     def run_batch(self, candidate_batch: List[str], reference_batch: Optional[List[str]] = None, 
                   input_text_batch: Optional[List[str]] = None, context_batch: Optional[List[str]] = None) -> List[float]:
