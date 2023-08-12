@@ -6,6 +6,11 @@ from arthur_bench.models.scoring import HallucinationScoreRequest
 
 
 class Hallucination(ScoringMethod):
+    """
+    Score each output against a context using Arthur's hosted hallucination checker
+    A score of 1.0 means the hallucination checker estimates the output is supported by the context
+    A score of 0.0 means the hallucination checker found information in the output unsupported by the context
+    """
 
     def __init__(self):
         self.client = ArthurClient()
@@ -25,9 +30,8 @@ class Hallucination(ScoringMethod):
 
         res = []
         for i in range(len(candidate_batch)):
-            req = HallucinationScoreRequest(response=candidate_batch[i], context=context_batch[i])
-
-            # TODO: maybe add some retry logic here if you want
-            score = self.client.bench.score_hallucination(req)
-            res.append(float(score["hallucination"]))
+            request = HallucinationScoreRequest(response=candidate_batch[i], context=context_batch[i])
+            response = self.client.bench.score_hallucination(request)
+            score = float(response["hallucination"])
+            res.append(score)
         return res
