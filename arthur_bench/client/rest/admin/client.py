@@ -38,12 +38,15 @@ class ArthurAdminClient:
         :param json_body:
         """
 
-        raw_resp = cast(requests.Response, self.http_client.post(
-            f"/login",
-            json=json_body.dict(),
-            validation_response_code=HTTPStatus.OK,
-            return_raw_response=True,
-        ))
+        raw_resp = cast(
+            requests.Response,
+            self.http_client.post(
+                f"/login",
+                json=json_body.dict(),
+                validation_response_code=HTTPStatus.OK,
+                return_raw_response=True,
+            ),
+        )
         return User(**raw_resp.json()), raw_resp.cookies
 
     def get_current_user(self) -> UserResponse:
@@ -52,9 +55,10 @@ class ArthurAdminClient:
 
         """
 
-        parsed_resp = cast(Dict, self.http_client.get(
-            f"/users/me", validation_response_code=HTTPStatus.OK
-        ))
+        parsed_resp = cast(
+            Dict,
+            self.http_client.get(f"/users/me", validation_response_code=HTTPStatus.OK),
+        )
         return UserResponse(**parsed_resp)
 
     def authenticate(self) -> AuthenticationInfo:
@@ -63,7 +67,10 @@ class ArthurAdminClient:
 
         """
 
-        parsed_resp = cast(Dict, self.http_client.get(
-            f"/users/me/auth_info", validation_response_code=HTTPStatus.OK
-        ))
+        parsed_resp = cast(
+            Dict,
+            self.http_client.get(
+                f"/users/me/auth_info", validation_response_code=HTTPStatus.OK
+            ),
+        )
         return AuthenticationInfo(**parsed_resp)

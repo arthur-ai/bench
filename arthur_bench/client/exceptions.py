@@ -1,4 +1,3 @@
-
 import functools
 import inspect
 
@@ -9,6 +8,7 @@ class ArthurError(Exception):
     Base Error for Arthur SDK. This class should not be used directly, Arthur exceptions should inherit from either
     ArthurUserError or ArthurInternalError.
     """
+
     pass
 
 
@@ -17,6 +17,7 @@ class ArthurUserError(ArthurError):
     """
     Exception raised due to incorrect user input to the Arthur SDK. Can be used directly but children are preferred.
     """
+
     pass
 
 
@@ -24,6 +25,7 @@ class ArthurInternalError(ArthurError):
     """
     Exception raised when user input is correct but an error occurs. Can be used directly but children are preferred.
     """
+
     pass
 
 
@@ -32,6 +34,7 @@ class MissingParameterError(ArthurUserError):
     """
     Exception raised when parameters supplied to the Arthur SDK are missing.
     """
+
     pass
 
 
@@ -39,6 +42,7 @@ class UserValueError(ArthurUserError, ValueError):
     """
     Exception raised when a user supplies an invalid value to the Arthur SDK.
     """
+
     pass
 
 
@@ -46,6 +50,7 @@ class UserTypeError(ArthurUserError, TypeError):
     """
     Exception raised when a user supplies an argument of the incorrect type to the Arthur SDK.
     """
+
     pass
 
 
@@ -53,6 +58,7 @@ class MethodNotApplicableError(ArthurUserError):
     """
     Exception raised when the method called is not valid for the resource.
     """
+
     pass
 
 
@@ -60,6 +66,7 @@ class ResponseClientError(ArthurUserError):
     """
     Exception raised when a 4XX response is received from the API.
     """
+
     pass
 
 
@@ -67,6 +74,7 @@ class UnauthorizedError(ResponseClientError):
     """
     Exception raised when a 401 Unauthorized response is received from the API.
     """
+
     pass
 
 
@@ -75,6 +83,7 @@ class PaymentRequiredError(ResponseClientError):
     Exception raised when a 402 response is received from the API due to a user trying to access features not available
     in their plan.
     """
+
     pass
 
 
@@ -82,6 +91,7 @@ class ForbiddenError(ResponseClientError):
     """
     Exception raised when a 403 Forbidden response is received from the API.
     """
+
     pass
 
 
@@ -89,6 +99,7 @@ class NotFoundError(ResponseClientError):
     """
     Exception raised when a 404 Not Found response is received from the API.
     """
+
     pass
 
 
@@ -97,6 +108,7 @@ class ExpectedParameterNotFoundError(ArthurInternalError):
     """
     Exception raised when a field or property should be available from Arthur but is unexpectedly missing.
     """
+
     pass
 
 
@@ -105,6 +117,7 @@ class InternalValueError(ArthurInternalError, ValueError):
 
     Exception raised when a value is unexpected.
     """
+
     pass
 
 
@@ -113,6 +126,7 @@ class InternalTypeError(ArthurInternalError, TypeError):
 
     Exception raised when a value is unexpected.
     """
+
     pass
 
 
@@ -164,11 +178,17 @@ def arthur_excepted(message=None):
                 raise e
             # otherwise wrap it in a message saying it's not the user's fault
             except ArthurInternalError as e:
-                raise ArthurInternalError(prefix + "an internal exception occurred, please report to Arthur") from e
+                raise ArthurInternalError(
+                    prefix + "an internal exception occurred, please report to Arthur"
+                ) from e
             except Exception as e:
-                raise ArthurInternalError(prefix +
-                                          "there was an unexpected internal exception, please report to Arthur") from e
+                raise ArthurInternalError(
+                    prefix
+                    + "there was an unexpected internal exception, please report to Arthur"
+                ) from e
+
         return wrapper_arthur_excepted
+
     return decorator_arthur_excepted
 
 

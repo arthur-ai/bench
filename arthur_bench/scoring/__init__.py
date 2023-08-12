@@ -13,13 +13,13 @@ from ..client.exceptions import UserValueError
 
 
 class ScoringMethodEnum(str, Enum):
-    BERTScore = 'bertscore'
-    SummaryQuality = 'summary_quality'
-    QACorrectness = 'qa_correctness'
-    ExactMatch = 'exact_match'
-    Readability = 'readability'
-    WordCountMatch = 'word_count_match'
-    HedgingLanguage = 'hedging_language'
+    BERTScore = "bertscore"
+    SummaryQuality = "summary_quality"
+    QACorrectness = "qa_correctness"
+    ExactMatch = "exact_match"
+    Readability = "readability"
+    WordCountMatch = "word_count_match"
+    HedgingLanguage = "hedging_language"
 
 
 SCORING_METHOD_CLASS_MAP: Dict[str, type[ScoringMethod]] = {
@@ -29,7 +29,7 @@ SCORING_METHOD_CLASS_MAP: Dict[str, type[ScoringMethod]] = {
     ScoringMethodEnum.ExactMatch: ExactMatch,
     ScoringMethodEnum.Readability: Readability,
     ScoringMethodEnum.WordCountMatch: WordCountMatch,
-    ScoringMethodEnum.HedgingLanguage: HedgingLanguage
+    ScoringMethodEnum.HedgingLanguage: HedgingLanguage,
 }
 
 

@@ -14,7 +14,7 @@ from arthur_bench.models.models import (
     TestSuiteRequest,
     PaginatedTestSuite,
     TestSuiteSummary,
-    CreateRunResponse
+    CreateRunResponse,
 )
 
 
@@ -41,7 +41,7 @@ class ArthurBenchClient(BenchClient):
         sort: Optional[str] = None,
         scoring_method: Optional[str] = None,
         page: Optional[int] = 1,
-        page_size: Optional[int] = None
+        page_size: Optional[int] = None,
     ) -> PaginatedTestSuites:
         """
                 Gets test suites
@@ -62,13 +62,18 @@ class ArthurBenchClient(BenchClient):
         if scoring_method is not None:
             params["scoring_method"] = scoring_method
         if page is not None:
-            params["page"] = page # type: ignore
+            params["page"] = page  # type: ignore
         if page_size is not None:
-            params["page_size"] = page_size # type: ignore
+            params["page_size"] = page_size  # type: ignore
 
-        parsed_resp = cast(Dict, self.http_client.get(
-            f"/bench/test_suites", params=params, validation_response_code=HTTPStatus.OK
-        ))
+        parsed_resp = cast(
+            Dict,
+            self.http_client.get(
+                f"/bench/test_suites",
+                params=params,
+                validation_response_code=HTTPStatus.OK,
+            ),
+        )
         return PaginatedTestSuites(**parsed_resp)
 
     def create_test_suite(self, json_body: TestSuiteRequest) -> PaginatedTestSuite:
@@ -78,18 +83,24 @@ class ArthurBenchClient(BenchClient):
         :param json_body:
         """
 
-        parsed_resp = cast(Dict, self.http_client.post(
-            f"/bench/test_suites",
-            json=json_body.dict(exclude={'created_at', 'created_by', 'bench_version'}),
-            validation_response_code=HTTPStatus.CREATED,
-        ))
+        parsed_resp = cast(
+            Dict,
+            self.http_client.post(
+                f"/bench/test_suites",
+                json=json_body.dict(
+                    exclude={"created_at", "created_by", "bench_version"}
+                ),
+                validation_response_code=HTTPStatus.CREATED,
+            ),
+        )
         return PaginatedTestSuite(**parsed_resp)
 
     def get_test_suite(
-            self, 
-            test_suite_id: str,
-            page: Optional[int] = 1,
-            page_size: Optional[int] = None) -> PaginatedTestSuite:
+        self,
+        test_suite_id: str,
+        page: Optional[int] = 1,
+        page_size: Optional[int] = None,
+    ) -> PaginatedTestSuite:
         """
         Get reference data for an existing test suite
 
@@ -97,15 +108,18 @@ class ArthurBenchClient(BenchClient):
         """
         params = {}
         if page is not None:
-            params["page"] = page # type: ignore
+            params["page"] = page  # type: ignore
         if page_size is not None:
-            params["page_size"] = page_size # type: ignore
+            params["page_size"] = page_size  # type: ignore
 
-        parsed_resp = cast(Dict, self.http_client.get(
-            f"/bench/test_suites/{test_suite_id}",
-            params=params,
-            validation_response_code=HTTPStatus.OK,
-        ))
+        parsed_resp = cast(
+            Dict,
+            self.http_client.get(
+                f"/bench/test_suites/{test_suite_id}",
+                params=params,
+                validation_response_code=HTTPStatus.OK,
+            ),
+        )
         return PaginatedTestSuite(**parsed_resp)
 
     def get_summary_statistics(
@@ -130,20 +144,23 @@ class ArthurBenchClient(BenchClient):
         if run_id is not None:
             params["run_id"] = run_id
         if page is not None:
-            params["page"] = page # type: ignore
+            params["page"] = page  # type: ignore
         if page_size is not None:
-            params["page_size"] = page_size # type: ignore
-        
-        parsed_resp = cast(Dict, self.http_client.get(
-            f"/bench/test_suites/{test_suite_id}/runs/summary",
-            params=params,
-            validation_response_code=HTTPStatus.OK,
-        ))
+            params["page_size"] = page_size  # type: ignore
+
+        parsed_resp = cast(
+            Dict,
+            self.http_client.get(
+                f"/bench/test_suites/{test_suite_id}/runs/summary",
+                params=params,
+                validation_response_code=HTTPStatus.OK,
+            ),
+        )
         return TestSuiteSummary(**parsed_resp)
 
     def get_runs_for_test_suite(
-        self, 
-        test_suite_id: str, 
+        self,
+        test_suite_id: str,
         sort: Optional[str] = None,
         page: Optional[int] = 1,
         page_size: Optional[int] = None,
@@ -159,15 +176,18 @@ class ArthurBenchClient(BenchClient):
         if sort is not None:
             params["sort"] = sort
         if page is not None:
-            params["page"] = page # type: ignore
+            params["page"] = page  # type: ignore
         if page_size is not None:
-            params["page_size"] = page_size # type: ignore
+            params["page_size"] = page_size  # type: ignore
 
-        parsed_resp = cast(Dict, self.http_client.get(
-            f"/bench/test_suites/{test_suite_id}/runs",
-            params=params,
-            validation_response_code=HTTPStatus.OK,
-        ))
+        parsed_resp = cast(
+            Dict,
+            self.http_client.get(
+                f"/bench/test_suites/{test_suite_id}/runs",
+                params=params,
+                validation_response_code=HTTPStatus.OK,
+            ),
+        )
         return PaginatedRuns(**parsed_resp)
 
     def create_new_test_run(
@@ -181,11 +201,14 @@ class ArthurBenchClient(BenchClient):
         :param json_body:
         """
 
-        parsed_resp = cast(Dict, self.http_client.post(
-            f"/bench/test_suites/{test_suite_id}/runs",
-            json=json_body.json(by_alias=True),
-            validation_response_code=HTTPStatus.CREATED,
-        ))
+        parsed_resp = cast(
+            Dict,
+            self.http_client.post(
+                f"/bench/test_suites/{test_suite_id}/runs",
+                json=json_body.json(by_alias=True),
+                validation_response_code=HTTPStatus.CREATED,
+            ),
+        )
         return CreateRunResponse(**parsed_resp)
 
     def get_test_run(
@@ -208,19 +231,22 @@ class ArthurBenchClient(BenchClient):
 
         params = {}
         if page is not None:
-            params["page"] = page # type: ignore
+            params["page"] = page  # type: ignore
         if page_size is not None:
-            params["page_size"] = page_size # type: ignore
+            params["page_size"] = page_size  # type: ignore
         if sort is not None:
             params["sort"] = sort
 
-        parsed_resp = cast(Dict, self.http_client.get(
-            f"/bench/test_suites/{test_suite_id}/runs/{test_run_id}",
-            params=params,
-            validation_response_code=HTTPStatus.OK,
-        ))
+        parsed_resp = cast(
+            Dict,
+            self.http_client.get(
+                f"/bench/test_suites/{test_suite_id}/runs/{test_run_id}",
+                params=params,
+                validation_response_code=HTTPStatus.OK,
+            ),
+        )
         return PaginatedRun(**parsed_resp)
-    
+
     def delete_test_suite(self, test_suite_id: str):
         """
         Deletes test suite
@@ -236,7 +262,7 @@ class ArthurBenchClient(BenchClient):
             return_raw_response=True,
         )
         return raw_resp
-    
+
     def delete_test_run(self, test_suite_id: str, test_run_id: str):
         """
         Deletes a test run
@@ -253,4 +279,3 @@ class ArthurBenchClient(BenchClient):
             return_raw_response=True,
         )
         return raw_resp
-

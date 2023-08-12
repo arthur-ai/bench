@@ -16,7 +16,7 @@ RECALL_WEIGHT = 0.9
 class BERTScore(ScoringMethod):
     """
     Tailored bert score implementation.
-    
+
     https://arxiv.org/abs/1904.09675
     """
 
@@ -26,14 +26,21 @@ class BERTScore(ScoringMethod):
 
     def __init__(self):
         with suppress_warnings("transformers"):
-            self.scorer = BERTScorer(lang='en', model_type=DEFAULT_MODEL)
+            self.scorer = BERTScorer(lang="en", model_type=DEFAULT_MODEL)
 
-    def run_batch(self, candidate_batch: List[str], reference_batch: Optional[List[str]] = None,
-                  input_text_batch: Optional[List[str]] = None, context_batch: Optional[List[str]] = None) -> List[float]:
+    def run_batch(
+        self,
+        candidate_batch: List[str],
+        reference_batch: Optional[List[str]] = None,
+        input_text_batch: Optional[List[str]] = None,
+        context_batch: Optional[List[str]] = None,
+    ) -> List[float]:
         if reference_batch is None:
-            raise UserTypeError("Reference Outputs must be provided for BERTScore scorer. Please provide "
-                                "reference outputs to the test suite")
-                                
+            raise UserTypeError(
+                "Reference Outputs must be provided for BERTScore scorer. Please provide "
+                "reference outputs to the test suite"
+            )
+
         # get precision, recall, and F1 score from bert_score package
         p, r, f = self.scorer.score(candidate_batch, reference_batch, verbose=False)
 
