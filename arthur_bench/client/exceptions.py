@@ -184,7 +184,8 @@ def arthur_excepted(message=None):
             except Exception as e:
                 raise ArthurInternalError(
                     prefix
-                    + "there was an unexpected internal exception, please report to Arthur"
+                    + "there was an unexpected internal exception, please report to"
+                    " Arthur"
                 ) from e
 
         return wrapper_arthur_excepted

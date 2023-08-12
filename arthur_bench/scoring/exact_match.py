@@ -22,8 +22,8 @@ class ExactMatch(ScoringMethod):
     ) -> List[float]:
         if reference_batch is None:
             raise UserTypeError(
-                "Reference Outputs must be provided for Exact Match scorer. Please provide "
-                "reference outputs to the test suite"
+                "Reference Outputs must be provided for Exact Match scorer. Please"
+                " provide reference outputs to the test suite"
             )
 
         return [

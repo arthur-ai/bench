@@ -42,7 +42,8 @@ def get_current_org(
                 f"{org_id}\n" for org_id in auth_info.organization_ids
             )[:-1]
             raise UserValueError(
-                f"Your access_key provides access to multiple organizations - please specify one of the following: "
+                f"Your access_key provides access to multiple organizations - please"
+                f" specify one of the following: "
                 + authenticated_org_id_str
             )
         else:  # len(auth_info.organization_ids) == 0

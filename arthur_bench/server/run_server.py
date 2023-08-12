@@ -4,10 +4,6 @@ from pathlib import Path
 import uuid
 from typing import Optional
 
-import http.server
-import socketserver
-
-
 try:
     import uvicorn
     from fastapi import FastAPI, Request

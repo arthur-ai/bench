@@ -126,8 +126,9 @@ class HTTPClient:
             _validate_base_url(base_url, allow_insecure)
         except UserValueError as e:
             raise UserValueError(
-                "Base URL is invalid, see nested exception for details. Base URL should not contain a "
-                "/path or &query=parameters, a /path;parameter, or a #fragment"
+                "Base URL is invalid, see nested exception for details. Base URL should"
+                " not contain a /path or &query=parameters, a /path;parameter, or a"
+                " #fragment"
             ) from e
 
         if path_prefix is None:
@@ -154,7 +155,8 @@ class HTTPClient:
         # if existing URL has a path, warn we're overriding it
         if parsed_url.path not in ("", "/") and parsed_url.path != path_prefix:
             logger.warning(
-                f"Overriding existing client base URL path '{parsed_url.path}' with supplied '{path_prefix}"
+                f"Overriding existing client base URL path '{parsed_url.path}' with"
+                f" supplied '{path_prefix}"
             )
 
         # assign the path to the parsed URL and write that back to our base url
@@ -221,8 +223,8 @@ class HTTPClient:
             raise UserValueError(f"retries must be greater than or equal to 0")
         if validation_response_code is None and retries > 0:
             logger.warning(
-                f"retries was specified as {retries} but validation_response_code was not set, response "
-                f"contents will not be evaluated."
+                f"retries was specified as {retries} but validation_response_code was"
+                " not set, response contents will not be evaluated."
             )
         # automatically add json content type headers and serialize json if `json` is supplied but no (multipart)
         #  files are supplied
@@ -237,7 +239,8 @@ class HTTPClient:
                 headers["Content-Type"] = "application/json"
             elif headers["Content-Type"] != "application/json":
                 logger.debug(
-                    f"Content-Type header is specified as {headers['Content-Type']}, not overwriting"
+                    f"Content-Type header is specified as {headers['Content-Type']},"
+                    " not overwriting"
                 )
             # body
             if type(json) != str and type(json) != bytes:
@@ -254,15 +257,15 @@ class HTTPClient:
             if json is not None:
                 if not isinstance(json, dict):
                     raise InternalTypeError(
-                        f"Received 'json' parameter with a multipart request but was of type "
-                        f"{type(json)} not dict."
+                        "Received 'json' parameter with a multipart request but was of"
+                        f" type {type(json)} not dict."
                     )
                 for field_name, field_value in json.items():
                     # validate key type
                     if not isinstance(field_name, str):
                         raise InternalTypeError(
-                            f"both 'files' and 'json' were supplied but 'json' keys type is "
-                            f"{type(field_name)} not str"
+                            "both 'files' and 'json' were supplied but 'json' keys"
+                            f" type is {type(field_name)} not str"
                         )
                     # serialize the values if needed
                     if isinstance(field_value, dict) or isinstance(field_value, list):
@@ -270,7 +273,8 @@ class HTTPClient:
                             field_value = jsonlib.dumps(field_value)
                         except TypeError as e:
                             raise InternalTypeError(
-                                f"failed to serialize 'json' input for key '{field_name}'"
+                                "failed to serialize 'json' input for key"
+                                f" '{field_name}'"
                             ) from e
                     # convert strings to BytesIO
                     if isinstance(field_value, str):
@@ -281,8 +285,9 @@ class HTTPClient:
                         field_value.seek(0)
                     except AttributeError as e:
                         raise InternalTypeError(
-                            f"Received 'data' dict but could not convert field '{field_name}' "
-                            f"of type '{type(json[field_name])}' to file-like object"
+                            "Received 'data' dict but could not convert field"
+                            f" '{field_name}' of type '{type(json[field_name])}' to"
+                            " file-like object"
                         ) from e
                     # set value in our newly-built data
                     data[field_name] = field_value
@@ -297,8 +302,9 @@ class HTTPClient:
                             and isinstance(entry[0], str)
                         ):
                             raise InternalTypeError(
-                                f"received list for files argument but did not contain tuples in "
-                                f"the correct format, entry was of type {type(entry)}: {entry}"
+                                "received list for files argument but did not contain"
+                                " tuples in the correct format, entry was of type"
+                                f" {type(entry)}: {entry}"
                             )
                         data[entry[0]] = entry
                 # if dict, ensure in tuple format like ("fname", data, [encoding]) or reformat if not
@@ -311,12 +317,13 @@ class HTTPClient:
                             data[fname] = (fname, file_obj)
                         else:
                             raise InternalTypeError(
-                                f"files['{fname}'] is of type {type(file_obj)}, not a tuple or "
-                                f"file-like"
+                                f"files['{fname}'] is of type {type(file_obj)}, not a"
+                                " tuple or file-like"
                             )
                 else:
                     raise InternalTypeError(
-                        f"received 'files' argument but was of type '{type(files)}; not list or dict"
+                        f"received 'files' argument but was of type '{type(files)}; not"
+                        " list or dict"
                     )
 
         url = construct_url(self.api_base_url, endpoint)
@@ -331,8 +338,8 @@ class HTTPClient:
                 if resp is not None:
                     encoding = resp.encoding if resp.encoding is not None else "utf-8"
                     logger.debug(
-                        f"Request failed with status {resp.status_code} auto retry {attempts}/{retries}:\n"
-                        f"{resp.content.decode(encoding)}"
+                        f"Request failed with status {resp.status_code} auto retry"
+                        f" {attempts}/{retries}:\n{resp.content.decode(encoding)}"
                     )
                 wait_time = self.BACKOFF_CONSTANT * (
                     self.BACKOFF_EXPONENT_BASE**attempts

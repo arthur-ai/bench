@@ -8,7 +8,6 @@ from langchain.prompts.chat import (
     SystemMessagePromptTemplate,
     AIMessagePromptTemplate,
     HumanMessagePromptTemplate,
-    BasePromptTemplate,
 )
 from arthur_bench.scoring import ScoringMethod
 from arthur_bench.client.exceptions import UserValueError, UserTypeError
@@ -150,7 +149,8 @@ class SummaryQuality(ScoringMethod):
             )
         if reference_outputs is None:
             raise TypeError(
-                "Reference Outputs must be provided for Summary Quality scorer, got None"
+                "Reference Outputs must be provided for Summary Quality scorer, got"
+                " None"
             )
         # truncate inputs if needed
         truncated_inputs = []
@@ -166,8 +166,8 @@ class SummaryQuality(ScoringMethod):
 
         if num_truncated > 0:
             logger.warning(
-                f"Truncated {num_truncated} out of {len(inputs)} total summary inputs to "
-                f"{CONTEXT_WINDOW_MAP[EVALUATOR_MODEL]} characters"
+                f"Truncated {num_truncated} out of {len(inputs)} total summary inputs"
+                f" to {CONTEXT_WINDOW_MAP[EVALUATOR_MODEL]} characters"
             )
 
         return super().run(
@@ -186,13 +186,14 @@ class SummaryQuality(ScoringMethod):
         """
         if input_text_batch is None:
             raise UserValueError(
-                "input text is required for this scoring method. Please provide a dataframe column or a list of your "
-                "input text strings in the Test Suite."
+                "input text is required for this scoring method. Please provide a"
+                " dataframe column or a list of your input text strings in the Test"
+                " Suite."
             )
         if reference_batch is None:
             raise UserTypeError(
-                "Reference Outputs must be provided for Summary Quality scorer. Please provide "
-                "reference outputs to the test suite"
+                "Reference Outputs must be provided for Summary Quality scorer. Please"
+                " provide reference outputs to the test suite"
             )
 
         if context_batch is not None:

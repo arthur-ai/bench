@@ -46,8 +46,8 @@ class ArthurClient:
             url = os.getenv("ARTHUR_API_URL")
         if url is None:
             raise MissingParameterError(
-                "You must provide a URL through the 'url' parameter or the ARTHUR_API_URL "
-                "environment variable"
+                "You must provide a URL through the 'url' parameter or the"
+                " ARTHUR_API_URL environment variable"
             )
         if verify_ssl is None:  # if not provided
             # read from env var, or default to True if not present
@@ -55,8 +55,8 @@ class ArthurClient:
                 verify_ssl = bool(strtobool(os.getenv("ARTHUR_VERIFY_SSL", "true")))
             except ValueError:
                 raise UserValueError(
-                    f"ARTHUR_VERIFY_SSL environment variable must be a boolean value, got "
-                    f"{os.getenv('ARTHUR_VERIFY_SSL')}"
+                    "ARTHUR_VERIFY_SSL environment variable must be a boolean value,"
+                    f" got {os.getenv('ARTHUR_VERIFY_SSL')}"
                 )
 
         # authorization
@@ -70,9 +70,9 @@ class ArthurClient:
         # validate only login or api key
         if login is not None and api_key is not None:
             raise UserValueError(
-                "You may not provide both a login and api key, please ensure you are are supplying only "
-                "one through the login/api_key parameters and ARTHUR_LOGIN/ARTHUR_API_KEY environment "
-                "variables"
+                "You may not provide both a login and api key, please ensure you are"
+                " are supplying only one through the login/api_key parameters and"
+                " ARTHUR_LOGIN/ARTHUR_API_KEY environment variables"
             )
         if login is not None:  # login if provided
             # if password not supplied, get it from input
@@ -93,10 +93,11 @@ class ArthurClient:
             header_refresh_func = None
         else:
             raise MissingParameterError(
-                "No authentication provided. Please supply a login (username or email) through "
-                "the 'login' parameter or ARTHUR_LOGIN environment variable.\n\nIf this is a "
-                "production environment, alternatively consider providing an API key through "
-                "the 'api_key' parameter or ARTHUR_API_KEY environment variable."
+                "No authentication provided. Please supply a login (username or email)"
+                " through the 'login' parameter or ARTHUR_LOGIN environment"
+                " variable.\n\nIf this is a production environment, alternatively"
+                " consider providing an API key through the 'api_key' parameter or"
+                " ARTHUR_API_KEY environment variable."
             )
 
         # org id

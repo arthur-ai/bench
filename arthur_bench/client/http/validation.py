@@ -59,7 +59,8 @@ def validate_response_status(
         status_code = response_or_code
     else:
         raise InternalTypeError(
-            f"{response_or_code} is of type {type(response_or_code)}, not requests.Response or int"
+            f"{response_or_code} is of type {type(response_or_code)}, not"
+            " requests.Response or int"
         )
 
     # make HTTPStatus (which extends int) if just raw int
@@ -164,8 +165,9 @@ def validate_multistatus_response_and_get_failures(
     # check that failure counts match ours
     if len(user_failures) + len(internal_failures) != body["counts"]["failure"]:
         raise InternalValueError(
-            f"provided response failure count {body['counts']['failure']} does not match "
-            f"{len(user_failures) + len(internal_failures)} results with status code >= 300"
+            f"provided response failure count {body['counts']['failure']} does not"
+            f" match {len(user_failures) + len(internal_failures)} results with status"
+            " code >= 300"
         )
 
     # raise an exception if specified
@@ -174,13 +176,13 @@ def validate_multistatus_response_and_get_failures(
         internal_message, user_message = None, None
         if len(internal_failures) > 0:
             internal_message = (
-                f"{len(internal_failures)} Arthur internal exceptions occurred in the multi-status "
-                f"response: {internal_failures}"
+                f"{len(internal_failures)} Arthur internal exceptions occurred in the"
+                f" multi-status response: {internal_failures}"
             )
         if len(user_failures) > 0:
             user_message = (
-                f"{len(user_failures)} client errors occurred, the following must be corrected: "
-                f"{user_failures}"
+                f"{len(user_failures)} client errors occurred, the following must be"
+                f" corrected: {user_failures}"
             )
         # if there are internal errors always raise an internal error
         if internal_message is not None:

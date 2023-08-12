@@ -30,8 +30,8 @@ class WordCountMatch(ScoringMethod):
     ) -> List[float]:
         if reference_batch is None:
             raise UserTypeError(
-                "Reference Outputs must be provided for Word Count Match scorer. Please provide "
-                "reference outputs to the test suite"
+                "Reference Outputs must be provided for Word Count Match scorer. "
+                "Please provide reference outputs to the test suite"
             )
         word_count_match = []
         for i in range(len(reference_batch)):

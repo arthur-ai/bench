@@ -40,15 +40,15 @@ TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%S.%f"
 DEFAULT_PAGE_SIZE = 5
 
 SORT_QUERY_TO_FUNC = {
-    "last_run_time": lambda x: x.last_run_time
-    if x.last_run_time is not None
-    else x.created_at,
+    "last_run_time": lambda x: (
+        x.last_run_time if x.last_run_time is not None else x.created_at
+    ),
     "name": lambda x: x.name,
     "created_at": lambda x: x.created_at,
     "avg_score": lambda x: x.avg_score,
-    "-last_run_time": lambda x: x.last_run_time
-    if x.last_run_time is not None
-    else x.created_at,
+    "-last_run_time": lambda x: (
+        x.last_run_time if x.last_run_time is not None else x.created_at
+    ),
     "-name": lambda x: x.name,
     "-created_at": lambda x: x.created_at,
     "-avg_score": lambda x: x.avg_score,
@@ -434,11 +434,15 @@ class LocalBenchClient(BenchClient):
         try:
             cases = (
                 duckdb.sql(
-                    f"SELECT * FROM ("
-                    f"SELECT test_cases.id, test_cases.input, test_cases.reference_output FROM ("
-                    f"SELECT unnest(test_cases) as test_cases from read_json_auto('{self.root_dir}/{test_suite_name}/suite.json', timestampformat='{TIMESTAMP_FORMAT}'))) "
-                    f"POSITIONAL JOIN (SELECT test_cases.output, test_cases.score FROM ("
-                    f"SELECT unnest(test_cases) as test_cases from read_json_auto('{self.root_dir}/{test_suite_name}/{run_name}/run.json',timestampformat='{TIMESTAMP_FORMAT}')))"
+                    "SELECT * FROM ("
+                    "SELECT test_cases.id, test_cases.input,"
+                    " test_cases.reference_output FROM ("
+                    "SELECT unnest(test_cases) as test_cases from"
+                    f" read_json_auto('{self.root_dir}/{test_suite_name}/suite.json',"
+                    f" timestampformat='{TIMESTAMP_FORMAT}'))) "
+                    "POSITIONAL JOIN (SELECT test_cases.output, test_cases.score FROM ("
+                    "SELECT unnest(test_cases) as test_cases from"
+                    f" read_json_auto('{self.root_dir}/{test_suite_name}/{run_name}/run.json',timestampformat='{TIMESTAMP_FORMAT}')))"
                 )
                 .df()
                 .to_dict("records")

@@ -109,8 +109,9 @@ class TestSuite:
             if self.suite.scoring_method.type == ScoringMethodType.Custom:
                 if scoring_method.name() != self.suite.scoring_method.name:
                     raise UserValueError(
-                        f"Test suite was originally created with scoring method: {self.suite.scoring_method.name} \
-			  			but provided scoring method has name: {scoring_method.name()}"
+                        "Test suite was originally created with scoring method:"
+                        f" {self.suite.scoring_method.name} 			  			but provided scoring"
+                        f" method has name: {scoring_method.name()}"
                     )
                 self.scorer = scoring_method()
             else:
@@ -165,7 +166,8 @@ class TestSuite:
 
         if len(candidate_output_list) != len(self.suite.test_cases):
             raise UserValueError(
-                f"candidate data has {len(candidate_output_list)} tests but expected {len(self.suite.test_cases)} tests"
+                f"candidate data has {len(candidate_output_list)} tests but expected"
+                f" {len(self.suite.test_cases)} tests"
             )
 
         inputs = [case.input for case in self.suite.test_cases]

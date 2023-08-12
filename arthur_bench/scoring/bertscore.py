@@ -37,8 +37,8 @@ class BERTScore(ScoringMethod):
     ) -> List[float]:
         if reference_batch is None:
             raise UserTypeError(
-                "Reference Outputs must be provided for BERTScore scorer. Please provide "
-                "reference outputs to the test suite"
+                "Reference Outputs must be provided for BERTScore scorer. Please"
+                " provide reference outputs to the test suite"
             )
 
         # get precision, recall, and F1 score from bert_score package

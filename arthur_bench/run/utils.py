@@ -124,7 +124,8 @@ def _load_suite_from_args(
     if requires_reference:
         if reference_column is None and reference_output_list is None:
             raise UserValueError(
-                "scoring method requires reference data but no reference data was provided"
+                "scoring method requires reference data but no reference data was"
+                " provided"
             )
     else:
         reference_column = None
@@ -137,8 +138,9 @@ def _load_suite_from_args(
         return load_suite_from_list(input_text_list, reference_output_list)
     else:
         raise UserValueError(
-            "must specify data using either reference_data data frame, "
-            "reference_data_path csv or input_text_list and reference_output_list strings"
+            "must specify data using either reference_data data frame,"
+            " reference_data_path csv or input_text_list and reference_output_list"
+            " strings"
         )
 
 

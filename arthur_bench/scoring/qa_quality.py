@@ -116,11 +116,14 @@ class QAQualityCorrectness(ScoringMethod):
         """
         if input_text_batch is None:
             raise UserValueError(
-                "input text is required for this scoring method. Please provide a dataframe column or a list of your input text strings in the Test Suite."
+                "input text is required for this scoring method. Please provide a"
+                " dataframe column or a list of your input text strings in the Test"
+                " Suite."
             )
         if context_batch is None:
             raise UserValueError(
-                "context is required for this scoring method. Please provide a dataframe column or a list of your context strings in the Test Suite."
+                "context is required for this scoring method. Please provide a"
+                " dataframe column or a list of your context strings in the Test Suite."
             )
 
         res = []

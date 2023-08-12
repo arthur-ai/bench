@@ -70,13 +70,15 @@ class TestSuiteRequest(BaseModel):
             # check it matches what we've been seeing
             if ref_val is None and last_ref_output_null is False:
                 raise UserValueError(
-                    "Test Suite has both null and non-null reference outputs. Reference outputs for "
-                    "test cases within a suite should be all null or all non-null."
+                    "Test Suite has both null and non-null reference outputs. Reference"
+                    " outputs for test cases within a suite should be all null or all"
+                    " non-null."
                 )
             if ref_val is not None and last_ref_output_null is True:
                 raise UserValueError(
-                    "Test Suite has both null and non-null reference outputs. Reference outputs for "
-                    "test cases within a suite should be all null or all non-null."
+                    "Test Suite has both null and non-null reference outputs. Reference"
+                    " outputs for test cases within a suite should be all null or all"
+                    " non-null."
                 )
             if ref_val is None:
                 last_ref_output_null = True

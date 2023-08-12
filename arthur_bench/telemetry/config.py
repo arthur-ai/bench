@@ -3,8 +3,6 @@ import uuid
 from pathlib import Path
 from pydantic import BaseModel
 
-import logging
-
 
 class TelemetryConfig(BaseModel):
     user_id: str
@@ -13,7 +11,7 @@ class TelemetryConfig(BaseModel):
 
 
 def _get_config_file_name() -> Path:
-    return Path(f"~/.bench_config/config.json").expanduser()
+    return Path("~/.bench_config/config.json").expanduser()
 
 
 def get_or_persist_id() -> TelemetryConfig:
