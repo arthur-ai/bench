@@ -26,7 +26,8 @@ logger = logging.getLogger(__name__)
 
 
 def _parse_response(response: requests.Response) -> Union[Dict, List, bytes, BytesIO]:
-    """Depending on the type of response from the server, parses the response and returns
+    """Depending on the type of response from the server, parses the response and
+        returns
 
     :param response: response from the REST call
     :return: parsed response
@@ -109,8 +110,8 @@ class HTTPClient:
         :param verify_ssl:
         :param timeout_sec:
         :param allow_insecure:
-        :param header_refresh_func: function to refresh headers, returning headers to update and time to wait before
-            next refresh
+        :param header_refresh_func: function to refresh headers, returning headers to
+            update and time to wait before next refresh
         """
         self.session = requests.Session()
         if default_headers is not None:
@@ -198,20 +199,25 @@ class HTTPClient:
 
         :param endpoint: the specific endpoint to append to the client URL
         :param method: the HTTP method to use
-        :param headers: headers to use for this request in addition to the client default headers
-        :param json: data to send as JSON, either a string/bytes to send directly or a dictionary/list to serialize. if
-            `files` is also supplied, this should be a map from name to content, to be sent along with the `files` as
-            a multipart request
-        :param files: a map from file names to file-like objects, to be sent as multipart/form-data
+        :param headers: headers to use for this request in addition to the client
+            default headers
+        :param json: data to send as JSON, either a string/bytes to send directly or a
+            dictionary/list to serialize. if `files` is also supplied, this should be a
+            map from name to content, to be sent along with the `files` as a multipart
+            request
+        :param files: a map from file names to file-like objects, to be sent as
+            multipart/form-data
         :param params: query parameters to add to the request
-        :param return_raw_response: if true, return the requests.Response object received; otherwise attempt to parse
-            the response
-        :param retries: number of times to retry the request on failure. uses exponential backoff
-        :param validate_response_status: if True, raise an ArthurException if the status code is not 2XX or does not
-            match `validation_response_code`
-        :param validation_response_code: expected status code of the response to validate. if None, allow any 2XX
-        :return: if return_raw_response is true, return the requests.Response object received; otherwise attempt to
-            parse the response
+        :param return_raw_response: if true, return the requests.Response object
+            received; otherwise attempt to parse the response
+        :param retries: number of times to retry the request on failure.
+            uses exponential backoff
+        :param validate_response_status: if True, raise an ArthurException if the status
+            code is not 2XX or does not match `validation_response_code`
+        :param validation_response_code: expected status code of the response to
+            validate. if None, allow any 2XX
+        :return: if return_raw_response is true, return the requests.Response object
+            received; otherwise attempt to parse the response
         :raises ArthurUserError: failed due to user error
         :raises ArthurInternalError: failed due to an internal error
         """
@@ -220,14 +226,14 @@ class HTTPClient:
 
         # VALIDATION AND PREPROCESSING
         if retries < 0:
-            raise UserValueError(f"retries must be greater than or equal to 0")
+            raise UserValueError("retries must be greater than or equal to 0")
         if validation_response_code is None and retries > 0:
             logger.warning(
                 f"retries was specified as {retries} but validation_response_code was"
                 " not set, response contents will not be evaluated."
             )
-        # automatically add json content type headers and serialize json if `json` is supplied but no (multipart)
-        #  files are supplied
+        # automatically add json content type headers and serialize json if `json` is
+        # supplied but no (multipart) files are supplied
         multipart: bool = files is not None or (
             "Content-Type" in headers.keys()
             and headers["Content-Type"] == "multipart/form-data"
@@ -243,7 +249,7 @@ class HTTPClient:
                     " not overwriting"
                 )
             # body
-            if type(json) != str and type(json) != bytes:
+            if not isinstance(json, str) and not isinstance(json, bytes):
                 try:
                     json = jsonlib.dumps(json)
                 except TypeError as e:
@@ -293,7 +299,8 @@ class HTTPClient:
                     data[field_name] = field_value
 
             if files is not None:
-                # if list, must be of tuples like ("fname", data, [encoding]) -- add to data in dict format
+                # if list, must be of tuples like ("fname", data, [encoding]) -- add to
+                # data in dict format
                 if isinstance(files, list):
                     for entry in files:
                         if not (
@@ -307,7 +314,8 @@ class HTTPClient:
                                 f" {type(entry)}: {entry}"
                             )
                         data[entry[0]] = entry
-                # if dict, ensure in tuple format like ("fname", data, [encoding]) or reformat if not
+                # if dict, ensure in tuple format like ("fname", data, [encoding]) or
+                # reformat if not
                 elif isinstance(files, dict):
                     for fname in files.keys():
                         file_obj = files[fname]
@@ -354,13 +362,17 @@ class HTTPClient:
                         headers,
                     )
                     # create multipart encoder
-                    #  note: it will re-seek to the beginning of all files so retries are safe
-                    # we want to stream the multipart upload: i.e. send the data in sections read from disk, rather than
-                    # loading it all into memory at once before starting the request. however the requests library can
-                    # only stream data from file-like objects. we need something to properly construct the multipart
-                    # request with its content boundaries and such
-                    # (see https://www.w3.org/TR/html401/interact/forms.html#h-17.13.4.2)
-                    # and turn it into a file-like object. this is what the MultipartEncoder does.
+                    #  note: it will re-seek to the beginning of all files so retries
+                    # are safe
+                    # we want to stream the multipart upload: i.e. send the data in
+                    # sections read from disk, rather than loading it all into memory at
+                    #  once before starting the request.
+                    # however the requests library can only stream data from file-like
+                    # objects. we need something to properly construct the multipart
+                    # request with its content boundaries and such (
+                    # see https://www.w3.org/TR/html401/interact/forms.html#h-17.13.4.2)
+                    # and turn it into a file-like object. t
+                    # this is what the MultipartEncoder does.
                     me = MultipartEncoder(fields=data)
                     headers["Content-Type"] = me.content_type
                     resp = self.session.request(
@@ -414,7 +426,7 @@ class HTTPClient:
         if not success:
             if error is None:
                 # should never happen but just in case
-                raise ArthurInternalError(f"failed to send request but error is None")
+                raise ArthurInternalError("failed to send request but error is None")
             raise error
 
         if resp is None:
@@ -437,16 +449,19 @@ class HTTPClient:
         """Send an HTTP GET request
 
         :param endpoint: the specific endpoint to append to the client URL
-        :param headers: headers to use for this request in addition to the client default headers
+        :param headers: headers to use for this request in addition to the client
+            default headers
         :param params: query parameters to add to the request
-        :param return_raw_response: if true, return the requests.Response object received; otherwise attempt to parse
-            the response
-        :param retries: number of times to retry the request on failure. uses exponential backoff
-        :param validate_response_status: if True, raise an ArthurException if the status code is not 2XX or does not
-            match `validation_response_code`
-        :param validation_response_code: expected status code of the response to validate. if None, allow any 2XX
-        :return: if return_raw_response is true, return the requests.Response object received; otherwise attempt to
-            parse the response
+        :param return_raw_response: if true, return the requests.Response object
+            received; otherwise attempt to parse the response
+        :param retries: number of times to retry the request on failure. uses
+            exponential backoff
+        :param validate_response_status: if True, raise an ArthurException if the status
+            code is not 2XX or does not match `validation_response_code`
+        :param validation_response_code: expected status code of the response to
+            validate. if None, allow any 2XX
+        :return: if return_raw_response is true, return the requests.Response object
+            received; otherwise attempt to parse the response
         :raises ArthurUserError: failed due to user error
         :raises ArthurInternalError: failed due to an internal error
         """
@@ -478,20 +493,25 @@ class HTTPClient:
         """Send an HTTP POST request
 
         :param endpoint: the specific endpoint to append to the client URL
-        :param headers: headers to use for this request in addition to the client default headers
-        :param json: data to send as JSON, either a string/bytes to send directly or a dictionary/list to serialize. if
-            `files` is also supplied, this should be a map from name to content, to be sent along with the
-            `files` as a multipart request
-        :param files: a map from file names to file-like objects, to be sent as multipart/form-data
+        :param headers: headers to use for this request in addition to the client
+            default headers
+        :param json: data to send as JSON, either a string/bytes to send directly or a
+            dictionary/list to serialize. if `files` is also supplied, this should be a
+            map from name to content, to be sent along with the `files` as a multipart
+            request
+        :param files: a map from file names to file-like objects,
+            to be sent as multipart/form-data
         :param params: query parameters to add to the request
-        :param return_raw_response: if true, return the requests.Response object received; otherwise attempt to parse
-            the response
-        :param retries: number of times to retry the request on failure. uses exponential backoff
-        :param validate_response_status: if True, raise an ArthurException if the status code is not 2XX or does not
-            match `validation_response_code`
-        :param validation_response_code: expected status code of the response to validate. if None, don't validate
-        :return: if return_raw_response is true, return the requests.Response object received; otherwise attempt to
-            parse the response
+        :param return_raw_response: if true, return the requests.Response object
+            received; otherwise attempt to parse the response
+        :param retries: number of times to retry the request on failure.
+            uses exponential backoff
+        :param validate_response_status: if True, raise an ArthurException if the status
+            code is not 2XX or does not match `validation_response_code`
+        :param validation_response_code: expected status code of the response to
+            validate. if None, don't validate
+        :return: if return_raw_response is true, return the requests.Response object
+            received; otherwise attempt to parse the response
         """
         return self.send(
             endpoint,
@@ -523,20 +543,25 @@ class HTTPClient:
         """Send an HTTP PUT request
 
         :param endpoint: the specific endpoint to append to the client URL
-        :param headers: headers to use for this request in addition to the client default headers
-        :param json: data to send as JSON, either a string/bytes to send directly or a dictionary/list to serialize. if
-            `files` is also supplied, this should be a map from name to content, to be sent along with the `files` as a
+        :param headers: headers to use for this request in addition to the client
+            default headers
+        :param json: data to send as JSON, either a string/bytes to send directly or a
+            dictionary/list to serialize. if `files` is also supplied, this should be a
+            map from name to content, to be sent along with the `files` as a
             multipart request
-        :param files: a map from file names to file-like objects, to be sent as multipart/form-data
+        :param files: a map from file names to file-like objects, to be sent as
+            multipart/form-data
         :param params: query parameters to add to the request
-        :param return_raw_response: if true, return the requests.Response object received; otherwise attempt to parse
-            the response
-        :param retries: number of times to retry the request on failure. uses exponential backoff
-        :param validate_response_status: if True, raise an ArthurException if the status code is not 2XX or does not
-            match `validation_response_code`
-        :param validation_response_code: expected status code of the response to validate. if None, don't validate
-        :return: if return_raw_response is true, return the requests.Response object received; otherwise attempt to
-            parse the response
+        :param return_raw_response: if true, return the requests.Response object
+            received; otherwise attempt to parse the response
+        :param retries: number of times to retry the request on failure.
+             uses exponential backoff
+        :param validate_response_status: if True, raise an ArthurException if the status
+            code is not 2XX or does not match `validation_response_code`
+        :param validation_response_code: expected status code of the response to
+            validate. if None, don't validate
+        :return: if return_raw_response is true, return the requests.Response object
+            received; otherwise attempt to parse the response
         """
         return self.send(
             endpoint,
@@ -568,20 +593,25 @@ class HTTPClient:
         """Send an HTTP POST request
 
         :param endpoint: the specific endpoint to append to the client URL
-        :param headers: headers to use for this request in addition to the client default headers
-        :param json: data to send as JSON, either a string/bytes to send directly or a dictionary/list to serialize.
-            if `files` is also supplied, this should be a map from name to content, to be sent along with the `files` as
-            a multipart request
-        :param files: a map from file names to file-like objects, to be sent as multipart/form-data
+        :param headers: headers to use for this request in addition to the client
+            default headers
+        :param json: data to send as JSON, either a string/bytes to send directly or a
+            dictionary/list to serialize.
+            if `files` is also supplied, this should be a map from name to content,
+            to be sent along with the `files` as a multipart request
+        :param files: a map from file names to file-like objects, to be sent as
+            multipart/form-data
         :param params: query parameters to add to the request
-        :param return_raw_response: if true, return the requests.Response object received; otherwise attempt to parse
-            the response
-        :param retries: number of times to retry the request on failure. uses exponential backoff
-        :param validate_response_status: if True, raise an ArthurException if the status code is not 2XX or does not
-            match `validation_response_code`
-        :param validation_response_code: expected status code of the response to validate. if None, don't validate
-        :return: if return_raw_response is true, return the requests.Response object received; otherwise attempt to
-            parse the response
+        :param return_raw_response: if true, return the requests.Response object
+            received; otherwise attempt to parse the response
+        :param retries: number of times to retry the request on failure.
+            uses exponential backoff
+        :param validate_response_status: if True, raise an ArthurException if the status
+            code is not 2XX or does not match `validation_response_code`
+        :param validation_response_code: expected status code of the response to
+            validate. if None, don't validate
+        :return: if return_raw_response is true, return the requests.Response object
+            received; otherwise attempt to parse the response
         """
         return self.send(
             endpoint,
@@ -609,16 +639,19 @@ class HTTPClient:
         """Send an HTTP DELETE request
 
         :param endpoint: the specific endpoint to append to the client URL
-        :param headers: headers to use for this request in addition to the client default headers
-        :param return_raw_response: if true, return the requests.Response object received; otherwise attempt to parse
-            the response
+        :param headers: headers to use for this request in addition to the client
+            default headers
+        :param return_raw_response: if true, return the requests.Response object
+            received; otherwise attempt to parse the response
         :param params: query parameters to add to the request
-        :param retries: number of times to retry the request on failure. uses exponential backoff
-        :param validate_response_status: if True, raise an ArthurException if the status code is not 2XX or does not
-            match validation_response_code
-        :param validation_response_code: expected status code of the response to validate. if None, don't validate
-        :return: if return_raw_response is true, return the requests.Response object received; otherwise attempt to
-            parse the response
+        :param retries: number of times to retry the request on failure.
+            uses exponential backoff
+        :param validate_response_status: if True, raise an ArthurException if the status
+            code is not 2XX or does not match validation_response_code
+        :param validation_response_code: expected status code of the response to
+            validate. if None, don't validate
+        :return: if return_raw_response is true, return the requests.Response object
+            received; otherwise attempt to parse the response
         """
         return self.send(
             endpoint,

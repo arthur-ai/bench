@@ -5,17 +5,19 @@ import inspect
 # Base Error
 class ArthurError(Exception):
     """
-    Base Error for Arthur SDK. This class should not be used directly, Arthur exceptions should inherit from either
-    ArthurUserError or ArthurInternalError.
+    Base Error for Arthur SDK. This class should not be used directly,
+    Arthur exceptions should inherit from either ArthurUserError or ArthurInternalError.
     """
 
     pass
 
 
-# Two Secondary Errors which differentiate between exceptions that are the user's fault and Arthur's fault
+# Two Secondary Errors which differentiate between exceptions that are the user's fault
+# and Arthur's fault
 class ArthurUserError(ArthurError):
     """
-    Exception raised due to incorrect user input to the Arthur SDK. Can be used directly but children are preferred.
+    Exception raised due to incorrect user input to the Arthur SDK. Can be used directly
+    but children are preferred.
     """
 
     pass
@@ -23,7 +25,8 @@ class ArthurUserError(ArthurError):
 
 class ArthurInternalError(ArthurError):
     """
-    Exception raised when user input is correct but an error occurs. Can be used directly but children are preferred.
+    Exception raised when user input is correct but an error occurs. Can be used
+    directly but children are preferred.
     """
 
     pass
@@ -48,7 +51,8 @@ class UserValueError(ArthurUserError, ValueError):
 
 class UserTypeError(ArthurUserError, TypeError):
     """
-    Exception raised when a user supplies an argument of the incorrect type to the Arthur SDK.
+    Exception raised when a user supplies an argument of the incorrect type to the
+    Arthur SDK.
     """
 
     pass
@@ -80,8 +84,8 @@ class UnauthorizedError(ResponseClientError):
 
 class PaymentRequiredError(ResponseClientError):
     """
-    Exception raised when a 402 response is received from the API due to a user trying to access features not available
-    in their plan.
+    Exception raised when a 402 response is received from the API due to a user trying
+    to access features not available in their plan.
     """
 
     pass
@@ -106,7 +110,8 @@ class NotFoundError(ResponseClientError):
 # Arthur Internal Exceptions
 class ExpectedParameterNotFoundError(ArthurInternalError):
     """
-    Exception raised when a field or property should be available from Arthur but is unexpectedly missing.
+    Exception raised when a field or property should be available from Arthur but is
+    unexpectedly missing.
     """
 
     pass
@@ -144,9 +149,12 @@ class ResponseRedirectError(ArthurInternalError):
 
 def arthur_excepted(message=None):
     """
-    Decorator to wrap user-facing Arthur functions with exception handling that describes to the user whether the error
-    is their fault or is our fault and should be reported.
-    :param message: an optional message to prefix the error with, should describe the failure e.g. "failed to send
+    Decorator to wrap user-facing Arthur functions with exception handling that
+    describes to the user whether the error is their fault or is our fault and should
+    be reported.
+
+    :param message: an optional message to prefix the error with, should describe the
+        failure e.g. "failed to send
     inferences" or "an error occurred while creating the model."
     :return: the decorator function
     """
@@ -158,7 +166,8 @@ def arthur_excepted(message=None):
     def decorator_arthur_excepted(func):
         @functools.wraps(func)
         def wrapper_arthur_excepted(*args, **kwargs):
-            # ensure all required parameters are present: check manually because TypeErrors from internal calls
+            # ensure all required parameters are present: check manually because
+            # TypeErrors from internal calls
             #  should not be UserErrors
             try:
                 inspect.signature(func).bind(*args, **kwargs)
@@ -193,5 +202,6 @@ def arthur_excepted(message=None):
     return decorator_arthur_excepted
 
 
-# TODO: TU-96 can we add custom linting steps to check that base exceptions aren't raised/caught and only arthur
+# TODO: TU-96 can we add custom linting steps to check that base exceptions aren't
+# raised/caught and only arthur
 #  exceptions are used?

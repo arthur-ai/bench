@@ -16,8 +16,8 @@ from arthur_bench.client.exceptions import (
     MissingParameterError,
 )
 from arthur_bench.client.bench_client import BenchClient
-from arthur_bench.client.local.client import LocalBenchClient
-from arthur_bench.client.rest.client import ArthurClient
+from arthur_bench.client.local import LocalBenchClient
+from arthur_bench.client.rest import ArthurClient
 from arthur_bench.run.testrun import TestRun
 from arthur_bench.run.utils import (
     _initialize_metadata,
@@ -33,18 +33,24 @@ logger = logging.getLogger(__name__)
 
 class TestSuite:
     """
-    Reusable pipeline for running a test suite built from reference_data and evaluated using metric
+    Reusable pipeline for running a test suite built from reference_data and
+    evaluated using scoring_method
 
     :param name: name of the test suite
-    :param scoring_method: scoring method to use to evaluate the results of a test run, as a string/enum or class
+    :param scoring_method: scoring method to use to evaluate the results of a test run,
+        as a string/enum or class
     :param description: short description of the task tested by this suite
     :param reference_data: dataframe of prompts and reference outputs
     :param reference_data_path: filepath to csv of prompts and reference outputs,
             required if not specifying reference_data
-    :param input_column: the column of reference_data containing prompts, defaults to 'prompt'
-    :param reference_column: the column of reference_data containing reference outputs, defaults to 'reference'
-    :param input_text_list: list of strings of input texts that can be provided instead of dataframe columns
-    :param reference_output_list: list of strings of reference outputs that can be provided instead of dataframe columns
+    :param input_column: the column of reference_data containing prompts,
+        defaults to 'prompt'
+    :param reference_column: the column of reference_data containing reference outputs,
+        defaults to 'reference'
+    :param input_text_list: list of strings of input texts that can be provided instead
+        of dataframe columns
+    :param reference_output_list: list of strings of reference outputs that can be
+        provided instead of dataframe columns
     """
 
     def __init__(
@@ -60,6 +66,8 @@ class TestSuite:
         reference_output_list: Optional[List[str]] = None,
         client: Optional[type[BenchClient]] = None,
     ):
+        self.client: BenchClient
+        self.suite: PaginatedTestSuite
         url = os.getenv("ARTHUR_API_URL")
         if client is None:
             if url:  # if remote url is specified use remote client
@@ -71,8 +79,8 @@ class TestSuite:
                 client = ArthurClient(url=url, api_key=api_key).bench  # type: ignore
             else:
                 client = LocalBenchClient()  # type: ignore
-        self.client: BenchClient = client  # type: ignore
-        self.suite: PaginatedTestSuite = _get_suite_if_exists(self.client, name)  # type: ignore
+        self.client = client  # type: ignore
+        self.suite = _get_suite_if_exists(self.client, name)  # type: ignore
 
         # get a scoringMethod class
         if isinstance(scoring_method, str):
@@ -110,7 +118,7 @@ class TestSuite:
                 if scoring_method.name() != self.suite.scoring_method.name:
                     raise UserValueError(
                         "Test suite was originally created with scoring method:"
-                        f" {self.suite.scoring_method.name} 			  			but provided scoring"
+                        f" {self.suite.scoring_method.name} but provided scoring"
                         f" method has name: {scoring_method.name()}"
                     )
                 self.scorer = scoring_method()
@@ -141,12 +149,16 @@ class TestSuite:
 
         :param run_name: name for the test run
         :param candidate_data: dataframe of candidate responses to test prompts
-        :param candidate_data_path: filepath to csv containing candidate responses to test prompts
-        :param candidate_column: the column of candidate data containing candidate responses,
-                defaults to 'candidate_output'
-        :param candidate_output_list: list of strings of candidate outputs that can be provided instead of dataframe
-        :param context_column: the column of reference_data containing supporting context for answering Question & Answering tasks
-        :param context_list: list of strings containing supporting context for answering question and answering tasks
+        :param candidate_data_path: filepath to csv containing candidate responses to
+            test prompts
+        :param candidate_column: the column of candidate data containing candidate
+            responses, defaults to 'candidate_output'
+        :param candidate_output_list: list of strings of candidate outputs that can be
+            provided instead of dataframe
+        :param context_column: the column of reference_data containing supporting
+            context for answering Question & Answering tasks
+        :param context_list: list of strings containing supporting context for answering
+             question and answering tasks
         :param save: whether to save the run results to file
         :param batch_size: the batch_size to use when computing scores
         :param model_name: model name for model used to generate outputs
@@ -172,7 +184,9 @@ class TestSuite:
 
         inputs = [case.input for case in self.suite.test_cases]
         ids = [case.id for case in self.suite.test_cases]
-        # ref outputs should be None if any items are None (we validate nullness must be all-or-none)
+
+        # ref outputs should be None if any items are None
+        # (we validate nullness must be all-or-none)
         ref_outputs: Optional[List[str]] = []
         if ref_outputs is not None:
             for case in self.suite.test_cases:

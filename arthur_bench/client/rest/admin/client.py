@@ -26,14 +26,18 @@ class ArthurAdminClient:
         """
         Create a new ArthurAdminClient from an HTTPClient
 
-        :param http_client: the :class:`~arthurai.client.http.requests.HTTPClient` to use for underlying requests
+        :param http_client: the :class:`~arthurai.client.http.requests.HTTPClient` to
+            use for underlying requests
         """
         self.http_client = http_client
         self.http_client.set_path_prefix(PATH_PREFIX)
 
     def login(self, json_body: LoginRequest) -> Tuple[User, RequestsCookieJar]:
         """
-        If the login attempt is successful, the user will be returned in the response body and an HttpOnly, set-cookie \"Authorization\" header will be returned that contains a JWT to be used in subsequent requests to the API in either the \"Authorization\" or cookie header
+        If the login attempt is successful, the user will be returned in the response
+        body and an HttpOnly, set-cookie \"Authorization\" header will be returned that
+        contains a JWT to be used in subsequent requests to the API in either the
+        \"Authorization\" or cookie header
 
         :param json_body:
         """
@@ -41,7 +45,7 @@ class ArthurAdminClient:
         raw_resp = cast(
             requests.Response,
             self.http_client.post(
-                f"/login",
+                "/login",
                 json=json_body.dict(),
                 validation_response_code=HTTPStatus.OK,
                 return_raw_response=True,
@@ -57,7 +61,7 @@ class ArthurAdminClient:
 
         parsed_resp = cast(
             Dict,
-            self.http_client.get(f"/users/me", validation_response_code=HTTPStatus.OK),
+            self.http_client.get("/users/me", validation_response_code=HTTPStatus.OK),
         )
         return UserResponse(**parsed_resp)
 
@@ -70,7 +74,7 @@ class ArthurAdminClient:
         parsed_resp = cast(
             Dict,
             self.http_client.get(
-                f"/users/me/auth_info", validation_response_code=HTTPStatus.OK
+                "/users/me/auth_info", validation_response_code=HTTPStatus.OK
             ),
         )
         return AuthenticationInfo(**parsed_resp)

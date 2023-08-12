@@ -1,18 +1,22 @@
 from textstat import lexicon_count
 from typing import List, Optional
 from arthur_bench.scoring import ScoringMethod
-from arthur_bench.scoring.utils import suppress_warnings
 from arthur_bench.client.exceptions import UserTypeError
 
 
 class WordCountMatch(ScoringMethod):
     """
-    Calculates how similar the number of words in the candidate output is to the the number of words in the reference output.
-    Scores span from 0 to 1.
-    A score of 1.0 indicates that there are the same number of words in the candidate output as in the reference output.
-    Scores less than 1.0 are calculated as ((len_reference-delta)/len_reference) where delta is the absolute difference in word lengths
-    between the candidate and reference outputs.
+    Calculates how similar the number of words in the candidate output
+    is to the the number of words in the reference output. Scores span from 0 to 1.
+
+    A score of 1.0 indicates that there are the same number of words
+    in the candidate output as in the reference output.
+    Scores less than 1.0 are calculated as ((len_reference-delta)/len_reference) where
+    delta is the absolute difference in word lengths between the candidate and
+    reference outputs.
+
     All negative computed values are truncated to 0.
+
     Utilizes lexicon count, removing punctuations: https://pypi.org/project/textstat/
 
     """

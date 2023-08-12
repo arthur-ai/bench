@@ -1,4 +1,3 @@
-import json
 import os
 import getpass
 import pandas as pd
@@ -40,7 +39,8 @@ def load_suite_from_dataframe(
     """
     Load test case data from a pandas dataframe.
 
-    :param data: dataframe where each row is a test case consisting of a column for input and a column for reference
+    :param data: dataframe where each row is a test case consisting of a column for
+        input and a column for reference
     :param input_column: column in dataframe containing inputs
     :param reference_column: column in dataframe containing reference outputs
     """
@@ -103,7 +103,8 @@ def load_suite_from_json(filepath: Union[str, os.PathLike]) -> TestSuiteRequest:
     """
     Load a full test suite from a json file.
 
-    :param filepath: string or pathlike object pointing to json file containing test suite data
+    :param filepath: string or pathlike object pointing to json file containing
+        test suite data
     """
     if get_file_extension(filepath) != ".json":
         raise UserValueError("filepath must be json file")

@@ -13,10 +13,11 @@ DEFAULT_HEDGE = (
 
 class HedgingLanguage(ScoringMethod):
     """
-    Given an input question and model output, determine if the output contains hedging language
-    such as "As an AI language model, I don't have personal opinions, emotions, or beliefs".
-    The values returned are a similarity score (BERTScore), with higher values corresponding to
-    higher likelihood of hedging language being present in the model output.
+    Given an input question and model output, determine if the output contains hedging
+    language such as "As an AI language model, I don't have personal opinions, emotions,
+    or beliefs". The values returned are a similarity score (BERTScore), with higher
+    values corresponding to higher likelihood of hedging language being present in
+    the model output.
     """
 
     @staticmethod

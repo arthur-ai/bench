@@ -354,8 +354,8 @@ class LocalBenchClient(BenchClient):
         run_files = glob.glob(f"{self.root_dir}/{test_suite_name}/*/run.json")
         for f in run_files:
             run_obj = PaginatedRun.parse_file(f)
-            avg_score = np.mean([o.score for o in run_obj.test_cases])
-            run_resp = TestRunMetadata(**run_obj.dict(), avg_score=avg_score)  # type: ignore
+            avg_score = float(np.mean([o.score for o in run_obj.test_cases]))
+            run_resp = TestRunMetadata(**run_obj.dict(), avg_score=avg_score)
             runs.append(run_resp)
 
         if sort is None:
@@ -442,7 +442,9 @@ class LocalBenchClient(BenchClient):
                     f" timestampformat='{TIMESTAMP_FORMAT}'))) "
                     "POSITIONAL JOIN (SELECT test_cases.output, test_cases.score FROM ("
                     "SELECT unnest(test_cases) as test_cases from"
-                    f" read_json_auto('{self.root_dir}/{test_suite_name}/{run_name}/run.json',timestampformat='{TIMESTAMP_FORMAT}')))"
+                    f" read_json_auto("
+                    "'{self.root_dir}/{test_suite_name}/{run_name}/run.json',"
+                    " timestampformat='{TIMESTAMP_FORMAT}')))"
                 )
                 .df()
                 .to_dict("records")
@@ -476,7 +478,8 @@ class LocalBenchClient(BenchClient):
 
     def get_test_suite_by_name(self, test_suite_name: str) -> PaginatedTestSuite:
         """
-        Additional getter to maintain backwards compatibility with non-identified local files
+        Additional getter to maintain backwards compatibility with non-identified local
+        files
         """
         suite_file = self.root_dir / test_suite_name / "suite.json"
         suite = load_suite_from_json(suite_file)

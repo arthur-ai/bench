@@ -37,11 +37,13 @@ class User(BaseModel):
     """
     alert_notifications_enabled: Optional[bool] = None
     """
-    Whether or not the user will receive email notifications when alerts are triggered, defaults to 'false'
+    Whether or not the user will receive email notifications when alerts are triggered,
+    defaults to 'false'
     """
     show_intro_sequence: Optional[bool] = None
     """
-    Used by the Arthur dashboard to determine whether or not to show the user an intro sequence upon login
+    Used by the Arthur dashboard to determine whether or not to show the user an intro
+    sequence upon login
     """
     help_mode_enabled: Optional[bool] = None
     """
@@ -83,41 +85,52 @@ class AuthenticationInfo(BaseModel):
     """
     external_user_id: Optional[str] = None
     """
-    An identifier for an external-IdP token bearer. Populated if this user's token came from an IDP and the IDP configuration specified an oidc.CustomClaimNames that mapped UserID to a claim.
+    An identifier for an external-IdP token bearer. Populated if this user's token came
+    from an IDP and the IDP configuration specified an oidc.CustomClaimNames that mapped
+    UserID to a claim.
     """
     internal_user_id: Optional[str] = None
     """
-    An identifier for an Arthur-internal user. Populated for Arthur-authenticated users with user tokens.
+    An identifier for an Arthur-internal user. Populated for Arthur-authenticated users
+    with user tokens.
     """
     service_account_id: Optional[str] = None
     """
-    An identifier for an Arthur service account. Populated for Arthur-authenticated service account tokens.
+    An identifier for an Arthur service account. Populated for Arthur-authenticated
+    service account tokens.
     """
     username: str
     """
-    Either the Arthur username or the username specified by an external IDP. This will be set to arthur.ServiceAccountName for service account tokens.
+    Either the Arthur username or the username specified by an external IDP.
+    This will be set to arthur.ServiceAccountName for service account tokens.
     """
     first_name: str
     """
-    The first name of the Arthur authenticated user, or the first name claim if the external IDP is configured with one.
+    The first name of the Arthur authenticated user, or the first name claim if the
+    external IDP is configured with one.
     """
     last_name: str
     """
-    The last name of the Arthur authenticated user, or the last name claim if the external IDP is configured with one.
+    The last name of the Arthur authenticated user, or the last name claim if the
+    external IDP is configured with one.
     """
     email: str
     """
-    The email of the Arthur authenticated user or the email of the external IDP user if the IDP is configured with that claim. For Arthur service accounts, this will be empty.
+    The email of the Arthur authenticated user or the email of the external IDP user if
+    the IDP is configured with that claim. For Arthur service accounts, this will be
+    empty.
     """
     roles: List[str]
     """
-    The list of roles that this user has. For Arthur tokens, there will always be one role in this array; however, there can be more than one for external providers.
+    The list of roles that this user has. For Arthur tokens, there will always be one
+    role in this array; however, there can be more than one for external providers.
     """
 
 
 class UserResponse(BaseModel):
     """
-    Represents an application user, if the client is using a service token then only organization_id and roles will be populated in the object
+    Represents an application user, if the client is using a service token then only
+    organization_id and roles will be populated in the object
     """
 
     id: Optional[str] = None
@@ -154,11 +167,13 @@ class UserResponse(BaseModel):
     """
     alert_notifications_enabled: Optional[bool] = None
     """
-    Whether or not the user will receive email notifications when alerts are triggered, defaults to 'false'
+    Whether or not the user will receive email notifications when alerts are triggered,
+    defaults to 'false'
     """
     show_intro_sequence: Optional[bool] = None
     """
-    used by the Arthur dashboard to determine whether the user should be shown the intro sequence upon login
+    used by the Arthur dashboard to determine whether the user should be shown the intro
+    sequence upon login
     """
     help_mode_enabled: Optional[bool] = None
     """
@@ -166,7 +181,8 @@ class UserResponse(BaseModel):
     """
     plan: Optional[str] = None
     """
-    string representation of what plan the org of the returned user is associated with (ie. self-service or paidSaas)
+    string representation of what plan the org of the returned user is associated with
+    (ie. self-service or paidSaas)
     """
     created_at: Optional[datetime] = None
     """

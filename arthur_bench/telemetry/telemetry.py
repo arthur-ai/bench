@@ -3,7 +3,7 @@ import uuid
 import os
 from enum import Enum
 from arthur_bench.telemetry.config import TelemetryConfig
-from arthur_bench.logger.logger import logger
+from arthur_bench.logger import logger
 
 
 AMPLITUDE_API_KEY = "bcc009e35e0b79daf089211108eed1de"
@@ -39,6 +39,7 @@ def set_track_usage_data(cfg: TelemetryConfig):
 
 # A no-op if user opts out of data collection.
 def send_event(event, user_id: uuid.UUID):
+    global TRACK_USAGE_DATA
     if TRACK_USAGE_DATA == Telemetry.OFF:
         return
 

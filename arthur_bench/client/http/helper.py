@@ -11,8 +11,9 @@ def construct_url(*parts: str, validate=True, default_https=True) -> str:
     """Construct a URL from various parts
 
     Useful for joining pieces which may or may not have leading and/or trailing
-    slashes. e.g. construct_url("https://arthur.ai/", "/api/v3", "/users") will yield the same valid url as
-    construct_url("https://arthur.ai", "api/v3/", "users/"): "https://arthur.ai/api/v3/users".
+    slashes. e.g. construct_url("https://arthur.ai/", "/api/v3", "/users") will yield
+    the same valid url as construct_url("https://arthur.ai", "api/v3/", "users/"):
+    "https://arthur.ai/api/v3/users".
 
     :param validate: if True, validate that the URL is valid
     :param default_https: if True, allow urls without a scheme and use https by default

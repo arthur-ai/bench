@@ -44,7 +44,8 @@ class ScoringMethod(ABC):
         :param candidate_batch: candidate generations to score
         :param reference_batch: reference strings representing target outputs
         :param input_text_batch: optional corresponding inputs
-        :param context_batch: optional corresponding contexts, if needed by scoring method
+        :param context_batch: optional corresponding contexts,
+            if needed by scoring method
         """
         raise NotImplementedError
 
@@ -57,8 +58,9 @@ class ScoringMethod(ABC):
         batch_size: int = SINGLE_ITEM_BATCH_DEFAULT,
     ) -> List[float]:
         """
-        Score a set of test cases. This method doesn't need to be implemented in most cases, but can be overriden to
-        add additional functionality such as task-specific logging.
+        Score a set of test cases. This method doesn't need to be implemented in most
+        cases, but can be overriden to add additional functionality such as
+        task-specific logging.
 
         :param candidate_outputs: candidate generations to score
         :param reference_outputs: reference strings representing target outputs
@@ -70,7 +72,6 @@ class ScoringMethod(ABC):
         all_scores = []
         with tqdm(total=len(candidate_outputs)) as pbar:
             for i in range(0, len(candidate_outputs), batch_size):
-                # TODO: make suite iterable: https://arthurai.atlassian.net/browse/LLM-250
                 input_batch = (
                     list(inputs[i : i + batch_size]) if inputs is not None else None
                 )
@@ -100,8 +101,8 @@ class ScoringMethod(ABC):
         """
         Supplies whether a scoring method is built-in or custom.
 
-        This method is implemented by checking whether the ScoringMethod class is part of the `arthur_bench.scoring`
-        module.
+        This method is implemented by checking whether the ScoringMethod class is
+        part of the `arthur_bench.scoring` module.
         :return: the type (built-in or custom)
         """
         try:

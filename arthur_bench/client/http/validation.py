@@ -40,11 +40,12 @@ def validate_response_status(
     """
     Validate the status code of a requests.Response object or (int) status code.
     :param response_or_code: the requests.Response object or status code to validate
-    :param expected_status_code: the expected status code to check for. If None, all codes <300 will be valid, and 3XX
-    codes will be subject to allow_redirects
+    :param expected_status_code: the expected status code to check for. If None, all c
+        odes <300 will be valid, and 3XX codes will be subject to allow_redirects
     :param allow_redirects: if True will not raise an exception for 3XX status codes
     :return: None
-    :raises InternalValueError: if expected_status_code is not None and does not match the response code
+    :raises InternalValueError: if expected_status_code is not None and does not match
+        the response code
     :raises ResponseServerError: if the response has a 5XX status code
     :raises ResponseClientError: if the response has a 4XX status code
     :raises ResponseRedirectError: if the response has a 3XX status code
@@ -66,7 +67,8 @@ def validate_response_status(
     # make HTTPStatus (which extends int) if just raw int
     status_code = HTTPStatus(status_code)
 
-    # if an exact status code is supplied and it matches return, to let through expected codes >= 400
+    # if an exact status code is supplied and it matches return, to let through expected
+    #  codes >= 400
     if expected_status_code is not None and status_code == expected_status_code:
         return
 
@@ -80,7 +82,8 @@ def validate_response_status(
             raise UnauthorizedError(
                 "Unauthorized, please ensure your access information is correct"
             )
-        # 402 error code corresponding specifically to requesting paid features from a free account
+        # 402 error code corresponding specifically to requesting paid features from a
+        # free account
         if status_code == HTTPStatus.PAYMENT_REQUIRED:
             raise PaymentRequiredError(formatter_func(response_or_code))
         # 403 error code corresponding specifically to forbidden
@@ -95,7 +98,8 @@ def validate_response_status(
     elif status_code >= 300 and not allow_redirects:
         raise ResponseRedirectError(formatter_func(response_or_code))
 
-    # finally if an expected code is supplied but doesn't match, raise an InternalValueError
+    # finally if an expected code is supplied but doesn't match, raise an
+    # InternalValueError
     elif expected_status_code is not None and status_code != expected_status_code:
         parsed_response = formatter_func(response_or_code)
         raise InternalValueError(
@@ -109,7 +113,7 @@ def validate_multistatus_response_and_get_failures(
 ) -> Tuple[List[dict], List[dict]]:
     """Validate a 207 MultiStatus response and return the failures it contains.
 
-    :param response: requests.Response object to validate, with the following body format:
+    :param response: requests.Response object to validate, with the body format:
 
         .. code-block:: JSON
 
@@ -126,17 +130,20 @@ def validate_multistatus_response_and_get_failures(
                     }
                 ]
             }
-    :param raise_on_failures: if True, raise an exception if the response contains any failures
+    :param raise_on_failures: if True, raise an exception if the response contains any
+        failures
     :return: a tuple of two lists: user-caused failures and internal failures
-    :raises ArthurInternalValueError: If the response does not have 207 status code, or is incorrectly formatted,
-     or 'counts' and 'results' do not agree
-    :raises ResponseClientError: if `raise_on_failures` and the response contains only client errors
-    :raises ResponseServerError: if `raise_on_failures` and the response contains server errors
+    :raises ArthurInternalValueError: If the response does not have 207 status code,
+        or is incorrectly formatted, or 'counts' and 'results' do not agree
+    :raises ResponseClientError: if `raise_on_failures` and the response contains only
+        client errors
+    :raises ResponseServerError: if `raise_on_failures` and the response contains server
+         errors
     """
     # initial input validation
     validate_response_status(response, HTTPStatus.MULTI_STATUS)
     body = response.json()
-    if type(body) != dict:
+    if not isinstance(body, dict):
         raise InternalValueError("response body is incorrectly formatted")
     if "counts" not in body.keys():
         raise InternalValueError("response body does not have 'counts' field")
@@ -146,7 +153,7 @@ def validate_multistatus_response_and_get_failures(
         )
     if "results" not in body.keys():
         raise InternalValueError("response body does not have 'results' field")
-    if type(body["results"]) != list:
+    if not isinstance(body["results"], list):
         raise InternalValueError("response 'results' field must be a list")
 
     # pass through results, gathering failures
@@ -154,7 +161,7 @@ def validate_multistatus_response_and_get_failures(
     internal_failures = []
     for result in body["results"]:
         if "status" not in result.keys():
-            raise InternalValueError(f"response result does not contain 'status'")
+            raise InternalValueError("response result does not contain 'status'")
         try:
             validate_response_status(result["status"])
         except ArthurUserError:

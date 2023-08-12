@@ -4,8 +4,7 @@
 
 from __future__ import annotations
 
-from enum import Enum
-from typing import Dict, List, Optional, Union
+from typing import Dict, Optional, Union
 
 from pydantic import BaseModel, Extra, Field
 
@@ -28,7 +27,8 @@ class PageSize(BaseModel):
 class Sort(BaseModel):
     __root__: str
     """
-    Must be supplied in the format [column_name] to denote asc sort by this column OR -[column_name] to denote desc sort by this column
+    Must be supplied in the format [column_name] to denote asc sort by this column OR
+    -[column_name] to denote desc sort by this column
     """
 
 
@@ -61,5 +61,6 @@ class TotalCount(BaseModel):
 class TotalPages(BaseModel):
     __root__: int = Field(..., example=1)
     """
-    The number of result pages that this query generated, the ceiling of the total number of results divided by the page size
+    The number of result pages that this query generated, the ceiling of the total
+    number of results divided by the page size
     """

@@ -1,1 +1,2 @@
-from . import client
+# flake8: noqa
+from .client import BenchClient
