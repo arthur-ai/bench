@@ -21,7 +21,7 @@ class LLMGuidedScorer(ScoringMethod):
             return float(score[0])
         
         # look for known classifier strings
-        score_keys = self.score_config.keys().sort(lambda x: len(x))
+        score_keys = sorted(list(self.score_config.keys()), key = lambda x: len(x))
         for key in score_keys:
             if re.match(resp, key):
                 return self.score_config[key]

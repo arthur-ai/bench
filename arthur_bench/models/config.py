@@ -134,3 +134,8 @@ ScoreConfig = Dict[float, str]
 
 class EvaluatorConfig(LMConfig):
     score_config: ScoreConfig
+
+
+    def __init__(self, score_config, *args, **kwargs):
+        super(EvaluatorConfig, self).__init__(*args, **kwargs)
+        self.score_config = score_config
