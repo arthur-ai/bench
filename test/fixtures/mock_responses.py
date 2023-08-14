@@ -32,10 +32,6 @@ MOCK_SUITE_RESPONSE = PaginatedTestSuite(
     created_at="2023-06-22T21:56:03.346141",
     updated_at="2023-06-22T21:56:03.346141",
     test_cases=MOCK_SUITE_CASES,
-    page=1,
-    page_size=2,
-    total_pages=1,
-    total_count=2,
 )
 
 MOCK_SUITE_RESPONSE_WITH_PAGES = PaginatedTestSuite(
@@ -63,10 +59,6 @@ MOCK_SUITE_CUSTOM_RESPONSE = PaginatedTestSuite(
     created_by="arthur",
     bench_version="0.0.1",
     test_cases=MOCK_SUITE_CASES,
-    page=1,
-    page_size=2,
-    total_pages=1,
-    total_count=2,
 )
 
 MOCK_NO_SUITES = PaginatedTestSuites(

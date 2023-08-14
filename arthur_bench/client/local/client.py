@@ -313,10 +313,6 @@ class LocalBenchClient(BenchClient):
             scoring_method=json_body.scoring_method,
             created_at=json_body.created_at,
             updated_at=json_body.created_at,
-            page=1,
-            page_size=len(json_body.test_cases),
-            total_count=len(json_body.test_cases),
-            total_pages=1,
         )
 
         suite_file.write_text(resp.json())

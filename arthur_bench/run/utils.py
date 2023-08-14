@@ -12,7 +12,7 @@ from arthur_bench.models.models import (
     TestSuiteRequest,
     PaginatedTestSuite,
 )
-from arthur_bench.client.exceptions import UserValueError
+from arthur_bench.client.exceptions import UserValueError, ArthurInternalError
 from arthur_bench.client.bench_client import BenchClient
 
 
@@ -188,6 +188,11 @@ def _get_suite_if_exists(
         suite = client.get_test_suite(
             str(test_suite_resp.test_suites[0].id), **query_params
         )
+        current_page: int
+        total_pages: int
+        if suite.page is None or suite.total_pages is None:
+            raise ArthurInternalError("expected paginated response")
+
         current_page = suite.page
         total_pages = suite.total_pages
         while current_page <= total_pages:
@@ -196,6 +201,8 @@ def _get_suite_if_exists(
                 str(test_suite_resp.test_suites[0].id), **query_params
             )
             suite.test_cases.extend(suite_next_page.test_cases)
+            if suite_next_page.page is None or suite_next_page.total_pages is None:
+                raise ArthurInternalError("expected paginated response")
             total_pages = suite_next_page.total_pages
             current_page = suite_next_page.page + 1
         return suite
