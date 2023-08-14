@@ -5,15 +5,15 @@ from enum import Enum
 from typing import List, Optional
 from uuid import UUID
 
-from arthur_bench.client.exceptions import UserValueError
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, validator, root_validator
 
 
 ## COMMON
 
+
 class ScoringMethodType(str, Enum):
-    BuiltIn = 'built_in'
-    Custom = 'custom'
+    BuiltIn = "built_in"
+    Custom = "custom"
 
 
 class ScoringMethod(BaseModel):
@@ -28,6 +28,7 @@ class TestCaseRequest(BaseModel):
     """
     An input, reference output pair.
     """
+
     input: str
     """
     Input to the test case. Does not include the prompt template.
@@ -42,6 +43,7 @@ class TestSuiteRequest(BaseModel):
     """
     Test case data and metadata for the test suite.
     """
+
     name: str
     description: Optional[str] = None
     scoring_method: ScoringMethod
@@ -50,7 +52,7 @@ class TestSuiteRequest(BaseModel):
     bench_version: str
     created_at: datetime
 
-    @validator('test_cases')
+    @validator("test_cases")
     def null_reference_outputs_all_or_none(cls, v):
         last_ref_output_null = None
         for tc in v:
@@ -58,17 +60,25 @@ class TestSuiteRequest(BaseModel):
             if isinstance(tc, TestCaseRequest):
                 ref_val = tc.reference_output
             elif isinstance(tc, dict):
-                ref_val = tc.get('reference_output', None)
+                ref_val = tc.get("reference_output", None)
             else:
-                raise TypeError(f"Unable to extract reference output value for type '{type(v)}'")
+                raise TypeError(
+                    f"Unable to extract reference output value for type '{type(v)}'"
+                )
 
             # check it matches what we've been seeing
             if ref_val is None and last_ref_output_null is False:
-                raise UserValueError("Test Suite has both null and non-null reference outputs. Reference outputs for "
-                                     "test cases within a suite should be all null or all non-null.")
+                raise ValueError(
+                    "Test Suite has both null and non-null reference outputs. Reference"
+                    " outputs for test cases within a suite should be all null or all"
+                    " non-null."
+                )
             if ref_val is not None and last_ref_output_null is True:
-                raise UserValueError("Test Suite has both null and non-null reference outputs. Reference outputs for "
-                                     "test cases within a suite should be all null or all non-null.")
+                raise ValueError(
+                    "Test Suite has both null and non-null reference outputs. Reference"
+                    " outputs for test cases within a suite should be all null or all"
+                    " non-null."
+                )
             if ref_val is None:
                 last_ref_output_null = True
             else:
@@ -76,16 +86,18 @@ class TestSuiteRequest(BaseModel):
 
         return v
 
-    @validator('scoring_method', pre=True)
+    @validator("scoring_method", pre=True)
     def scoring_method_backwards_compatible(cls, v):
         if isinstance(v, str):
             return ScoringMethod(name=v, type=ScoringMethodType.BuiltIn)
         return v
-    
+
+
 class TestCaseOutput(BaseModel):
     """
     A generated output, score pair
     """
+
     id: UUID
     """
     Optional unique identifier for this test case of the suite and run
@@ -98,13 +110,14 @@ class TestCaseOutput(BaseModel):
     """
     Score assigned to output
     """
-    
+
+
 class CreateRunRequest(BaseModel):
     name: str
     """
     Name identifier of the run
     """
-    test_cases: List[TestCaseOutput] = Field(alias='test_case_outputs')
+    test_cases: List[TestCaseOutput] = Field(alias="test_case_outputs")
     """
     List of outputs and scores for all cases in the test suite
     """
@@ -138,6 +151,7 @@ class CreateRunRequest(BaseModel):
 
 ## RESPONSES
 
+
 class TestSuiteMetadata(BaseModel):
     id: UUID
     name: str
@@ -154,6 +168,7 @@ class PaginatedTestSuites(BaseModel):
     page_size: int
     total_pages: int
     total_count: int
+
 
 class TestCaseResponse(BaseModel):
     id: UUID
@@ -197,6 +212,7 @@ class PaginatedRuns(BaseModel):
     """
     Paginated list of runs for a test suite.
     """
+
     test_suite_id: UUID
     test_runs: List[TestRunMetadata]
     page: int
@@ -243,10 +259,11 @@ class PaginatedRun(BaseModel):
     """
     Paginated list of prompts, reference outputs, and model outputs for a particular run.
     """
+
     id: UUID
     name: str
     test_suite_id: UUID
-    test_cases: List[RunResult] = Field(alias='test_case_runs')
+    test_cases: List[RunResult] = Field(alias="test_case_runs")
     updated_at: datetime
     created_at: datetime
     page: Optional[int] = None

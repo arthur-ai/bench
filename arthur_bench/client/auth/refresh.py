@@ -8,13 +8,9 @@ import pytz
 from arthur_bench.client.auth.helpers import user_login
 
 
-# TODO: update to handle actual refresh here before and have the external caller simply fetch the recently created token
-#  or even better, have the external subscribe to fresh tokens and update accordingly
-#  this is necessary because we're now using this across many different HTTP Clients at once
 class AuthRefresher:
-
-    AUTH_KEY = 'Authorization'
-    ALGORITHMS = ['HS256']
+    AUTH_KEY = "Authorization"
+    ALGORITHMS = ["HS256"]
     MINS_BEFORE_EXPIRY_TO_REFRESH = 5
 
     def __init__(self, url: str, login: str, password: str, verify_ssl: bool):
@@ -32,13 +28,17 @@ class AuthRefresher:
         :return: the amount of time to wait before fetching a new token
         """
         # see when the token expires
-        token_decoded = jwt.decode(current_token, algorithms=AuthRefresher.ALGORITHMS,
-                                   options={"verify_signature": False})
-        expiry = datetime.fromtimestamp(token_decoded['exp'], tz=pytz.UTC)
+        token_decoded = jwt.decode(
+            current_token,
+            algorithms=AuthRefresher.ALGORITHMS,
+            options={"verify_signature": False},
+        )
+        expiry = datetime.fromtimestamp(token_decoded["exp"], tz=pytz.UTC)
         cur_time = datetime.now(tz=pytz.UTC)
 
-        time_to_briefly_before_expiry = (expiry -
-                                         timedelta(minutes=AuthRefresher.MINS_BEFORE_EXPIRY_TO_REFRESH)) - cur_time
+        time_to_briefly_before_expiry = (
+            expiry - timedelta(minutes=AuthRefresher.MINS_BEFORE_EXPIRY_TO_REFRESH)
+        ) - cur_time
         # ensure time isn't negative
         if time_to_briefly_before_expiry < timedelta():
             return timedelta()
@@ -54,7 +54,11 @@ class AuthRefresher:
         :return: Headers to update (Authorization), and time to wait before refreshing again
         """
         password = b64decode(self._password_encoded).decode()
-        auth_token = user_login(api_http_host=self._url, login=self._login, password=password,
-                                verify_ssl=self._verify_ssl)
+        auth_token = user_login(
+            api_http_host=self._url,
+            login=self._login,
+            password=password,
+            verify_ssl=self._verify_ssl,
+        )
         next_refresh_wait_time = self._get_refresh_wait_time(auth_token)
         return {self.AUTH_KEY: auth_token}, next_refresh_wait_time
