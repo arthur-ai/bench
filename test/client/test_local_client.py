@@ -54,8 +54,8 @@ def test_get_test_suites_empty(local_client):
 @pytest.mark.parametrize(
     "req,expected_response",
     [
-        (MOCK_SUITE, MOCK_SUITE_RESPONSE),
         (MOCK_SUITE_CUSTOM, MOCK_SUITE_CUSTOM_RESPONSE),
+        (MOCK_SUITE, MOCK_SUITE_RESPONSE),
     ],
 )
 def test_create_test_suite(local_client, req, expected_response):
