@@ -76,6 +76,7 @@ A **Scoring Method** is the criteria used to judge the candidate outputs for eac
 | Exact Match (`exact_match`)       | any | Reference Output, Candidate Output|
 | Readability (`readability`)       | any | Candidate Output |
 | Word Count Match (`word_count_match`)   | any | Reference Output, Candidate Output |
+| Specificity (`specificity`)       | any | Candidate Output |
 
 #### `bertscore`
 
@@ -100,5 +101,9 @@ The Readability metric evaluates the reading ease of the candidate output accord
 #### `word_count_match`
 
 For scenarios where there is a preferred output length, `word_count_match` calculates a corresponding score on the scale of 0 to 1. Specifically, this scoring method calculates how similar the number of words in the candidate output is to the number of words in the reference output, where a score of 1.0 indicates that there are the same number of words in the candidate output as in the reference output. Scores less than 1.0 are calculated as ((len_reference-delta)/len_reference) where delta is the absolute difference in word lengths between the candidate and reference outputs. All negative computed values are truncated to 0. 
+
+#### `specificity`
+
+The Specificity metric outputs a score of 0 to 1, where smaller values correspond to candidate outputs with more vague language while higher values correspond to candidate outputs with more precise language. Specificity is calculated through 3 heuristic approaches: identifying the presence of predefined words that indicate vagueness, determing how rare the words used are according to word frequencies calculated by popular NLP corpora, and detecting the use of proper nouns and numbers.
     
     

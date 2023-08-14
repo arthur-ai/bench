@@ -35,3 +35,17 @@ def test_run_wcm(mock_summary_data):
         expected = [0.8888888, 0.7857142, 1.0, 0.583333]
         for i, result in enumerate(wcm_run_result):
             assert torch.isclose(torch.tensor(result), torch.tensor(expected[i]), atol=1e-5)
+
+def test_specificity(mock_summary_data):
+
+        specificity = Specificity()
+
+        spec_run_result = specificity.run_batch(
+            mock_summary_data['candidate_summary'],
+            mock_summary_data['summary']
+        )
+
+        #assert return correct values
+        expected = [[0.825000, 0.5829599, 0.5714, 0.895714]]
+        for i, result in enumerate(spec_run_result):
+            assert torch.isclose(torch.tensor(result), torch.tensor(expected[i]), atol=1e-4)

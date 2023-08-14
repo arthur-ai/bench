@@ -14,3 +14,4 @@ Scoring Methods
    exact_match.ExactMatch
    readability.Readability
    word_count_match.WordCountMatch
+   specificity.Specificity
