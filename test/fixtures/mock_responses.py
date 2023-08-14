@@ -289,7 +289,11 @@ MOCK_SUITE_RESPONSE_JSON = {
     "name": "test_suite",
     "num_runs": 0,
     "last_run_time": None,
-    "scoring_method": "bertscore",
+    "scoring_method": {
+        "name": "bertscore",
+        "type": "built_in",
+        "config": MOCK_BERTSCORE_CONFIG,
+    },
     "test_cases": [
         {
             "id": "62d2d1b3-d7df-4999-b01c-52e93d34f576",
