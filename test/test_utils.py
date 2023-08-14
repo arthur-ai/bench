@@ -9,7 +9,7 @@ from fixtures.mock_responses import (
     MOCK_SUITE_WITH_SCORING_CONFIG,
     MOCK_SUITE_WITH_SCORING_JSON,
 )
-from arthur_bench.run.utils import (
+from arthur_bench.utils.loaders import (
     load_suite_from_json,
     load_suite_from_dataframe,
     load_suite_from_list,
