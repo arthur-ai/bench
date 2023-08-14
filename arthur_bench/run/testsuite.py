@@ -55,7 +55,7 @@ class TestSuite:
         reference_column: str = "reference_output",
         input_text_list: Optional[List[str]] = None,
         reference_output_list: Optional[List[str]] = None,
-        client: Optional[type[BenchClient]] = None,
+        client: Optional[BenchClient] = None,
     ):
         self.suite: PaginatedTestSuite
         if client is None:

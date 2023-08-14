@@ -78,6 +78,7 @@ def test_load_suite_from_df(mock_suite_cases):
         (MOCK_SUITE_WITH_NULL, MOCK_SUITE_WITH_NULL_JSON),
         (MOCK_SUITE_WITH_SCORING_CONFIG, MOCK_SUITE_WITH_SCORING_JSON),
     ],
+    ids=["base_suite", "suite_with_null", "suite_with_custom_scoring"],
 )
 def test_suite_serialization(object, expected):
     assert object.json() == expected

@@ -80,7 +80,6 @@ class ScoringMethod(ABC):
         all_scores = []
         with tqdm(total=len(candidate_outputs)) as pbar:
             for i in range(0, len(candidate_outputs), batch_size):
-                # TODO: make suite iterable: https://arthurai.atlassian.net/browse/LLM-250
                 input_batch = (
                     list(inputs[i : i + batch_size]) if inputs is not None else None
                 )
