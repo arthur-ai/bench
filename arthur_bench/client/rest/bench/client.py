@@ -16,7 +16,10 @@ from arthur_bench.models.models import (
     CreateRunResponse,
 )
 
-from arthur_bench.models.scoring import HallucinationScoreRequest, HallucinationScoreResponse
+from arthur_bench.models.scoring import (
+    HallucinationScoreRequest,
+    HallucinationScoreResponse,
+)
 
 
 PATH_PREFIX = "/api/v3"
@@ -41,8 +44,8 @@ class ArthurBenchClient(BenchClient):
         name: Optional[str] = None,
         sort: Optional[str] = None,
         scoring_method: Optional[str] = None,
-        page: Optional[int] = 1,
-        page_size: Optional[int] = None,
+        page: int = 1,
+        page_size: int = 5,
     ) -> PaginatedTestSuites:
         """
                 Gets test suites
@@ -88,7 +91,7 @@ class ArthurBenchClient(BenchClient):
             Dict,
             self.http_client.post(
                 f"/bench/test_suites",
-                json=json_body.dict(
+                json=json_body.json(
                     exclude={
                         "created_at": True,
                         "created_by": True,
@@ -105,8 +108,9 @@ class ArthurBenchClient(BenchClient):
     def get_test_suite(
         self,
         test_suite_id: str,
-        page: Optional[int] = 1,
-        page_size: Optional[int] = None,
+        page: int = 1,
+        page_size: int = 5,
+
     ) -> PaginatedTestSuite:
         """
         Get reference data for an existing test suite
@@ -133,8 +137,8 @@ class ArthurBenchClient(BenchClient):
         self,
         test_suite_id: str,
         run_id: Optional[str] = None,
-        page: Optional[int] = 1,
-        page_size: Optional[int] = None,
+        page: int = 1,
+        page_size: int = 5,
     ) -> TestSuiteSummary:
         """
         Get paginated summary statistics of a test suite
@@ -169,8 +173,8 @@ class ArthurBenchClient(BenchClient):
         self,
         test_suite_id: str,
         sort: Optional[str] = None,
-        page: Optional[int] = 1,
-        page_size: Optional[int] = None,
+        page: int = 1,
+        page_size: int = 5,
     ) -> PaginatedRuns:
         """
         Get runs for a particular test suite (identified by test_suite_id)
@@ -222,8 +226,8 @@ class ArthurBenchClient(BenchClient):
         self,
         test_suite_id: str,
         test_run_id: str,
-        page: Optional[int] = 1,
-        page_size: Optional[int] = None,
+        page: int = 1,
+        page_size: int = 5,
         sort: Optional[bool] = None,
     ) -> PaginatedRun:
         """
@@ -286,12 +290,17 @@ class ArthurBenchClient(BenchClient):
             return_raw_response=True,
         )
         return raw_resp
-    
-    def score_hallucination(self, json_body: HallucinationScoreRequest) -> HallucinationScoreResponse:
-        parsed_resp = cast(Dict, self.http_client.post(
-            f"/bench/scoring/hallucination",
-            json=json_body.json(),
-            validation_response_code=HTTPStatus.CREATED,
-        ))
+
+    def score_hallucination(
+        self, json_body: HallucinationScoreRequest
+    ) -> HallucinationScoreResponse:
+        parsed_resp = cast(
+            Dict,
+            self.http_client.post(
+                f"/bench/scoring/hallucination",
+                json=json_body.json(),
+                validation_response_code=HTTPStatus.CREATED,
+            ),
+        )
         return HallucinationScoreResponse(**parsed_resp)
  

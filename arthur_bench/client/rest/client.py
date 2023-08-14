@@ -36,7 +36,7 @@ class ArthurClient:
                  allow_insecure: bool = False,
                  offline: bool = False):
         """
-        TODO!
+        REST client for logging and fetching data stored in the Arthur platform
         """
         # basic values
         if url is None:
@@ -53,7 +53,6 @@ class ArthurClient:
                                      f"{os.getenv('ARTHUR_VERIFY_SSL')}")
 
         # authorization
-        # TODO: allow specified login/pass to override an env var api key
         if login is None:
             login = os.getenv('ARTHUR_LOGIN')
         if password is None:
