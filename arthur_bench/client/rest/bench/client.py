@@ -110,6 +110,7 @@ class ArthurBenchClient(BenchClient):
         test_suite_id: str,
         page: int = 1,
         page_size: int = 5,
+
     ) -> PaginatedTestSuite:
         """
         Get reference data for an existing test suite
@@ -302,3 +303,4 @@ class ArthurBenchClient(BenchClient):
             ),
         )
         return HallucinationScoreResponse(**parsed_resp)
+ 

@@ -22,6 +22,7 @@ from arthur_bench.run.utils import (
     _get_suite_if_exists,
     _initialize_scoring_method,
 )
+
 from arthur_bench.scoring.scoring_method import SINGLE_ITEM_BATCH_DEFAULT
 
 
