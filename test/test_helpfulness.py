@@ -47,6 +47,6 @@ def test_specificity(mock_summary_data):
         )
 
         #assert return correct values
-        expected = [[0.825000, 0.5829599, 0.5714, 0.895714]]
+        expected = [0.825000, 0.5829599, 0.5714, 0.895714]
         for i, result in enumerate(spec_run_result):
             assert torch.isclose(torch.tensor(result), torch.tensor(expected[i]), atol=1e-4)
