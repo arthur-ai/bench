@@ -19,7 +19,7 @@ const SummaryVisualizations = () => {
     const { summaries, scoring_method, num_test_cases } = useSelector((state: State) => ({
         summaries: state.testSuites.currentTestSuite.summaries.summaries,
         num_test_cases: state.testSuites.currentTestSuite.summaries?.num_test_cases,
-        scoring_method: state.testSuites.currentTestSuite.data?.data?.scoring_method,
+        scoring_method: state.testSuites.currentTestSuite.data?.data?.scoring_method.name,
 
     }));
     return (
