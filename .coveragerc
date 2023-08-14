@@ -1,0 +1,4 @@
+[run]
+omit = 
+    arthur_bench/client/auth/*
+    arthur_bench/client/http/*
