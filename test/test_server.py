@@ -11,8 +11,8 @@ from fixtures.mock_responses import (
 )
 
 mock_arthur_client = get_mock_client(suite_exists=True)
-app.client = mock_arthur_client
-app.development = True  # disable telemetry during tests
+app.state.client = mock_arthur_client
+app.state.development = True  # disable telemetry during tests
 
 
 client = TestClient(app)

@@ -193,7 +193,7 @@ def _get_suite_if_exists(
         if suite.page is None or suite.total_pages is None:
             raise ArthurInternalError("expected paginated response")
 
-        current_page = suite.page
+        current_page = suite.page + 1
         total_pages = suite.total_pages
         while current_page <= total_pages:
             query_params["page"] = current_page

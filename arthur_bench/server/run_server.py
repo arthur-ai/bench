@@ -27,7 +27,7 @@ from arthur_bench.telemetry.config import get_or_persist_id, persist_usage_data
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
-app.development = False
+app.state.development = False
 
 origins = ["http://localhost:8000", "http://127.0.0.1:8000"]
 
@@ -51,7 +51,7 @@ def test_suites(
     scoring_method: Optional[str] = None,
     name: Optional[str] = None,
 ):
-    client = request.app.client
+    client = request.app.state.client
     suite_resp = client.get_test_suites(
         page=page,
         page_size=page_size,
@@ -60,7 +60,7 @@ def test_suites(
         name=name,
     )
 
-    if not request.app.development:
+    if not request.app.state.development:
         send_event(
             {
                 "event_type": "test_suites_load",
@@ -71,7 +71,7 @@ def test_suites(
                     ],
                 },
             },
-            request.app.user_id,
+            request.app.state.user_id,
         )
     return suite_resp
 
@@ -80,7 +80,7 @@ def test_suites(
 def test_suite(
     request: Request, test_suite_id: uuid.UUID, page: int = 1, page_size: int = 5
 ):
-    client = request.app.client
+    client = request.app.state.client
     try:
         suite_resp = client.get_test_suite(
             test_suite_id=str(test_suite_id), page=page, page_size=page_size
@@ -101,7 +101,7 @@ def test_runs(
     page_size: int = 5,
     sort: Optional[str] = None,
 ):
-    client = request.app.client
+    client = request.app.state.client
     try:
         run_resp = client.get_runs_for_test_suite(
             test_suite_id=str(test_suite_id), page=page, page_size=page_size, sort=sort
@@ -110,7 +110,7 @@ def test_runs(
         return HTTPException(status_code=404, detail=str(e))
     suite_resp = client.get_test_suite(test_suite_id=str(test_suite_id))
 
-    if not request.app.development:
+    if not request.app.state.development:
         send_event(
             {
                 "event_type": "test_runs_load",
@@ -121,7 +121,7 @@ def test_runs(
                     "scoring_method_real": suite_resp.scoring_method.name,
                 },
             },
-            request.app.user_id,
+            request.app.state.user_id,
         )
     return run_resp
 
@@ -134,7 +134,7 @@ def test_suite_summary(
     page_size: int = 5,
     run_id: Optional[uuid.UUID] = None,
 ):
-    client = request.app.client
+    client = request.app.state.client
     try:
         summary_resp = client.get_summary_statistics(
             test_suite_id=str(test_suite_id),
@@ -155,7 +155,7 @@ def test_run_results(
     page: int = 1,
     page_size: int = 5,
 ):
-    client = request.app.client
+    client = request.app.state.client
 
     try:
         run_resp = client.get_test_run(
@@ -215,11 +215,11 @@ def run():
     if args.directory:
         default_root_dir = args.directory
     client = LocalBenchClient(default_root_dir)
-    app.client = client
+    app.state.client = client
 
     config = get_or_persist_id()
     set_track_usage_data(config)
-    app.user_id = config.user_id
+    app.state.user_id = config.user_id
 
     uvicorn.run(
         "arthur_bench.server.run_server:app",
