@@ -84,13 +84,10 @@ def test_suite(
     try:
         suite_resp = client.get_test_suite(
             test_suite_id=str(test_suite_id), page=page, page_size=page_size
-        ).json()
+        )
     except NotFoundError as e:
         return HTTPException(status_code=404, detail=str(e))
-    # TODO : update when front end is ready
-    suite = json.loads(suite_resp)
-    suite["scoring_method"] = suite["scoring_method"]["name"]
-    return suite
+    return suite_resp
 
 
 @app.get("/api/v3/bench/test_suites/{test_suite_id}/runs")
