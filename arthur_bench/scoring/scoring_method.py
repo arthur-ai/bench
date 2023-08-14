@@ -2,8 +2,7 @@ from abc import abstractmethod, ABC
 import sys
 import json
 import logging
-from os import PathLike
-from typing import List, Optional, TypeVar
+from typing import List, Optional, TypeVar, get_origin, get_args, Union
 from inspect import signature
 
 from tqdm import tqdm
@@ -19,9 +18,13 @@ SINGLE_ITEM_BATCH_DEFAULT = 1
 TScoringMethod = TypeVar("TScoringMethod", bound="ScoringMethod")
 
 
+def _is_optional(field):
+    return get_origin(field) is Union and type(None) in get_args(field)
+
+
 class ScoringMethod(ABC):
     """
-    Base class for all scoring methods.     
+    Base class for all scoring methods.
     """
 
     @staticmethod
@@ -32,27 +35,37 @@ class ScoringMethod(ABC):
         :return: the ScoringMethod name
         """
         raise NotImplementedError
-    
+
     @staticmethod
     def requires_reference() -> bool:
         return True
 
     @abstractmethod
-    def run_batch(self, candidate_batch: List[str], reference_batch: Optional[List[str]] = None,
-                  input_text_batch: Optional[List[str]] = None, context_batch: Optional[List[str]] = None) -> List[float]:
+    def run_batch(
+        self,
+        candidate_batch: List[str],
+        reference_batch: Optional[List[str]] = None,
+        input_text_batch: Optional[List[str]] = None,
+        context_batch: Optional[List[str]] = None,
+    ) -> List[float]:
         """
         Score a batch of candidate generations.
 
         :param candidate_batch: candidate generations to score
         :param reference_batch: reference strings representing target outputs
         :param input_text_batch: optional corresponding inputs
-        :param context_batch: optional corresponding contexts, if needed by scoring method 
+        :param context_batch: optional corresponding contexts, if needed by scoring method
         """
         raise NotImplementedError
 
-    def run(self, candidate_outputs: List[str], reference_outputs: Optional[List[str]] = None,
-            inputs: Optional[List[str]] = None, contexts: Optional[List[str]] = None,
-            batch_size: int = SINGLE_ITEM_BATCH_DEFAULT) -> List[float]:
+    def run(
+        self,
+        candidate_outputs: List[str],
+        reference_outputs: Optional[List[str]] = None,
+        inputs: Optional[List[str]] = None,
+        contexts: Optional[List[str]] = None,
+        batch_size: int = SINGLE_ITEM_BATCH_DEFAULT,
+    ) -> List[float]:
         """
         Score a set of test cases. This method doesn't need to be implemented in most cases, but can be overriden to
         add additional functionality such as task-specific logging.
@@ -68,20 +81,28 @@ class ScoringMethod(ABC):
         with tqdm(total=len(candidate_outputs)) as pbar:
             for i in range(0, len(candidate_outputs), batch_size):
                 # TODO: make suite iterable: https://arthurai.atlassian.net/browse/LLM-250
-                input_batch = list(inputs[i:i + batch_size]) if inputs is not None else None
-                ref_batch = list(reference_outputs[i:i + batch_size]) if reference_outputs is not None else None
+                input_batch = (
+                    list(inputs[i : i + batch_size]) if inputs is not None else None
+                )
+                ref_batch = (
+                    list(reference_outputs[i : i + batch_size])
+                    if reference_outputs is not None
+                    else None
+                )
 
-                context_batch = None if contexts is None else contexts[i:i + batch_size]
+                context_batch = (
+                    None if contexts is None else contexts[i : i + batch_size]
+                )
                 scores = self.run_batch(
-                    candidate_outputs[i:i + batch_size],
+                    candidate_outputs[i : i + batch_size],
                     ref_batch,
                     input_batch,
-                    context_batch
+                    context_batch,
                 )
 
                 all_scores.extend(scores)
                 pbar.update(len(candidate_outputs))
-    
+
         return all_scores
 
     def to_dict(self):
@@ -89,12 +110,15 @@ class ScoringMethod(ABC):
         Provides a json serializable representation of the scoring method.
         """
         config = self.__dict__
-        valid_args = [p for p in signature(self.__init__).parameters.keys()]
+        valid_args = [p for p in signature(self.__init__).parameters.values()]
 
         # warn if arguments missing from initialization for reloading
         for arg in valid_args:
-            if arg not in config:
-                logger.warning(f"scoring method accepts argument {arg} but argument is not included in json representation")
+            if not _is_optional(arg.annotation) and arg.name not in config:
+                logger.warning(
+                    f"scoring method requires argument {arg} but argument is not included in json representation. "
+                    "this may effect test suite reloading, consider implementing custom to_dict and from_dict methods"
+                )
 
         jsonable_config = {}
         # remove non serializable args
@@ -103,14 +127,16 @@ class ScoringMethod(ABC):
                 _ = json.dumps(val)
                 jsonable_config[key] = val
             except TypeError as e:
-                # TODO: str rep instead?
-                logger.warning(f"not included attribute {val} in config as it is not json serializable")
+                logger.warning(
+                    f"not including attribute {key} in config as it is not json serializable. "
+                    "consider implementing custom to_dict and from_dict methods"
+                )
         return jsonable_config
 
     @classmethod
     def from_dict(cls, config: dict):
         """
-        Load a scoring method from a json configuration file. 
+        Load a scoring method from a json configuration file.
         """
         valid_args = [p for p in signature(cls.__init__).parameters.keys()]
 
@@ -119,7 +145,6 @@ class ScoringMethod(ABC):
             if key in valid_args:
                 init_config[key] = value
         return cls(**init_config)
-
 
     @classmethod
     def type(cls) -> ScoringMethodType:
@@ -138,4 +163,3 @@ class ScoringMethod(ABC):
                 return ScoringMethodType.Custom
         except AttributeError:
             return ScoringMethodType.Custom
-             
