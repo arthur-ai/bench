@@ -27,6 +27,7 @@ from arthur_bench.telemetry.config import get_or_persist_id, persist_usage_data
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
+app.development = False
 
 origins = ["http://localhost:8000", "http://127.0.0.1:8000"]
 
