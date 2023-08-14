@@ -93,7 +93,6 @@ def test_get_test_suites(local_client, req, expected_response):
 def test_get_test_suite_by_id(local_client):
     id_ = local_client.get_test_suites(name="test_suite").test_suites[0].id
     resp = local_client.get_test_suite(str(id_))
-    print(resp)
     assert_test_suite_equal(resp, MOCK_SUITE_RESPONSE_WITH_PAGES)
 
 
