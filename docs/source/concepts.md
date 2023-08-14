@@ -106,4 +106,6 @@ For scenarios where there is a preferred output length, `word_count_match` calcu
 
 The Specificity metric outputs a score of 0 to 1, where smaller values correspond to candidate outputs with more vague language while higher values correspond to candidate outputs with more precise language. Specificity is calculated through 3 heuristic approaches: identifying the presence of predefined words that indicate vagueness, determing how rare the words used are according to word frequencies calculated by popular NLP corpora, and detecting the use of proper nouns and numbers.
     
-    
+#### `hedging_language`
+
+The Hedging Language scoring method evaluates whether a candidate response is similar to generic hedging language used by an LLM ("As an AI language model, I don't have personal opinions, emotions, or beliefs"). Each row of the Test Run will receive a binary 0, indicating hedging language *not* used, or 1, indicating hedging language used.

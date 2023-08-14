@@ -15,3 +15,5 @@ Scoring Methods
    readability.Readability
    word_count_match.WordCountMatch
    specificity.Specificity
+   hedging_language.HedgingLanguage
+
