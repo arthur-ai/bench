@@ -1,6 +1,5 @@
 from typing import Optional, Dict, cast
 from http import HTTPStatus
-from requests.cookies import RequestsCookieJar
 
 # import http client
 from arthur_bench.client.http.requests import HTTPClient
@@ -16,6 +15,8 @@ from arthur_bench.models.models import (
     TestSuiteSummary,
     CreateRunResponse,
 )
+
+from arthur_bench.models.scoring import HallucinationScoreRequest, HallucinationScoreResponse
 
 
 PATH_PREFIX = "/api/v3"
@@ -285,3 +286,12 @@ class ArthurBenchClient(BenchClient):
             return_raw_response=True,
         )
         return raw_resp
+    
+    def score_hallucination(self, json_body: HallucinationScoreRequest) -> HallucinationScoreResponse:
+        parsed_resp = cast(Dict, self.http_client.post(
+            f"/bench/scoring/hallucination",
+            json=json_body.json(),
+            validation_response_code=HTTPStatus.CREATED,
+        ))
+        return HallucinationScoreResponse(**parsed_resp)
+ 
