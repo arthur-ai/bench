@@ -129,13 +129,12 @@ class LMConfig:
         return LLMChain(llm=llm, prompt=prompt.to_template(model_type=self.model_name))
 
 
-ScoreConfig = Dict[float, str]
+ScoreConfig = Dict[str, float]
 
 
 class EvaluatorConfig(LMConfig):
     score_config: ScoreConfig
 
-
     def __init__(self, score_config, *args, **kwargs):
-        super(EvaluatorConfig, self).__init__(*args, **kwargs)
         self.score_config = score_config
+        super(EvaluatorConfig, self).__init__(*args, **kwargs)
