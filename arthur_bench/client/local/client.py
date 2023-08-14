@@ -89,6 +89,7 @@ def _summarize_run(run: PaginatedRun) -> SummaryItem:
 
 @dataclass
 class PageInfo:
+    sorted_pages: List
     start: int
     end: int
     page: int
@@ -103,9 +104,12 @@ def _paginate(
     """Paginate sorted files and return iteration indices and page info"""
     if sort_key is not None:
         desc = sort_key[0] == "-"
-        objs.sort(key=SORT_QUERY_TO_FUNC[sort_key], reverse=desc)
+        sorted_pages = sorted(objs, key=SORT_QUERY_TO_FUNC[sort_key], reverse=desc)
+    else:
+        sorted_pages = objs
     offset = (page - 1) * page_size
     return PageInfo(
+        sorted_pages=sorted_pages,
         start=offset,
         end=min(offset + page_size, len(objs)),
         page=page,
@@ -215,7 +219,7 @@ class LocalBenchClient(BenchClient):
                 id=uuid.UUID(test_suite_id),
                 name=suite.name,
                 scoring_method=suite.scoring_method,
-                test_cases=suite.test_cases[pagination.start : pagination.end],
+                test_cases=pagination.sorted_pages[pagination.start : pagination.end],
                 created_at=suite.created_at,
                 updated_at=suite.updated_at,
                 page=pagination.page,
@@ -287,7 +291,7 @@ class LocalBenchClient(BenchClient):
             sort = "last_run_time"
         paginate = _paginate(suites, page=page, page_size=page_size, sort_key=sort)
         return PaginatedTestSuites(
-            test_suites=suites[paginate.start : paginate.end],
+            test_suites=paginate.sorted_pages[paginate.start : paginate.end],
             page=paginate.page,
             page_size=paginate.page_size,
             total_pages=paginate.total_pages,
@@ -367,7 +371,7 @@ class LocalBenchClient(BenchClient):
         pagination = _paginate(runs, page, page_size, sort_key=sort)
         return PaginatedRuns(
             test_suite_id=uuid.UUID(test_suite_id),
-            test_runs=runs,
+            test_runs=pagination.sorted_pages[pagination.start : pagination.end],
             page_size=pagination.page_size,
             page=pagination.page,
             total_pages=pagination.total_pages,
@@ -448,15 +452,14 @@ class LocalBenchClient(BenchClient):
         except duckdb.IOException:
             cases = []
 
-        pagination = _paginate(
-            [RunResult.parse_obj(r) for r in cases], page, page_size, sort_key="score"
-        )
+        run_results = [RunResult.parse_obj(r) for r in cases]
+        pagination = _paginate(run_results, page, page_size, sort_key="score")
         return PaginatedRun(
             id=uuid.UUID(test_run_id),
             name=run_name,
             created_at=created_at,
             updated_at=created_at,
-            test_case_runs=cases[pagination.start : pagination.end],
+            test_case_runs=pagination.sorted_pages[pagination.start : pagination.end],
             test_suite_id=uuid.UUID(test_suite_id),
             page=pagination.page,
             page_size=pagination.page_size,
