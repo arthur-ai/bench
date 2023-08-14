@@ -264,7 +264,7 @@ class LocalBenchClient(BenchClient):
                     total_count=0,
                 )
 
-        suites = []
+        suites: List[TestSuiteMetadata] = []
         suite_files = glob.glob(f"{self.root_dir}/*/suite.json")
         for f in suite_files:
             suite = _load_suite_with_optional_id(f)
@@ -279,31 +279,6 @@ class LocalBenchClient(BenchClient):
                         description=suite.description,
                         created_at=suite.created_at,
                         last_run_time=suite.last_run_time,
-                    ),
-                    page=1,
-                    page_size=1,
-                    total_pages=1,
-                    total_count=1,
-                )
-            else:
-                return PaginatedTestSuites(
-                    test_suites=[], page=1, page_size=0, total_pages=1, total_count=0
-                )
-
-        suites = []
-        suite_files = glob.glob(f"{self.root_dir}/*/suite.json")
-        for f in suite_files:
-            suite = _load_suite_with_optional_id(f)
-            if suite is None:
-                suite = self.get_test_suite_by_name(f.split("/")[-2])
-            if scoring_method is None or suite.scoring_method.name == scoring_method:
-                suites.append(
-                    TestSuiteMetadata(
-                        id=suite.id,
-                        name=suite.name,
-                        scoring_method=suite.scoring_method,
-                        description=suite.description,
-                        created_at=suite.created_at,
                     )
                 )
 

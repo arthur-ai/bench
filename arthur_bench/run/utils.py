@@ -13,7 +13,7 @@ from arthur_bench.models.models import (
     PaginatedTestSuite,
 )
 from arthur_bench.client.exceptions import UserValueError
-from arthur_bench.client.bench_client import TBenchClient
+from arthur_bench.client.bench_client import BenchClient
 
 
 def get_file_extension(filepath: Union[str, os.PathLike]) -> str:
