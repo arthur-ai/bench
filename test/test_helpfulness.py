@@ -4,6 +4,7 @@ import torch
 
 from arthur_bench.scoring.readability import Readability
 from arthur_bench.scoring.word_count_match import WordCountMatch
+from arthur_bench.scoring.specificity import Specificity
 from textstat import flesch_reading_ease
 
 
