@@ -1,7 +1,7 @@
 import pytest
 import pandas as pd
-from helpers import FIXTURE_FILE_DIR
-from fixtures.mock_responses import (
+from tests.helpers import FIXTURE_FILE_DIR
+from tests.fixtures.mock_responses import (
     MOCK_SUITE_RESPONSE,
     MOCK_SUITE_JSON,
     MOCK_SUITE_WITH_NULL,

@@ -1,8 +1,8 @@
 from fastapi.testclient import TestClient
 
 from arthur_bench.server.run_server import app
-from helpers import get_mock_client
-from fixtures.mock_responses import (
+from tests.helpers import get_mock_client
+from tests.fixtures.mock_responses import (
     MOCK_SUITES_JSON,
     MOCK_SUITE_RESPONSE_JSON,
     MOCK_RUNS_RESPONSE_JSON,

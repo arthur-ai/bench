@@ -3,7 +3,7 @@ import shutil
 from arthur_bench.client.local import LocalBenchClient
 from arthur_bench.client.exceptions import UserValueError, NotFoundError
 
-from fixtures.mock_responses import (
+from tests.fixtures.mock_responses import (
     MOCK_NO_SUITES,
     MOCK_SUITE_RESPONSE,
     MOCK_SUITE_CUSTOM_RESPONSE,
@@ -16,8 +16,8 @@ from fixtures.mock_responses import (
     MOCK_SUMMARY,
     MOCK_SUMMARY_RESPONSE,
 )
-from fixtures.mock_requests import MOCK_SUITE, MOCK_SUITE_CUSTOM, MOCK_RUN
-from helpers import (
+from tests.fixtures.mock_requests import MOCK_SUITE, MOCK_SUITE_CUSTOM, MOCK_RUN
+from tests.helpers import (
     assert_test_suite_equal,
     assert_test_suites_equal,
     assert_runs_equal,

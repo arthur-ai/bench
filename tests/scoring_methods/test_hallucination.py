@@ -1,10 +1,9 @@
 import pytest
-import os
 from unittest.mock import Mock, patch
 
-from helpers import get_mock_client
+from tests.helpers import get_mock_client
 from arthur_bench.scoring.hallucination import Hallucination
-from fixtures.mock_data import MOCK_SUMMARY_DATA
+from tests.fixtures.mock_data import MOCK_SUMMARY_DATA
 
 
 @pytest.fixture

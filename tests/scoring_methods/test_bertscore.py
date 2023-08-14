@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import MagicMock, patch
 import torch
 
-from fixtures.mock_data import MOCK_SUMMARY_DATA
+from tests.fixtures.mock_data import MOCK_SUMMARY_DATA
 from arthur_bench.scoring.bertscore import BERTScore
 
 

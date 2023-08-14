@@ -1,6 +1,6 @@
 import torch
 
-from fixtures.mock_data import MOCK_SUMMARY_DATA
+from tests.fixtures.mock_data import MOCK_SUMMARY_DATA
 from arthur_bench.scoring.readability import Readability
 from arthur_bench.scoring.word_count_match import WordCountMatch
 
