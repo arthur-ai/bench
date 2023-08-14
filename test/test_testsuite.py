@@ -1,3 +1,4 @@
+from collections import defaultdict
 import pytest
 import pandas as pd
 from unittest import mock
