@@ -14,6 +14,8 @@ from arthur_bench.models.models import (
 )
 from arthur_bench.client.exceptions import UserValueError, ArthurInternalError
 from arthur_bench.client.bench_client import BenchClient
+from arthur_bench.scoring import ScoringMethod, scoring_method_class_from_string
+
 
 
 def get_file_extension(filepath: Union[str, os.PathLike]) -> str:
@@ -27,6 +29,15 @@ def _initialize_metadata() -> Dict[str, Any]:
         "bench_version": __version__,
         "created_by": getpass.getuser(),
     }
+
+def _initialize_scoring_method(scoring_method_arg: Union[str, ScoringMethod], config: Optional[dict] = None) -> ScoringMethod:
+    if isinstance(scoring_method_arg, str):
+        scoring_method = scoring_method_class_from_string(scoring_method_arg)
+        if config is not None:
+            return scoring_method.from_dict(config)
+        return scoring_method()
+    else:
+        return scoring_method_arg
 
 
 def _validate_dataframe(data: pd.DataFrame, column: str):

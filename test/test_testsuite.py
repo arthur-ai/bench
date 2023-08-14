@@ -24,7 +24,7 @@ def mock_client():
 @pytest.fixture
 def test_suite_default(mock_load_scoring, mock_client):
     with mock.patch(
-        "arthur_bench.run.testsuite.scoring_method_class_from_string", mock_load_scoring
+        "arthur_bench.run.testsuite._initialize_scoring_method", mock_load_scoring
     ):
         return TestSuite(
             name="test_suite",
@@ -54,6 +54,9 @@ class MockScoringMethod(ScoringMethod):
 
 
 class CustomScorer(ScoringMethod):
+    def __init__(self, custom_name="param_name"):
+        self.custom_name = custom_name
+
     @staticmethod
     def name():
         return "test_custom_scorer"
@@ -70,8 +73,8 @@ class CustomScorer(ScoringMethod):
 
 @pytest.fixture(scope="session")
 def mock_load_scoring():
-    def load_scoring_method(name):
-        return MockScoringMethod
+    def load_scoring_method(scoring_method_arg):
+        return MockScoringMethod()
 
     return load_scoring_method
 
@@ -90,7 +93,7 @@ def mock_load_scoring():
         (
             {
                 "name": "test_suite_custom",
-                "scoring_method": CustomScorer,
+                "scoring_method": CustomScorer(),
                 "description": "test_description",
                 "reference_data": MOCK_CUSTOM_DATAFRAME,
                 "input_column": "custom_prompt",

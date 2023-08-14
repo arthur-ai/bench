@@ -16,7 +16,10 @@ from arthur_bench.models.models import (
     CreateRunResponse,
 )
 
-from arthur_bench.models.scoring import HallucinationScoreRequest, HallucinationScoreResponse
+from arthur_bench.models.scoring import (
+    HallucinationScoreRequest,
+    HallucinationScoreResponse,
+)
 
 
 PATH_PREFIX = "/api/v3"
@@ -89,7 +92,13 @@ class ArthurBenchClient(BenchClient):
             self.http_client.post(
                 f"/bench/test_suites",
                 json=json_body.json(
-                    exclude={"created_at", "created_by", "bench_version"}
+                    exclude={
+                        "created_at": True,
+                        "created_by": True,
+                        "bench_version": True,
+                        # TODO: add REST data store support for scoring method config
+                        "scoring_method": {"config"},
+                    }
                 ),
                 validation_response_code=HTTPStatus.CREATED,
             ),
@@ -280,11 +289,16 @@ class ArthurBenchClient(BenchClient):
             return_raw_response=True,
         )
         return raw_resp
-    
-    def score_hallucination(self, json_body: HallucinationScoreRequest) -> HallucinationScoreResponse:
-        parsed_resp = cast(Dict, self.http_client.post(
-            f"/bench/scoring/hallucination",
-            json=json_body.json(),
-            validation_response_code=HTTPStatus.CREATED,
-        ))
+
+    def score_hallucination(
+        self, json_body: HallucinationScoreRequest
+    ) -> HallucinationScoreResponse:
+        parsed_resp = cast(
+            Dict,
+            self.http_client.post(
+                f"/bench/scoring/hallucination",
+                json=json_body.json(),
+                validation_response_code=HTTPStatus.CREATED,
+            ),
+        )
         return HallucinationScoreResponse(**parsed_resp)

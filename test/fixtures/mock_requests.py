@@ -18,7 +18,15 @@ MOCK_SUITE_CASES = [
 
 MOCK_SUITE = TestSuiteRequest(
     name="test_suite",
-    scoring_method={"name": "bertscore", "type": "built_in"},
+    scoring_method={
+        "name": "bertscore",
+        "type": "built_in",
+        "config": {
+            "precision_weight": 0.1,
+            "recall_weight": 0.9,
+            "model_type": "microsoft/deberta-v3-base",
+        },
+    },
     created_at="2023-06-22T21:56:03.346141",
     created_by="arthur",
     bench_version="0.0.1",
@@ -28,7 +36,11 @@ MOCK_SUITE = TestSuiteRequest(
 MOCK_SUITE_CUSTOM = TestSuiteRequest(
     name="test_suite_custom",
     description="test_description",
-    scoring_method={"name": "test_custom_scorer", "type": "custom"},
+    scoring_method={
+        "name": "test_custom_scorer",
+        "type": "custom",
+        "config": {"custom_name": "param_name"},
+    },
     created_at="2023-06-21T21:56:03.346141",
     created_by="arthur",
     bench_version="0.0.1",

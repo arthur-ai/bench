@@ -24,18 +24,21 @@ class BERTScore(ScoringMethod):
     def name() -> str:
         return "bertscore"
 
-    def __init__(self):
+    def __init__(self, model_type=DEFAULT_MODEL, precision_weight=PRECISION_WEIGHT, recall_weight=RECALL_WEIGHT):
+        self.precision_weight = precision_weight
+        self.recall_weight = recall_weight
+
         with suppress_warnings("transformers"):
-            self.scorer = BERTScorer(lang='en', model_type=DEFAULT_MODEL)
+            self.scorer = BERTScorer(lang='en', model_type=model_type)
+
+    def to_dict(self):
+        return {"precision_weight": self.precision_weight, "recall_weight": self.recall_weight, "model_type": self.scorer.model_type}
 
     def run_batch(self, candidate_batch: List[str], reference_batch: Optional[List[str]] = None,
                   input_text_batch: Optional[List[str]] = None, context_batch: Optional[List[str]] = None) -> List[float]:
-        if reference_batch is None:
-            raise UserTypeError("Reference Outputs must be provided for BERTScore scorer. Please provide "
-                                "reference outputs to the test suite")
-                                
+
         # get precision, recall, and F1 score from bert_score package
         p, r, f = self.scorer.score(candidate_batch, reference_batch, verbose=False)
 
         # return a BERTScore using our weighting of precision and recall (instead of F1 which weights them equally)
-        return (PRECISION_WEIGHT * p + RECALL_WEIGHT * r).tolist()
+        return (self.precision_weight * p + self.recall_weight * r).tolist()
