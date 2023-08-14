@@ -73,6 +73,9 @@ A **Scoring Method** is the criteria used to judge the candidate outputs for eac
 | BERT Score (`bertscore`)          | any | Reference Output, Candidate Output|
 | Summary Quality (`summary_quality`)  | Summarization | Input, Reference Output, Candidate Output|
 | QA Correctness (`qa_correctness`) | Question-Answering| Input, Candidate Output, Context|
+| Exact Match (`exact_match`)       | any | Reference Output, Candidate Output|
+| Readability (`readability`)       | any | Candidate Output |
+| Word Count Match (`word_count_match`)   | any | Reference Output, Candidate Output |
 
 #### `bertscore`
 
@@ -85,3 +88,19 @@ The Summary Quality scoring method is a comprehensive measure of summarization q
 #### `qa_correctness`
 
 The QA correctness metric evaluates the correctness of an answer, given a question and context. This scoring method does not require a reference output, but does require context. Each row of the Test Run will receive a binary 0, indicating an incorrect output, or 1, indicating a correct output.
+
+#### `exact_match`
+
+The Exact Match metric evaluates whether the candidate output exactly matches the reference output. This is case sensitive. Each row of the Test Run will receive a binary 0, indicating a non-match, or 1, incidating an exact match.
+
+#### `readability`
+
+The Readability metric evaluates the reading ease of the candidate output according to the [Flesch Reading Ease Score](https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests). The higher the score, the easier the candidate output is to read: scores of 90-100 correlate to a 5th grade reading level, while scores less than 10 are classified as being "extremely difficult to read, and best understood by university graduates."
+
+#### `word_count_match`
+
+For scenarios where there is a preferred output length, `word_count_match` calculates a corresponding score on the scale of 0 to 1. Specifically, this scoring method calculates how similar the number of words in the candidate output is to the number of words in the reference output, where a score of 1.0 indicates that there are the same number of words in the candidate output as in the reference output. Scores less than 1.0 are calculated as ((len_reference-delta)/len_reference) where delta is the absolute difference in word lengths between the candidate and reference outputs. All negative computed values are truncated to 0. 
+    
+#### `hedging_language`
+
+The Hedging Language scoring method evaluates whether a candidate response is similar to generic hedging language used by an LLM ("As an AI language model, I don't have personal opinions, emotions, or beliefs"). Each row of the Test Run will receive a binary 0, indicating hedging language *not* used, or 1, indicating hedging language used.
