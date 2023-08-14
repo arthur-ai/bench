@@ -1,6 +1,7 @@
 import os
 import json
 import argparse
+import logging
 from pathlib import Path
 import uuid
 from typing import Optional
@@ -22,6 +23,8 @@ from arthur_bench.client.local.client import _bench_root_dir, LocalBenchClient
 from arthur_bench.client.exceptions import NotFoundError
 from arthur_bench.telemetry.telemetry import send_event, set_track_usage_data
 from arthur_bench.telemetry.config import get_or_persist_id, persist_usage_data
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
@@ -170,7 +173,11 @@ if os.path.exists(FRONT_END_DIRECTORY):
     app.mount(
         "/", StaticFiles(directory=FRONT_END_DIRECTORY, html=True), name="frontend"
     )
-# TODO: warning if front end is not built
+else:
+    logger.warning(
+        "frontend files not found. if running package from source, "
+        "frontend files must be built locally"
+    )
 
 
 def run():
@@ -203,7 +210,6 @@ def run():
         persist_usage_data(False)
         return
 
-    # TODO: how to maintain state on fast api server
     default_root_dir = _bench_root_dir()
     if args.directory:
         default_root_dir = args.directory

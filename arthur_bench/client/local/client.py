@@ -97,10 +97,13 @@ class PageInfo:
     total_count: int
 
 
-def _paginate(objs: List, page: int, page_size: int, sort_key: str) -> PageInfo:
+def _paginate(
+    objs: List, page: int, page_size: int, sort_key: Optional[str] = None
+) -> PageInfo:
     """Paginate sorted files and return iteration indices and page info"""
-    desc = sort_key[0] == "-"
-    objs.sort(key=SORT_QUERY_TO_FUNC[sort_key], reverse=desc)
+    if sort_key is not None:
+        desc = sort_key[0] == "-"
+        objs.sort(key=SORT_QUERY_TO_FUNC[sort_key], reverse=desc)
     offset = (page - 1) * page_size
     return PageInfo(
         start=offset,
@@ -207,7 +210,7 @@ class LocalBenchClient(BenchClient):
         else:
             suite_file = self.root_dir / suite_index[test_suite_id] / "suite.json"
             suite = PaginatedTestSuite.parse_file(suite_file)
-            pagination = _paginate(suite.test_cases, page, page_size, sort_key="id")
+            pagination = _paginate(suite.test_cases, page, page_size)
             return PaginatedTestSuite(
                 id=uuid.UUID(test_suite_id),
                 name=suite.name,
@@ -335,6 +338,10 @@ class LocalBenchClient(BenchClient):
             scoring_method=json_body.scoring_method,
             created_at=json_body.created_at,
             updated_at=json_body.created_at,
+            page=1,
+            page_size=len(json_body.test_cases),
+            total_count=len(json_body.test_cases),
+            total_pages=1,
         )
 
         suite_file.write_text(resp.json())
