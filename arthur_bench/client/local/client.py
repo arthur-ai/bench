@@ -369,6 +369,7 @@ class LocalBenchClient(BenchClient):
             sort = "created_at"
 
         pagination = _paginate(runs, page, page_size, sort_key=sort)
+
         return PaginatedRuns(
             test_suite_id=uuid.UUID(test_suite_id),
             test_runs=pagination.sorted_pages[pagination.start : pagination.end],

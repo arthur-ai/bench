@@ -9,6 +9,9 @@ contourpy==1.1.0
 cycler==0.11.0
 dataclasses-json==0.5.14
 duckdb==0.8.1
+evaluate==0.4.0
+exceptiongroup==1.1.2
+fastapi==0.99.1
 filelock==3.12.2
 fonttools==4.42.0
 frozenlist==1.4.0
