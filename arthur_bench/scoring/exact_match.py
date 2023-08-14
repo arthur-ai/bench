@@ -5,8 +5,15 @@ from arthur_bench.scoring import ScoringMethod
 
 
 class ExactMatch(ScoringMethod):
+    """
+    Returns 1 if candidate matches reference, 0 if candidate does not match reference.
+    """
     def __init__(self, case_sensitive=True):
         self.case_sensitive = case_sensitive
+
+    @staticmethod
+    def name() -> str:
+        return "exact_match"
 
     def run_batch(
         self,
