@@ -34,5 +34,5 @@ jobs:
         mypy arthur_bench --ignore-missing-imports --install-types --non-interactive
     - name: Test with pytest
       run: |
-        if [ -f test/requirements.txt ]; then pip install -r test/requirements.txt; fi
+        if [ -f tests/requirements.txt ]; then pip install -r tests/requirements.txt; fi
         pytest
