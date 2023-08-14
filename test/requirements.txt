@@ -1,1 +1,2 @@
+fastapi==0.99.1
 pytest==7.3.1
