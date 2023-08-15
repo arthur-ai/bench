@@ -13,6 +13,7 @@ from textstat import flesch_reading_ease
 def mock_get_num_vague_words():
     scorer = MagicMock()
     scorer.return_value = 1
+    scorer.__gt__ = True
     return scorer.return_value
 
 @pytest.fixture
