@@ -12,8 +12,8 @@ from textstat import flesch_reading_ease
 @pytest.fixture
 def mock_get_num_vague_words():
     scorer = MagicMock()
-    scorer.return_value = (1)
-    return scorer
+    scorer.return_value = 1
+    return scorer.return_value
 
 @pytest.fixture
 def mock_get_mean_word_freq():
