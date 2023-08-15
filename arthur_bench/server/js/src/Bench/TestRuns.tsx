@@ -5,7 +5,7 @@ import styles from './styles';
 import SummaryVisualizations from '@compound/SummaryVisualizations/SummaryVisualizations';
 import { useParams } from 'react-router-dom';
 import Loading from '@compound/Loading';
-import { useTestSuites } from 'arthur-api/hooks/api/useTestSuites';
+import { useTestSuites } from './useTestSuites';
 
 const TestRuns = () => {
     const { css } = useFela();

@@ -5,7 +5,7 @@ import TestRunRow from './TestRunRow';
 import { useFela } from 'react-fela';
 import styles from './styles';
 import { Paginator } from '../../core/Paginator';
-import { useTestSuites } from 'arthur-api/hooks/api/useTestSuites';
+import { useTestSuites } from '../../../../src/Bench/useTestSuites';
 import { useSelector } from 'react-redux';
 import { State } from 'arthur-redux';
 import { Run } from 'arthur-redux/slices/testSuites/types';

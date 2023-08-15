@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useCallback } from 'react';
 import * as actions from 'arthur-redux/slices/testSuites/actions';
 import { TPagination } from 'arthur-redux/slices/testSuites/types';
-import {TSelectItem} from "ui/components/core/StyledSelect/StyledSelect";
+import {TSelectItem} from "@core/StyledSelect/StyledSelect";
 
 export const useTestSuites = () => {
     const dispatch = useDispatch();
