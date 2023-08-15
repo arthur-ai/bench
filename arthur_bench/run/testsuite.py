@@ -20,6 +20,7 @@ from arthur_bench.run.utils import (
     _load_suite_from_args,
     _load_run_data_from_args,
     _get_suite_if_exists,
+    _check_if_run_exists,
     _initialize_scoring_method,
 )
 
@@ -160,6 +161,8 @@ class TestSuite:
             context_column=context_column,
             context_list=context_list,
         )
+
+        _check_if_run_exists(self.client, self.name, run_name)
 
         if len(candidate_output_list) != len(self.suite.test_cases):
             raise UserValueError(
