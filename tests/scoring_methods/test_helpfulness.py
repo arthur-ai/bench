@@ -67,7 +67,7 @@ def test_specificity(mock_summary_data):
         patch('arthur_bench.scoring.specificity.Specificity.get_mean_word_freq') as mock_get_mean_word_freq,
         patch('arthur_bench.scoring.specificity.Specificity.get_pn_and_num') as mock_get_pn_and_num,
         patch('arthur_bench.scoring.specificity.lexicon_count') as mock_lexicon_count
-    )
+    ):
 
         specificity = Specificity()
 
