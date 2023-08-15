@@ -16,7 +16,6 @@ from arthur_bench.client.exceptions import (
 from arthur_bench.client import BenchClient, _get_bench_client
 from arthur_bench.run.testrun import TestRun
 from arthur_bench.run.utils import (
-    _initialize_metadata,
     _load_suite_from_args,
     _load_run_data_from_args,
     _get_suite_if_exists,
@@ -66,7 +65,6 @@ class TestSuite:
         self.scorer: ScoringMethod
 
         if suite is None:
-            # TODO: separate load functionality? so large models aren't getting loaded unecessarily if test suite creation fails
             self.scorer = _initialize_scoring_method(scoring_method_arg=scoring_method)
             cases = _load_suite_from_args(
                 reference_data=reference_data,
@@ -87,7 +85,6 @@ class TestSuite:
                 scoring_method=method_meta,
                 description=description,
                 test_cases=cases,
-                **_initialize_metadata(),
             )
             self.suite = self.client.create_test_suite(new_suite)
 
@@ -204,7 +201,6 @@ class TestSuite:
             prompt_template=prompt_template,
             test_suite_id=self.suite.id,
             client=self.client,
-            **_initialize_metadata(),
         )
 
         if save:

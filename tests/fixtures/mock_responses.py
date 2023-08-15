@@ -180,6 +180,9 @@ MOCK_SUITES_ALL = PaginatedTestSuites(
                 "type": "custom",
                 "config": {"custom_name": "param_name"},
             },
+            description="test_description",
+            created_at="2023-06-21T21:56:03.346141",
+            updated_at="2023-06-22T21:56:03.346141",
         ),
         TestSuiteMetadata(
             id="8b7ba080-8d14-42d2-9250-ec0edb96abd7",
@@ -189,6 +192,8 @@ MOCK_SUITES_ALL = PaginatedTestSuites(
                 "type": "built_in",
                 "config": MOCK_BERTSCORE_CONFIG,
             },
+            created_at="2023-06-22T21:56:03.346141",
+            updated_at="2023-06-22T21:56:03.346141",
         ),
     ],
     page=1,
@@ -207,6 +212,9 @@ MOCK_SUITES_CUSTOM_ONLY = PaginatedTestSuites(
                 "type": "custom",
                 "config": {"custom_name": "param_name"},
             },
+            description="test_description",
+            created_at="2023-06-21T21:56:03.346141",
+            updated_at="2023-06-22T21:56:03.346141",
         ),
     ],
     page=1,
@@ -232,7 +240,7 @@ MOCK_RUNS_RESPONSE = PaginatedRuns(
     total_pages=1,
 )
 
-MOCK_RUN_RESULTS = [
+MOCK_RUN_RESULTS_SORTED = [
     RunResult(
         id="70eb3014-2b04-4974-bb05-a2e20f2cf367",
         input="this is another test prompt",
@@ -249,13 +257,43 @@ MOCK_RUN_RESULTS = [
     ),
 ]
 
+MOCK_RUN_RESULTS_INDEXED = [
+    RunResult(
+        id="62d2d1b3-d7df-4999-b01c-52e93d34f576",
+        input="this is test input to a language model",
+        reference_output="this is test output from a language model",
+        output="this is a test run output",
+        score=0.9,
+    ),
+    RunResult(
+        id="70eb3014-2b04-4974-bb05-a2e20f2cf367",
+        input="this is another test prompt",
+        reference_output="this is a test response",
+        output="this is a good test run output",
+        score=0.7,
+    ),
+]
+
 MOCK_RUN_RESPONSE = PaginatedRun(
     id="af8466a8-6425-4ea5-85cb-ed952b26fa6c",
     test_suite_id="8b7ba080-8d14-42d2-9250-ec0edb96abd7",
     name="test_run",
     created_at="2023-06-22T21:56:03.346141",
     updated_at="2023-06-22T21:56:03.346141",
-    test_cases=MOCK_RUN_RESULTS,
+    test_cases=MOCK_RUN_RESULTS_SORTED,
+    page=1,
+    page_size=5,
+    total_count=2,
+    total_pages=1,
+)
+
+MOCK_RUN_RAW = PaginatedRun(
+    id="af8466a8-6425-4ea5-85cb-ed952b26fa6c",
+    test_suite_id="8b7ba080-8d14-42d2-9250-ec0edb96abd7",
+    name="test_run",
+    created_at="2023-06-22T21:56:03.346141",
+    updated_at="2023-06-22T21:56:03.346141",
+    test_cases=MOCK_RUN_RESULTS_INDEXED,
     page=1,
     page_size=5,
     total_count=2,
