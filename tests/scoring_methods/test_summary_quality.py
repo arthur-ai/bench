@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import Mock, patch
 
 from langchain.llms.fake import FakeListLLM
-from fixtures.mock_data import MOCK_SUMMARY_DATA
+from tests.fixtures.mock_data import MOCK_SUMMARY_DATA
 from arthur_bench.scoring.summary_quality import SummaryQuality
 
 

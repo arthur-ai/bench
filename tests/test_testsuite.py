@@ -4,11 +4,15 @@ import pandas as pd
 from unittest import mock
 from typing import List, Optional
 
-from helpers import assert_test_suite_equal, assert_test_run_equal, get_mock_client
+from tests.helpers import (
+    assert_test_suite_equal,
+    assert_test_run_equal,
+    get_mock_client,
+)
 from arthur_bench.run.testsuite import TestSuite
 from arthur_bench.scoring import ScoringMethod
-from fixtures.mock_requests import MOCK_SUITE, MOCK_SUITE_CUSTOM, MOCK_RUN
-from fixtures.mock_data import (
+from tests.fixtures.mock_requests import MOCK_SUITE, MOCK_SUITE_CUSTOM, MOCK_RUN
+from tests.fixtures.mock_data import (
     MOCK_DATAFRAME,
     MOCK_INPUTS,
     MOCK_REFERENCE_OUTPUTS,

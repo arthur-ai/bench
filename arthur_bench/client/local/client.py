@@ -28,7 +28,8 @@ from arthur_bench.models.models import (
     TestCaseResponse,
     RunResult,
 )
-from arthur_bench.run.utils import load_suite_from_json, get_file_extension
+
+from arthur_bench.utils.loaders import load_suite_from_json, get_file_extension
 
 BENCH_FILE_DIR_KEY = "BENCH_FILE_DIR"
 DEFAULT_BENCH_FILE_DIR = Path(os.getcwd()) / "bench"

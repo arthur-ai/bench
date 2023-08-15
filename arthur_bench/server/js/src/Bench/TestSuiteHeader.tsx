@@ -79,7 +79,7 @@ const TestSuiteHeader = ({ data }: Props) => {
             <div className={css(styles.topRow)}>
                 <div className={css(styles.topRow)}>
                     <h2>{data.name}</h2>
-                    <MethodTag name={data.scoring_method} />
+                    <MethodTag name={data.scoring_method.name} />
                 </div>
                 <Button
                     iconStart={EIconType.DETAILS}

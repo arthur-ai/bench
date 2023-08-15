@@ -16,5 +16,5 @@ Test Objects
 Test Suite Loaders
 ===================
 
-.. automodule:: arthur_bench.run.utils
+.. automodule:: arthur_bench.utils.loaders
    :members:

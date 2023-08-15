@@ -1,7 +1,7 @@
 import pytest
 import torch
 from unittest.mock import MagicMock, patch
-from fixtures.mock_data import MOCK_HEDGING_LANGUAGE
+from tests.fixtures.mock_data import MOCK_HEDGING_LANGUAGE
 
 from arthur_bench.scoring.hedging_language import HedgingLanguage, DEFAULT_HEDGE
 

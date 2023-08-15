@@ -4,7 +4,7 @@ from http import HTTPStatus
 from unittest import mock
 from arthur_bench.client.http.requests import HTTPClient
 from arthur_bench.client.rest.bench.client import ArthurBenchClient
-from fixtures.mock_requests import (
+from tests.fixtures.mock_requests import (
     MOCK_SUITE,
     MOCK_SUITE_JSON,
     MOCK_RUN,

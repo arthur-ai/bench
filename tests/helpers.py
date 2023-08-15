@@ -10,7 +10,7 @@ from arthur_bench.models.models import (
     TestSuiteSummary,
 )
 from arthur_bench.client.bench_client import BenchClient
-from fixtures.mock_responses import (
+from tests.fixtures.mock_responses import (
     MOCK_SUITE_RESPONSE,
     MOCK_NO_SUITES,
     MOCK_SUITES,

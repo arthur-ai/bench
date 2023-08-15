@@ -6,7 +6,7 @@ import { TSelectItem } from '../../core/StyledSelect/StyledSelect';
 import SortDropdown from '../SortDropdown/SortDropdown';
 
 const metrics = [
-    { id: '1', name: 'BERTScore' },
+    { id: '1', name: 'bertscore' },
     { id: '2', name: 'summary_quality' },
     { id: '3', name: 'qa_correctness' },
 ];
