@@ -4,12 +4,12 @@ on:
   push:
     paths:
       - arthur_bench/server/js/**
-      - .github/workflows/js.yml
+      - .github/workflows/test-js.yml
 
   pull_request:
     paths:
       - arthur_bench/server/js/**
-      - .github/workflows/js.yml
+      - .github/workflows/test-js.yml
 
 jobs:
   build:
@@ -22,6 +22,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18.x'
-      - run: cd arthur_bench/server/js
-      - run: npm i
-      - run: npm run build
+      - name: Install dependencies
+        working-directory: arthur_bench/server/js
+        run: npm i
+      - name: Build
+        working-directory: arthur_bench/server/js
+        run: npm run build
