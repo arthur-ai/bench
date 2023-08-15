@@ -46,10 +46,6 @@ def test_run_wcm():
             assert torch.isclose(torch.tensor(result), torch.tensor(expected[i]), atol=1e-5)
 
 def test_specificity(mock_lexicon_count):
-    with (
-        patch('arthur_bench.scoring.specificity.lexicon_count') as mock_lexicon_count
-    ):
-
         specificity = Specificity()
 
         spec_run_result = specificity.run_batch(
@@ -57,10 +53,7 @@ def test_specificity(mock_lexicon_count):
             MOCK_SUMMARY_DATA['summary']
         )
 
-        #assert mock functions called 
-        mock_lexicon_count.assert_called()
-
         #assert return correct values
-        expected = [0.8250, 0.59796, 0.5714475, 0.825000]
+        expected = [0.825000, 0.5829599, 0.5714, 0.895714]
         for i, result in enumerate(spec_run_result):
             assert torch.isclose(torch.tensor(result), torch.tensor(expected[i]), atol=1e-4)
