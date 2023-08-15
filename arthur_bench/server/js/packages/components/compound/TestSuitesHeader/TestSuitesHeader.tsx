@@ -9,6 +9,13 @@ const metrics = [
     { id: '1', name: 'bertscore' },
     { id: '2', name: 'summary_quality' },
     { id: '3', name: 'qa_correctness' },
+    { id: '4', name: 'exact_match' },
+    { id: '5', name: 'hallucination' },
+    { id: '6', name: 'readability' },
+    { id: '7', name: 'word_count_match' },
+    { id: '8', name: 'specificity' },
+    { id: '9', name: 'hedging_language' },
+    { id: '10', name: 'python_unit_testing' },
 ];
 const sortOptions = [
     { id: 'last_run_time', name: 'OLDEST FIRST' },
