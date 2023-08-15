@@ -45,7 +45,7 @@ def test_run_wcm():
         for i, result in enumerate(wcm_run_result):
             assert torch.isclose(torch.tensor(result), torch.tensor(expected[i]), atol=1e-5)
 
-def test_specificity(mock_get_mean_word_freq, mock_get_num_vague_words, mock_get_pn_and_num, mock_lexicon_count):
+def test_specificity(mock_lexicon_count):
     with (
         patch('arthur_bench.scoring.specificity.lexicon_count') as mock_lexicon_count
     ):
