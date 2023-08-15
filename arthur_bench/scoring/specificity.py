@@ -86,7 +86,7 @@ class Specificity(ScoringMethod):
             # non_vague_prop = max(0.0, non_vague_prop) #normalize
 
             adj_freq = 2.0-(self.get_mean_word_freq(c)/0.0004) #reverse scale and normalize
-            adj_freq = max(0.0, adj_freq)
+            # adj_freq = max(0.0, adj_freq)
             # adj_freq = min(1.0, adj_freq)
 
             pn_num = self.get_pn_and_num(c)
