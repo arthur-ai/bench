@@ -80,7 +80,7 @@ class TestSuite:
             method_meta = ScoringMethodMetadata(
                 name=self.scorer.name(),
                 type=self.scorer.type(),
-                config=self.scorer.to_dict(),
+                config=self.scorer.to_dict(warn=True),
             )
             new_suite = TestSuiteRequest(
                 name=name,

@@ -35,7 +35,7 @@ class BERTScore(ScoringMethod):
         with suppress_warnings("transformers"):
             self.scorer = BERTScorer(lang="en", model_type=model_type)
 
-    def to_dict(self):
+    def to_dict(self, warn=False):
         return {
             "precision_weight": self.precision_weight,
             "recall_weight": self.recall_weight,
