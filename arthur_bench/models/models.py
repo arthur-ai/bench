@@ -49,9 +49,6 @@ class TestSuiteRequest(BaseModel):
     description: Optional[str] = None
     scoring_method: ScoringMethod
     test_cases: List[TestCaseRequest] = Field(..., min_items=1)
-    created_by: str
-    bench_version: str
-    created_at: datetime
 
     @validator("test_cases")
     def null_reference_outputs_all_or_none(cls, v):
@@ -122,9 +119,6 @@ class CreateRunRequest(BaseModel):
     """
     List of outputs and scores for all cases in the test suite
     """
-    created_by: str
-    bench_version: str
-    created_at: datetime
     description: Optional[str] = None
     """
     Optional description of the run

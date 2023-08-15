@@ -1,11 +1,12 @@
 import os
 import duckdb
+import getpass
 import numpy as np
 import glob
 import json
 from datetime import datetime
 from math import ceil
-from typing import Optional, Union, List
+from typing import Optional, Union, List, Dict, Any
 from dataclasses import dataclass
 import uuid
 from pathlib import Path
@@ -60,6 +61,15 @@ SORT_QUERY_TO_FUNC = {
 
 def _bench_root_dir() -> Path:
     return Path(os.environ.get(BENCH_FILE_DIR_KEY, DEFAULT_BENCH_FILE_DIR))
+
+
+def _initialize_metadata() -> Dict[str, Any]:
+    timestamp = datetime.now().isoformat()
+    return {
+        "created_at": timestamp,
+        "created_by": getpass.getuser(),
+        "updated_at": timestamp,
+    }
 
 
 def _load_suite_with_optional_id(
@@ -321,8 +331,7 @@ class LocalBenchClient(BenchClient):
             ],
             description=json_body.description,
             scoring_method=json_body.scoring_method,
-            created_at=json_body.created_at,
-            updated_at=json_body.created_at,
+            **_initialize_metadata(),
         )
 
         suite_file.write_text(resp.json())
@@ -339,7 +348,7 @@ class LocalBenchClient(BenchClient):
         resp = PaginatedRun(
             id=run_id,
             test_suite_id=uuid.UUID(test_suite_id),
-            updated_at=json_body.created_at,
+            **_initialize_metadata(),
             **json_body.dict(),
         )
 
