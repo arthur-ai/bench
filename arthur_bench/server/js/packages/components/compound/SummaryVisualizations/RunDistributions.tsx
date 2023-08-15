@@ -4,7 +4,7 @@ import {
     TDistribution,
     TestRunSummary,
 } from 'arthur-redux/slices/testSuites/types';
-import { TGraphDataItem } from '@core/Charts/LineChart/';
+import { TGraphDataItem } from 'ui/components/core/Charts/LineChart/';
 import { useParams } from 'react-router-dom';
 
 const getValues = (summaries: TestRunSummary[], testRunId: string, total: number): TGraphDataItem[] => {
@@ -31,6 +31,7 @@ const RunDistributions = ({ summaries, total }: Props) => {
 
     return (
         <LineChart
+            id={params.testSuiteId}
             graphData={values}
             showLegend
             height={'300px'}

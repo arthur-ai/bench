@@ -5,7 +5,7 @@ import TestRunRow from './TestRunRow';
 import { useFela } from 'react-fela';
 import styles from './styles';
 import { Paginator } from '../../core/Paginator';
-import { useTestSuites } from '../../../../src/Bench/useTestSuites';
+import { useTestSuites } from 'arthur-api/hooks/api/useTestSuites';
 import { useSelector } from 'react-redux';
 import { State } from 'arthur-redux';
 import { Run } from 'arthur-redux/slices/testSuites/types';
@@ -85,6 +85,7 @@ const TestRunTable = (props: TTableProps) => {
                                     column={column}
                                     selectedSort={selectedSort}
                                     setSelectedSort={setSelectedSort}
+                                    key={column.name}
                                 />
                             ))}
                         </TableHeader>
@@ -92,7 +93,7 @@ const TestRunTable = (props: TTableProps) => {
                             <TestRunRow
                                 testRun={run}
                                 testSuiteId={testSuiteId}
-                                key={testSuiteId}
+                                key={run.id}
                             />
                         ))}
                     </Table>

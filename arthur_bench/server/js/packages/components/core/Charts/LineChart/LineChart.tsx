@@ -93,7 +93,7 @@ const LineChart = (props: TLineChartProps) => {
 
         const moreLegendItems: LegendItems = [];
 
-        graphData.map((line: TGraphDataItem, index: number) => {
+        graphData.forEach((line: TGraphDataItem, index: number) => {
             moreLegendItems.push({
                 color: line.name.toLowerCase().includes('baseline') || line.isReference
                     ? graphs.backgrounds.raisin
@@ -320,6 +320,7 @@ const LineChart = (props: TLineChartProps) => {
 
             <EChartsReact
                 {...props}
+                key={id}
                 notMerge={notMerge}
                 option={merge(graphOptions, options)}
                 showLoading={isLoading}

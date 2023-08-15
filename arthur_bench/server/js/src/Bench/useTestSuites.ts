@@ -1,9 +1,9 @@
 import arthurAxios from 'arthur-axios';
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useCallback } from 'react';
 import * as actions from 'arthur-redux/slices/testSuites/actions';
 import { TPagination } from 'arthur-redux/slices/testSuites/types';
-import {TSelectItem} from "@core/StyledSelect/StyledSelect";
+import {TSelectItem} from "ui/components/core/StyledSelect/StyledSelect";
 
 export const useTestSuites = () => {
     const dispatch = useDispatch();
@@ -83,7 +83,7 @@ export const useTestSuites = () => {
             });
     }, [dispatch]);
 
-    const fetchTestRunSummary = useCallback((testSuiteId: string, testRunId?: string) => {
+    const fetchTestRunSummary = useCallback((testSuiteId: string, testRunId?: string): Promise<void> => {
 
         let url = `/api/v3/bench/test_suites/${testSuiteId}/runs/summary`;
 
@@ -91,7 +91,7 @@ export const useTestSuites = () => {
             url += `?run_id=${testRunId}`
         }
 
-        arthurAxios
+        return arthurAxios
             .get(url)
             .then((r) => {
                 dispatch(
