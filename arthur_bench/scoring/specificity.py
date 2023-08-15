@@ -82,14 +82,16 @@ class Specificity(ScoringMethod):
 
             vague_words = self.get_num_vague_words(c)
             non_vague_prop = (len_s - vague_words)/len_s #proportion of words which are not vague
-            non_vague_prop = max(0.0, (non_vague_prop/0.2) -4.0) #normalize
+            non_vague_prop = (non_vague_prop/0.2) -4.0
+            # non_vague_prop = max(0.0, non_vague_prop) #normalize
 
             adj_freq = 2.0-(self.get_mean_word_freq(c)/0.0004) #reverse scale and normalize
             adj_freq = max(0.0, adj_freq)
-            adj_freq = min(1.0, adj_freq)
+            # adj_freq = min(1.0, adj_freq)
 
             pn_num = self.get_pn_and_num(c)
-            pn_prop = min(1.0, 5.0*(pn_num/len_s)) #normalize
+            pn_num = 5.0*(pn_num/len_s)
+            # pn_prop = min(1.0, pn_num) #normalize
 
             s= (0.33*non_vague_prop)+ (0.33*adj_freq) + (0.33*pn_prop) #aggregate
             res.append(s)
