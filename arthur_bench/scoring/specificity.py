@@ -90,8 +90,8 @@ class Specificity(ScoringMethod):
             # adj_freq = min(1.0, adj_freq)
 
             pn_num = self.get_pn_and_num(c)
-            pn_num = 5.0*(pn_num/len_s)
-            # pn_prop = min(1.0, pn_num) #normalize
+            pn_prop= 5.0*(pn_num/len_s)
+            # pn_prop = min(1.0, pn_prop) #normalize
 
             s= (0.33*non_vague_prop)+ (0.33*adj_freq) + (0.33*pn_prop) #aggregate
             res.append(s)
