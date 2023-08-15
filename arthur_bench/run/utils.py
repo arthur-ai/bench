@@ -153,7 +153,9 @@ def _check_if_run_exists(
         suite = client.get_test_suite(
             str(test_suite_resp.test_suites[0].id), **query_params
         )
-        runs = client.get_runs_for_test_suite(suite.id, **query_params)
+
+        # check for runs with run_name on the suite
+        runs = client.get_runs_for_test_suite(str(suite.id), **query_params)
         for run_metadata in runs.test_runs:
             if run_metadata.name == run_name:
                 raise UserValueError(f"A test run with the name {run_name} already exists. Give this test run a unique name and re-run.")
@@ -172,7 +174,8 @@ def _check_if_run_exists(
                 str(test_suite_resp.test_suites[0].id), **query_params
             )
 
-            runs = client.get_runs_for_test_suite(suite_next_page.id, **query_params)
+            # check for runs with run_name on the suite
+            runs = client.get_runs_for_test_suite(str(suite_next_page.id), **query_params)
             for run_metadata in runs.test_runs:
                 if run_metadata.name == run_name:
                     raise UserValueError(f"A test run with the name {run_name} already exists. Give this test run a unique name and re-run.")

@@ -162,7 +162,8 @@ class TestSuite:
             context_list=context_list,
         )
 
-        _check_if_run_exists(self.client, self.name, run_name)
+        # make sure no existing test run named run_name is already attached to this suite 
+        _check_if_run_exists(self.client, self.suite.name, run_name)
 
         if len(candidate_output_list) != len(self.suite.test_cases):
             raise UserValueError(
