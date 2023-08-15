@@ -21,6 +21,7 @@ dynamic = ["version"]
 
 dependencies = [
     'duckdb~=0.8.1',
+    'evaluate~=0.4.0',
     'openai==0.27.0',
     'pandas~=2.0.1',
     'langchain~=0.0.170',
@@ -58,7 +59,7 @@ bench = "arthur_bench.server.run_server:run"
 url = 'http://arthur.ai'
 
 [tool.setuptools.packages.find]
-exclude = ["docs*", "test*", "examples*"]
+exclude = ["docs*", "tests*", "examples*"]
 
 [tool.setuptools.dynamic]
 version = {attr = "arthur_bench.__version__"}
