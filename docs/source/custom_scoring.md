@@ -43,13 +43,17 @@ class ScoringMethod(ABC):
 ```
 To create a custom scorer, we will implement the `name` and `run_batch` methods, and optionally override the `requires_reference` method if our scoring method doesn't require reference or target data.
 
-In the below example we create a custom scorer to check for repetition in a model generation.
+In the below example we create a custom scorer to check for repetition in a model generation. The scorer will accept an argument threshold, that specifies the maximum number of acceptable repetitions.
 ```
 from nltk import trigrams
 
 from arthur_bench.scoring import ScoringMethod
 
 class TrigramRepetition(ScoringMethod):
+
+    def __init__(self, threshold: int = 5):
+        self.threshold = threshold
+    
     @staticmethod
     def name() -> str:
         return "trigram_repetition"
@@ -71,7 +75,7 @@ class TrigramRepetition(ScoringMethod):
                 else:
                     counts[tri] = 1
             max_repeat = max(counts.values())
-            repeat_scores.append(float(max_repeat < 5))
+            repeat_scores.append(float(max_repeat < self.threshold))
         return repeat_scores
 ```
 
@@ -82,7 +86,7 @@ Additionally, we provide a path to a csv file containing news articles to be use
 ```
 from arthur_bench.run.testsuite import TestSuite
 
-repetition_test = TestSuite('news_summary', scoring_method=TrigramRepetition, reference_data_path='./example_summaries.csv')
+repetition_test = TestSuite('news_summary', scoring_method=TrigramRepetition(), reference_data_path='./example_summaries.csv')
 ```
 
 ### Run the test suite
@@ -91,11 +95,28 @@ Now that we've loaded in our custom scoring method, our test suite can be run as
 
 ```
 run = repetition_test.run('test_run', candidate_output_list=['a great summary with no repetition!', 'a bad summary that repeats summary that repeats summary that repeats summary that repeats'])
-print(run.test_case_outputs)
+print(run.test_cases)
 ```
 
 ```
 >>> [TestCaseOutput(output='a great summary with no repetition!', score=1.0), TestCaseOutput(output='a bad summary that repeats summary that repeats summary that repeats summary that repeats summary that repeats', score=0.0)]
 ```
+
+### Scoring Method Validation
+
+Test suites expect scoring method configurations to remain consistent from run to run, so that each runs scores can be compared and reliably tracked throughout time. Let's see what happens if we attempt to use this suite at a later time, but edit the underlying parameters.
+
+```
+scorer = TrigramRepetition(threshold=7)
+repetition_test = TestSuite('news_summary', scoring_method=scorer)
+```
+
+We see the following warning:
+
+```
+scoring method configuration has changed from test suite creation.
+```
+
+By default, bench will save the json serializable attributes of your scoring method as the configuration. If you need more advanced serialization for validation or re-initialization, implement the `to_dict()` and `from_dict()` methods on your custom class. You can find the full ScoringMethod spec {class}`here <arthur_bench.scoring.scoring_method.ScoringMethod>`.
 
 If you think you've got a useful scoring method, please consider [contributing](contributing.md)!
