@@ -115,7 +115,7 @@ def assert_summary_equal(summary: TestSuiteSummary, summary_other: TestSuiteSumm
     assert summary.total_pages == summary_other.total_pages
 
 
-def get_mock_client(suite_exists=False):
+def get_mock_client(suite_exists=False, mock_suite=MOCK_SUITE_RESPONSE_WITH_PAGES):
     client = Mock(spec=BenchClient)
     client.create_test_suite.return_value = MOCK_SUITE_RESPONSE
     client.create_new_test_run.return_value = uuid.uuid4()
@@ -123,7 +123,7 @@ def get_mock_client(suite_exists=False):
         client.get_test_suites.return_value = MOCK_NO_SUITES
     else:
         client.get_test_suites.return_value = MOCK_SUITES
-        client.get_test_suite.return_value = MOCK_SUITE_RESPONSE_WITH_PAGES
+        client.get_test_suite.return_value = mock_suite
         client.get_runs_for_test_suite.return_value = MOCK_RUNS_RESPONSE
         client.get_summary_statistics.return_value = MOCK_SUMMARY_RESPONSE
         client.get_test_run.return_value = MOCK_RUN_RESPONSE
