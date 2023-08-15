@@ -24,7 +24,7 @@ class HedgingLanguage(ScoringMethod):
     def requires_reference() -> bool:
         return False
 
-    def __init__(self, **kwargs):
+    def __init__(self):
         with suppress_warnings("transformers"):
             self.scorer = BERTScorer(lang='en', model_type=DEFAULT_MODEL)
 
