@@ -32,7 +32,7 @@ from arthur_bench.models.models import (
 from arthur_bench.utils.loaders import load_suite_from_json, get_file_extension
 
 BENCH_FILE_DIR_KEY = "BENCH_FILE_DIR"
-DEFAULT_BENCH_FILE_DIR = Path(os.getcwd()) / "bench"
+DEFAULT_BENCH_FILE_DIR = Path(os.getcwd()) / "bench_runs"
 
 SUITE_INDEX_FILE = "suite_id_to_name.json"
 RUN_INDEX_FILE = "run_id_to_name.json"
@@ -176,6 +176,7 @@ class LocalBenchClient(BenchClient):
         suite_file = self.root_dir / test_suite_name / "suite.json"
         suite = PaginatedTestSuite.parse_file(suite_file)
         suite.last_run_time = runtime
+        suite.num_runs += 1
         suite_file.write_text(suite.json())
 
     def _write_suite_index(self):
@@ -223,6 +224,8 @@ class LocalBenchClient(BenchClient):
                 test_cases=pagination.sorted_pages[pagination.start : pagination.end],
                 created_at=suite.created_at,
                 updated_at=suite.updated_at,
+                last_run_time=suite.last_run_time,
+                num_runs=suite.num_runs,
                 page=pagination.page,
                 page_size=pagination.page_size,
                 total_count=pagination.total_count,
@@ -252,6 +255,7 @@ class LocalBenchClient(BenchClient):
                             scoring_method=suite.scoring_method,
                             description=suite.description,
                             created_at=suite.created_at,
+                            updated_at=suite.updated_at,
                             last_run_time=suite.last_run_time,
                         )
                     ],
@@ -283,6 +287,7 @@ class LocalBenchClient(BenchClient):
                         scoring_method=suite.scoring_method,
                         description=suite.description,
                         created_at=suite.created_at,
+                        updated_at=suite.updated_at,
                         last_run_time=suite.last_run_time,
                     )
                 )

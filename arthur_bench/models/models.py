@@ -5,7 +5,7 @@ from enum import Enum
 from typing import List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, Field, validator, root_validator
+from pydantic import BaseModel, Field, validator
 
 
 ## COMMON
@@ -192,7 +192,7 @@ class PaginatedTestSuite(BaseModel):
     updated_at: datetime
     description: Optional[str] = None
     last_run_time: Optional[datetime] = None
-    num_runs: Optional[int] = 0
+    num_runs: int = 0
     page: Optional[int] = None
     page_size: Optional[int] = None
     total_pages: Optional[int] = None

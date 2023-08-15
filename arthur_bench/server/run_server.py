@@ -208,10 +208,7 @@ def run():
         persist_usage_data(False)
         return
 
-    default_root_dir = _bench_root_dir()
-    if args.directory:
-        default_root_dir = args.directory
-    client = LocalBenchClient(default_root_dir)
+    client = LocalBenchClient(args.directory)
     app.state.client = client
 
     config = get_or_persist_id()

@@ -66,7 +66,6 @@ class TestSuite:
         self.scorer: ScoringMethod
 
         if suite is None:
-            # TODO: separate load functionality? so large models aren't getting loaded unecessarily if test suite creation fails
             self.scorer = _initialize_scoring_method(scoring_method_arg=scoring_method)
             cases = _load_suite_from_args(
                 reference_data=reference_data,
