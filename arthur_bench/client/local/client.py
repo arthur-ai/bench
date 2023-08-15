@@ -236,7 +236,7 @@ class LocalBenchClient(BenchClient):
         self,
         name: Optional[str] = None,
         sort: Optional[str] = None,
-        scoring_method: Optional[str] = None,
+        scoring_method: Optional[List[str]] = None,
         page: int = 1,
         page_size: int = DEFAULT_PAGE_SIZE,
     ) -> PaginatedTestSuites:
@@ -279,7 +279,7 @@ class LocalBenchClient(BenchClient):
             suite = _load_suite_with_optional_id(f)
             if suite is None:
                 suite = self.get_test_suite_by_name(f.split("/")[-2])
-            if scoring_method is None or suite.scoring_method.name == scoring_method:
+            if scoring_method is None or suite.scoring_method.name in scoring_method:
                 suites.append(
                     TestSuiteMetadata(
                         id=suite.id,

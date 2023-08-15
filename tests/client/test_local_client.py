@@ -99,9 +99,10 @@ def test_create_test_suite_exists(bench_temp_dir_with_suites):
     [
         ({}, MOCK_SUITES_ALL),
         ({"name": "test_suite"}, MOCK_SUITES),
-        ({"scoring_method": "test_custom_scorer"}, MOCK_SUITES_CUSTOM_ONLY),
+        ({"scoring_method": ["test_custom_scorer"]}, MOCK_SUITES_CUSTOM_ONLY),
         ({"name": "name doesn't exist"}, MOCK_NO_SUITES),
-        ({"scoring_method": "fake_scoring_method"}, MOCK_NO_SUITES),
+        ({"scoring_method": ["fake_scoring_method"]}, MOCK_NO_SUITES),
+        ({"scoring_method": ["test_custom_scorer", "bertscore"]}, MOCK_SUITES_ALL),
     ],
     ids=[
         "no_params",
@@ -109,6 +110,7 @@ def test_create_test_suite_exists(bench_temp_dir_with_suites):
         "get_by_scoring",
         "name_invalid",
         "scoring_invalid",
+        "scoring_multiple",
     ],
 )
 def test_get_test_suites(bench_temp_dir_with_suites, req, expected_response):

@@ -4,11 +4,11 @@ import argparse
 import logging
 from pathlib import Path
 import uuid
-from typing import Optional
+from typing import Optional, Annotated, List, Union
 
 try:
     import uvicorn
-    from fastapi import FastAPI, Request, HTTPException
+    from fastapi import FastAPI, Request, HTTPException, Query
     from fastapi.staticfiles import StaticFiles
     from fastapi.middleware.cors import CORSMiddleware
 
@@ -48,7 +48,7 @@ def test_suites(
     page: int = 1,
     page_size: int = 5,
     sort: Optional[str] = None,
-    scoring_method: Optional[str] = None,
+    scoring_method: Annotated[Union[List[str], None], Query()] = None,
     name: Optional[str] = None,
 ):
     client = request.app.state.client

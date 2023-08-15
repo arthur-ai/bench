@@ -1,4 +1,4 @@
-from typing import Optional, Dict, cast
+from typing import Optional, Dict, cast, List, Any
 from http import HTTPStatus
 
 # import http client
@@ -43,7 +43,7 @@ class ArthurBenchClient(BenchClient):
         self,
         name: Optional[str] = None,
         sort: Optional[str] = None,
-        scoring_method: Optional[str] = None,
+        scoring_method: Optional[List[str]] = None,
         page: int = 1,
         page_size: int = 5,
     ) -> PaginatedTestSuites:
@@ -58,7 +58,7 @@ class ArthurBenchClient(BenchClient):
                 :param scoring_method:
         """
 
-        params = {}
+        params: Dict[str, Any] = {}
         if name is not None:
             params["name"] = name
         if sort is not None:
@@ -110,7 +110,6 @@ class ArthurBenchClient(BenchClient):
         test_suite_id: str,
         page: int = 1,
         page_size: int = 5,
-
     ) -> PaginatedTestSuite:
         """
         Get reference data for an existing test suite
@@ -303,4 +302,3 @@ class ArthurBenchClient(BenchClient):
             ),
         )
         return HallucinationScoreResponse(**parsed_resp)
- 
