@@ -28,9 +28,6 @@ def mock_get_pn_and_num():
     mock.score.return_value = 0.3
     return mock
 
-
-
-
 def test_run_readability():
 
         readability = Readability()
@@ -60,6 +57,7 @@ def test_run_wcm():
         for i, result in enumerate(wcm_run_result):
             assert torch.isclose(torch.tensor(result), torch.tensor(expected[i]), atol=1e-5)
 
+
 def test_specificity_mocks(mock_get_pn_and_num, mock_get_num_vague_words, mock_get_mean_word_freq):
   with patch("arthur_bench.scoring.specificity.Specificity.get_pn_and_num", mock_get_pn_and_num.score):
     with patch("arthur_bench.scoring.specificity.Specificity.get_mean_word_freq", mock_get_mean_word_freq.score):
@@ -83,31 +81,6 @@ def test_specificity_mocks(mock_get_pn_and_num, mock_get_num_vague_words, mock_g
         for i, result in enumerate(spec_run_result):
             assert torch.isclose(torch.tensor(result), torch.tensor(expected[i]), atol=1e-4)
 
-    
-
-def test_specificity(mock_get_mean_word_freq, mock_get_num_vague_words, mock_get_pn_and_num):
-    with (
-        patch('arthur_bench.scoring.specificity.Specificity.get_num_vague_words') as mock_get_num_vague_words,
-        patch('arthur_bench.scoring.specificity.Specificity.get_mean_word_freq') as mock_get_mean_word_freq,
-        patch('arthur_bench.scoring.specificity.Specificity.get_pn_and_num') as mock_get_pn_and_num
-    ):
-
-        specificity = Specificity()
-
-        spec_run_result = specificity.run_batch(
-            MOCK_SUMMARY_DATA['candidate_summary'],
-            MOCK_SUMMARY_DATA['summary']
-        )
-
-        #assert mock functions called 
-        mock_get_num_vague_words.assert_called()
-        mock_get_mean_word_freq.assert_called()
-        mock_get_pn_and_num.assert_called()
-
-        #assert return correct values
-        expected = [.198, .198, .198, .198]
-        for i, result in enumerate(spec_run_result):
-            assert torch.isclose(torch.tensor(result), torch.tensor(expected[i]), atol=1e-4)
 
 def test_specificity():
         specificity = Specificity()
