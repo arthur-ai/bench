@@ -94,7 +94,7 @@ test_suite = TestSuite(
     "exact_match", 
     reference_data=df,
     input_column="my_input",
-    reference_output="baseline_output"
+    reference_column="baseline_output"
 )
 
 test_suite.run(
@@ -180,7 +180,7 @@ dolly_suite = TestSuite(
     "bertscore", 
     reference_data=dolly_df_sample,
     input_column="instruction",
-    reference_output="response"
+    reference_column="response"
 )
 
 # run test suite on gpt-3.5-turbo generated answers to the questions
