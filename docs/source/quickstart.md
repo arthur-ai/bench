@@ -2,6 +2,14 @@
 
 Make sure you have completed installation from the [setup](setup.md) guide before moving on to this quickstart.
 
+## (Optional) Environment Setup
+
+Set the environment variable BENCH_FILE_DIR to point to the local directory where you want your test results to be saved (this will by default by "./bench_runs", a folder inside the direcrory where you are running your tests). 
+
+```
+export BENCH_FILE_DIR="your/best/file/dir/"
+```
+
 ## Creating your first test suite
 
 Instantiate a test suite with a name, data, and scoring method.
@@ -38,12 +46,6 @@ print(run)
 You should now have logged test case results with scores of 1.0 and 0.0, respectively.
 
 ## View results in local UI
-
-First set the BENCH_FILE_DIR to point to the local directory where your test results have been saved
-
-```
-export BENCH_FILE_DIR="./"
-```
 
 Now run `bench` from the command line to launch the local UI and explore the test results.
 
