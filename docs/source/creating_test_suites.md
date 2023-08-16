@@ -22,7 +22,8 @@ You can create and run a test suite by passing lists of strings directly as the 
 
 ```python
 suite = TestSuite(
-    'bench_quickstart', 
+    "bench_quickstart", 
+    "exact_match",
     input_text_list=["What year was FDR elected?", "What is the opposite of down?"], 
     reference_output_list=["1932", "up"]
 )
@@ -43,7 +44,8 @@ baseline_outputs = [gpt4.predict(x) for x in inputs]
 candidate_outputs = [gpt35.predict(x) for x in inputs]
 
 suite = TestSuite(
-    'bench_llm_quickstart', 
+    "bench_llm_quickstart", 
+    "exact_match",
     input_text_list=inputs, 
     reference_output_list=baseline_outputs
 )
