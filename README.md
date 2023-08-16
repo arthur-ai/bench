@@ -2,17 +2,13 @@
 
 Bench is a tool for evaluating LLMs for production use cases. Whether you are comparing different LLMs, considering different prompts, or testing generation hyperparameters like temperature and # tokens, Bench provides one touch point for all your LLM performance evalaution.
 
-If you want:
+If you have encounted a need for any of the following in your LLM work, then Bench can help with your evaluation needs:
 
-- to know whether open source models can do as well as the top closed-source LLM API providers on your data
-- to translate the rankings on existing LLM leaderboards into scores that you care about for your actual use case
-- to standardize your workflow of LLM evaluation with a common interface across tasks and use cases
+- to standardize the workflow of LLM evaluation with a common interface across tasks and use cases
+- to test whether open source LLMs can do as well as the top closed-source LLM API providers on your specific data
+- to translate the rankings on LLM leaderboards and benchmarks into scores that you care about for your actual use case
 
-, then Bench can help with your LLM evaluation needs.
-
-## Getting started
-
-### Package installation and environment setup
+## Package installation
 First [download](https://github.com/arthur-ai/bench/releases) the tar file from the Github releases. Next install the package to your python environment.
 
 Install Bench with optional dependencies for serving results locally (recommended):  
@@ -23,34 +19,30 @@ Install Bench with minimum dependencies:
 
 For further setup instructions visit our [installation guide](https://docs.arthur.com/bench/setup/index.html)
 
+## Using Bench
 
-### Hello Bench
-
-For a more in depth walkthrough of the following example, visit our [quickstart guide](https://docs.arthur.com/bench/quickstart.html)
-
-Create a demo test suite and run the `exact_match` scoring method:
+To make sure you have everything installed correctly, you can run the following code snippets to create a test suite, run it to give a score to candidate outputs.
 
 ```python
 from arthur_bench.run.testsuite import TestSuite
 suite = TestSuite(
-    'bench_quickstart', 
+    "bench_quickstart", 
+    "exact_match",
     input_text_list=["What year was FDR elected?", "What is the opposite of down?"], 
     reference_output_list=["1932", "up"]
 )
-suite.run('quickstart_run', candidate_output_list=["1932", "up is the opposite of down"])
+suite.run("quickstart_run", candidate_output_list=["1932", "up is the opposite of down"])
 ```
 
-To view the results in the local UI, run the simple command:
+Saved test suites can be loaded later on to benchmark test performance over time, without needing to re-prepare reference data:
+
+```python
+existing_suite = TestSuite("bench_quickstart", "exact_match")
+existing_suite.run("quickstart_new_run", candidate_output_list=["1936", "up"])
+```
+
+To view the results for these runs in the local UI that comes with the `bench` package, run `bench` from the command line (this requires the bench optional server dependencies to be installed):
 
 ```
 bench
-```
-
-This will require bench optional server dependencies to be installed.
-
-### Running an existing test suite
-Saved test suites can be loaded for reuse by name, without needing to specify data again. 
-
-```
-my_existing_suite = TestSuite('my_bench_test', 'bertscore')
 ```
