@@ -8,8 +8,8 @@ We use a custom scorer that compares each LLM temperature setting based on how m
 
 In this guide, we use the OpenAI API and use the `pyspellchecker` package for a custom scoring method
 ```
+pip install openai pyspellchecker
 export OPENAI_API_KEY="sk-..."
-pip install pyspellchecker
 ```
 
 ## Data preparation
