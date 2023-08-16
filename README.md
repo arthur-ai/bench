@@ -9,13 +9,14 @@ If you have encounted a need for any of the following in your LLM work, then Ben
 - to translate the rankings on LLM leaderboards and benchmarks into scores that you care about for your actual use case
 
 ## Package installation
-First [download](https://github.com/arthur-ai/bench/releases) the tar file from the Github releases. Next install the package to your python environment.
 
-Install Bench with optional dependencies for serving results locally (recommended):  
-`pip install --find-links=./directory_with_tar_file 'arthur-bench[server]'`
+1. [Download](https://github.com/arthur-ai/bench/releases) the `.tar` file from the Github releases. 
 
-Install Bench with minimum dependencies:
-`pip install --find-links=./directory_with_tar_file 'arthur-bench'`
+2. Create or activate the python environment within which you would like run Arthur Bench.
+
+3. Navigate to the directory with the downloaded bench `.tar` file.
+
+4. `pip`-install the package
 
 For further setup instructions visit our [installation guide](docs/setup.md)
 
