@@ -1,18 +1,14 @@
-## Creating test suites
+# Creating test suites
 
-### What data should I use to create a test suite?
+## What data should I use?
 
 It is best to use data that is as close to your production use case as possible. If possible, we recommend sampling some historic data and manually validating a set of 25+ cases. If that is not possible, manually selecting some some inputs and using a foundation model to generate a starting set of reference outputs is a good option.
 
-#### Public benchmarks & datasets
-
 Public datasets on HuggingFace like the [Dolly dataset](https://huggingface.co/datasets/databricks/databricks-dolly-15k) and the [HumanEval dataset](https://huggingface.co/datasets/openai_humaneval) can be a great starting place to benchmark on your use case before you have data that is closer to your actual production setting.
-
-#### LLM generations as baseline
 
 When no baseline examples easily exist for the inputs you want to evaluate LLM performance on, you can use an existing LLM to generate a good enough set of baseline outputs for the task.
 
-### Ways to create a test suite
+## Ways to create a test suite
 
 No matter how you prepare your data for a test suite, you use the common interface provided by importing the `TestSuite` class:
 
@@ -20,7 +16,7 @@ No matter how you prepare your data for a test suite, you use the common interfa
 from arthur_bench.run.testsuite import TestSuite
 ```
 
-#### strings -> test suite
+### `List[str]` -> `TestSuite`
 
 **Toy example**
 
@@ -35,7 +31,6 @@ suite = TestSuite(
 suite.run('quickstart_run', candidate_output_list=["1932", "up is the opposite of down"])
 ```
 
-**LLM APIs**
 This path also allows you to pass LLM responses directly into a test suite as a set of baseline reference outputs and/or as a run of candidate outputs. For example, you can use `gpt-4` outputs as a baseline for a test suite, and then run `gpt-3.5-turbo` as a candidate to see how it compares.
 
 ```python
@@ -55,11 +50,9 @@ suite = TestSuite(
 suite.run('quickstart_llm_run', candidate_output_list=candidate_outputs)
 ```
 
-#### DataFrame -> test suite
+### `DataFrame` -> `TestSuite`
 
 If you have your test suite and/or model response data in a pandas DataFrame you can create test suites and runs directly from those dataframes
-
-**Default column names**
 
 Here is an example test suite built from a dataframe with the default reference data and candidate data column names that `TestSuite` expects (you can also use other column names as we show below)
 
@@ -83,7 +76,7 @@ Running test suite:
 test_suite.run("candidate_from_df", candidate_data=df)
 ```
 
-**Custom column names**
+Alternatively you can create and run test suites from dataframes with custom column names:
 
 ```python
 df = pd.DataFrame({
@@ -111,11 +104,9 @@ test_suite.run(
 )
 ```
 
-#### CSV -> test suite
+### `.csv` -> `TestSuite`
 
 If your test suite and/or model response data already exists in CSV files you can create test suites and runs directly from those files
-
-**Default column names**
 
 Here is an example test suite CSV with the default reference data and candidate data column names that `TestSuite` expects (you can also use other column names as we show below)
 
@@ -145,7 +136,7 @@ test_suite.run(
     candidate_data_path="/path/to/test_suite_data_default_columns.csv"
 ```
 
-**Custom column names**
+Alternatively you can create and run test suites from `.csv` files with custom column names:
 
 `test_suite_data_custom_columns.csv`
 ```csv
@@ -157,11 +148,10 @@ What is the opposite of down?, up, up is the opposite of down
 Creating test suite:
 
 ```python
-
 test_suite = TestSuite(
     "suite_from_csv_custom", 
     "exact_match", 
-    reference_data_path="/path/to/test_suite_data_custom__columns.csv",
+    reference_data_path="/path/to/test_suite_data_custom_columns.csv",
     input_column="my_input",
     reference_column="baseline_output"
 )
@@ -176,7 +166,7 @@ test_suite.run(
     candidate_column="gpt35_output"
 ```
 
-#### HuggingFace dataset -> DataFrame -> test suite
+### HuggingFace dataset -> `DataFrame` -> `TestSuite`
 
 Here we create a small question-answering test suite from the Dolly dataset downloaded from HuggingFace. We set up the test suite to use BERTScore to measure similarity between candidate answers and reference answers
 
