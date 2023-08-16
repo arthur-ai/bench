@@ -1,13 +1,21 @@
 # Setup
 
 ## Package installation
-First [download](https://github.com/arthur-ai/bench/releases) the tar file from the Github releases. Next install the package to your python environment.
 
-Install Bench with optional dependencies for serving results locally (recommended):  
-`pip install --find-links=./path_to_tar_file 'arthur-bench[server]'`
+[Download](https://github.com/arthur-ai/bench/releases) the tar file from the Github releases. 
 
-Install Bench with minimum dependencies:
-`pip install --find-links=./path_to_tar_file 'arthur-bench'`
+Create a directory to place your downloaded `.tar` file and all your future bench testing data
+
+```
+# place your downloaded .tar file here
+mkdir "bench_working_dir"
+```
+
+Now, install Bench to your python environment with optional dependencies for serving results locally (recommended):  
+`pip install --find-links="bench_working_dir/" 'arthur-bench[server]'`
+
+Alternatively, install Bench to your python environment with minimum dependencies:
+`pip install --find-links="bench_working_dir/" 'arthur-bench'`
 
 ## Choosing Local vs SaaS:
 
@@ -28,23 +36,21 @@ To launch the local UI, run `bench` from the command line. You will see a url fo
 Running these commands will create a working directory to view example test suites from our github repo in the bench UI.
 
 ```
-# create a standalone working directory for bench examples and future test runs
-mkdir "bench_working_dir"
-cd bench_working_dir
-
- # clone the bench repo
+# clone the bench repo
 git clone https://github.com/arthur-ai/bench.git
 
 # checkout to the docs-cleanup branch
 cd bench
-git checkout docs-cleanup
+git checkout docs-cleanup # TODO: DELETE ONCE WE ARE MERGED INTO MAIN
 
-# navigate to the examples folder with the test run data
-cd examples 
+# tell the local UI where to 
+export BENCH_FILE_DIR="./examples/bench_runs/"
 
 # launch the UI
 bench
 ```
+
+When you want to view the local UI for your own test suites going forward, make sure your `BENCH_FILE_DIR` environment variable is configured to point to the location of your new test runs.
 
 ## SaaS (Coming Soon!)
 

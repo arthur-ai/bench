@@ -33,5 +33,16 @@ suite.run('quickstart_run', candidate_output_list=["1932", "up is the opposite o
 You should now have logged test case results with scores of 1.0 and 0.0, respectively.
 
 ## View results in local UI
-Run `bench` from the command line to launch the local UI and explore the test results.
+
+First set the BENCH_FILE_DIR to point to the local directory where your test results have been saved
+
+```
+export BENCH_FILE_DIR="./"
+```
+
+Now run `bench` from the command line to launch the local UI and explore the test results.
+
+```
+bench
+```
 
