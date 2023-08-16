@@ -18,7 +18,7 @@ If you have encounted a need for any of the following in your LLM work, then Ben
 
 4. `pip`-install the package
 
-For further setup instructions visit our [installation guide](docs/setup.md)
+For further setup instructions visit our [installation guide](docs/source/setup.md)
 
 ## Using Bench
 
