@@ -15,7 +15,6 @@ from tests.fixtures.mock_requests import MOCK_SUITE, MOCK_SUITE_CUSTOM, MOCK_RUN
 from tests.fixtures.mock_responses import (
     MOCK_SUITE_RESPONSE_WITH_PAGES,
     MOCK_SUITE_CUSTOM_RESPONSE_WITH_PAGES,
-    MOCK_SUITE_WITH_SCORING_CONFIG,
 )
 from tests.fixtures.mock_data import (
     MOCK_DATAFRAME,
@@ -129,7 +128,7 @@ def mock_load_scoring():
 )
 def test_create_test_suite(params, expected, mock_client):
     suite = TestSuite(client=mock_client, **params)
-    suite.client.get_test_suites.assert_called_once_with(name=params["name"])
+    suite.client.get_suite_if_exists.assert_called_once_with(name=params["name"])
     suite.client.create_test_suite.assert_called_once()
     _, args, _ = suite.client.create_test_suite.mock_calls[0]
     assert_test_suite_equal(args[0], expected, check_page=False)
@@ -152,11 +151,8 @@ def test_create_test_suite(params, expected, mock_client):
 def test_reload_test_suite(params, found_model):
     mock_client = get_mock_client(suite_exists=True, mock_suite=found_model)
     suite = TestSuite(client=mock_client, **params)
-    suite.client.get_test_suites.assert_called_once_with(name=params["name"])
+    suite.client.get_suite_if_exists.assert_called_once_with(name=params["name"])
     suite.client.create_test_suite.assert_not_called()
-    suite.client.get_test_suite.assert_called_with(
-        "8b7ba080-8d14-42d2-9250-ec0edb96abd7", page_size=100
-    )
     assert_test_suite_equal(suite.suite, found_model)
     assert suite.scorer is not None
 
