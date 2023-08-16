@@ -2,20 +2,19 @@
 
 ## Package installation
 
-[Download](https://github.com/arthur-ai/bench/releases) the tar file from the Github releases. 
+1. [Download](https://github.com/arthur-ai/bench/releases) the `.tar` file from the Github releases. 
 
-Create a directory to place your downloaded `.tar` file and all your future bench testing data
+2. Create or activate the python environment within whcih you would like run Arthur Bench.
 
-```
-# place your downloaded .tar file here
-mkdir "bench_working_dir"
-```
+3. Navigate to the directory with the downloaded bench `.tar` file.
 
-Now, install Bench to your python environment with optional dependencies for serving results locally (recommended):  
-`pip install --find-links="bench_working_dir/" 'arthur-bench[server]'`
+4. `pip`-install the package
+
+Install Bench to your python environment with optional dependencies for serving results locally (recommended):  
+`pip install --find-links="./" 'arthur-bench[server]'`
 
 Alternatively, install Bench to your python environment with minimum dependencies:
-`pip install --find-links="bench_working_dir/" 'arthur-bench'`
+`pip install --find-links="./" 'arthur-bench'`
 
 ## Choosing Local vs SaaS:
 
@@ -29,11 +28,9 @@ Bench has two options for tracking datasets and results:
 
 Bench spins up a local UI (like [tensorboard](https://www.tensorflow.org/tensorboard)) to provide a visual interface for your test data. 
 
-To launch the local UI, run `bench` from the command line. You will see a url for a local server that you can copy and paste into your browser to navigate the UI. The only setup required is to configure the environment variable `BENCH_FILE_DIR`, which defaults to `./bench_runs` relative to whichever directory you are running the `bench` command from.
-
 ### View Examples
 
-Running these commands will create a working directory to view example test suites from our github repo in the bench UI.
+Running these commands will view launch the bench UI locally ot view the example test suites from the Arthur Bench github rep.
 
 ```
 # clone the bench repo
@@ -43,18 +40,19 @@ git clone https://github.com/arthur-ai/bench.git
 cd bench
 git checkout docs-cleanup # TODO: DELETE ONCE WE ARE MERGED INTO MAIN
 
-# tell the local UI where to 
+# set the BENCH_FILE_DIR environment variable to point to the example test suite data
 export BENCH_FILE_DIR="./examples/bench_runs/"
 
-# launch the UI
+# launch the bench UI
 bench
 ```
+You will see a url for a local server that you can copy and paste into your browser to navigate the UI.
 
 Viewing examples in the bench UI will look something like this:
 <p align="center">
 <img src="./_static/img/Bench_UI_Screenshot.png" alt="Examples UI" width="750"/>
 
-When you want to view the local UI for your own test suites going forward, make sure your `BENCH_FILE_DIR` environment variable is configured to point to the location of your new test runs.
+When you want to view the local UI for your own test suites going forward, make sure your `BENCH_FILE_DIR` environment variable is configured to point to the location of your new test runs, and run `bench` from the command line.
 
 ## SaaS (Coming Soon!)
 
