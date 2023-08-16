@@ -31,6 +31,7 @@ const RunDistributions = ({ summaries, total }: Props) => {
 
     return (
         <LineChart
+            id={params.testSuiteId}
             graphData={values}
             showLegend
             height={'300px'}

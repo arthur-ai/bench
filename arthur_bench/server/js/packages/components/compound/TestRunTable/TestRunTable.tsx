@@ -85,6 +85,7 @@ const TestRunTable = (props: TTableProps) => {
                                     column={column}
                                     selectedSort={selectedSort}
                                     setSelectedSort={setSelectedSort}
+                                    key={column.name}
                                 />
                             ))}
                         </TableHeader>
@@ -92,7 +93,7 @@ const TestRunTable = (props: TTableProps) => {
                             <TestRunRow
                                 testRun={run}
                                 testSuiteId={testSuiteId}
-                                key={testSuiteId}
+                                key={run.id}
                             />
                         ))}
                     </Table>

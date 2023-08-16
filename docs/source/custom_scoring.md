@@ -43,13 +43,16 @@ class ScoringMethod(ABC):
 ```
 To create a custom scorer, we will implement the `name` and `run_batch` methods, and optionally override the `requires_reference` method if our scoring method doesn't require reference or target data.
 
-In the below example we create a custom scorer to check for repetition in a model generation.
 ```python
 from nltk import trigrams
 
 from arthur_bench.scoring import ScoringMethod
 
 class TrigramRepetition(ScoringMethod):
+
+    def __init__(self, threshold: int = 5):
+        self.threshold = threshold
+    
     @staticmethod
     def name() -> str:
         return "trigram_repetition"
@@ -71,7 +74,7 @@ class TrigramRepetition(ScoringMethod):
                 else:
                     counts[tri] = 1
             max_repeat = max(counts.values())
-            repeat_scores.append(float(max_repeat < 5))
+            repeat_scores.append(float(max_repeat < self.threshold))
         return repeat_scores
 ```
 
@@ -91,7 +94,7 @@ Now that we've loaded in our custom scoring method, our test suite can be run as
 
 ```python
 run = repetition_test.run('test_run', candidate_output_list=['a great summary with no repetition!', 'a bad summary that repeats summary that repeats summary that repeats summary that repeats'])
-print(run.test_case_outputs)
+print(run.test_cases)
 ```
 
 ```python
@@ -99,3 +102,4 @@ print(run.test_case_outputs)
 ```
 
 If you think you've got a useful scoring method, please consider [contributing](contributing.md)!
+

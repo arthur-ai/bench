@@ -18,7 +18,6 @@ from arthur_bench.run.testrun import TestRun
 from arthur_bench.run.utils import (
     _load_suite_from_args,
     _load_run_data_from_args,
-    _get_suite_if_exists,
     _initialize_scoring_method,
 )
 
@@ -61,7 +60,7 @@ class TestSuite:
         if client is None:
             client = _get_bench_client()
         self.client = client
-        suite = _get_suite_if_exists(self.client, name)
+        suite = client.get_suite_if_exists(name=name)
         self.scorer: ScoringMethod
 
         if suite is None:
@@ -78,7 +77,7 @@ class TestSuite:
             method_meta = ScoringMethodMetadata(
                 name=self.scorer.name(),
                 type=self.scorer.type(),
-                config=self.scorer.to_dict(),
+                config=self.scorer.to_dict(warn=True),
             )
             new_suite = TestSuiteRequest(
                 name=name,
@@ -99,6 +98,8 @@ class TestSuite:
                     raise UserValueError(
                         "cannot reference custom scoring method by string. please provide instantiated scoring method"
                     )
+
+                self.scorer = scoring_method
                 if self.scorer.name() != self.suite.scoring_method.name:
                     raise UserValueError(
                         f"Test suite was originally created with scoring method: {self.suite.scoring_method.name} \
@@ -108,7 +109,6 @@ class TestSuite:
                     logger.warning(
                         "scoring method configuration has changed from test suite creation."
                     )
-                self.scorer = scoring_method
             else:
                 self.scorer = _initialize_scoring_method(
                     self.suite.scoring_method.name, self.suite.scoring_method.config
@@ -149,6 +149,14 @@ class TestSuite:
         :param prompt_template: prompt template name used to generate outputs
         :returns: TestRun object containing scored outputs
         """
+
+        # make sure no existing test run named run_name is already attached to this suite
+        if self.client.check_run_exists(str(self.suite.id), run_name):
+            raise UserValueError(
+                f"A test run with the name {run_name} already exists. "
+                "Give this test run a unique name and re-run."
+            )
+
         candidate_output_list, context_list = _load_run_data_from_args(
             candidate_data=candidate_data,
             candidate_data_path=candidate_data_path,

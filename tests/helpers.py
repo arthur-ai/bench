@@ -47,15 +47,18 @@ def assert_test_run_equal(test_run: CreateRunRequest, test_run_other: CreateRunR
     assert test_run.foundation_model == test_run_other.foundation_model
 
 
-def get_mock_client(suite_exists=False):
+def get_mock_client(suite_exists=False, mock_suite=MOCK_SUITE_RESPONSE_WITH_PAGES):
     client = Mock(spec=BenchClient)
     client.create_test_suite.return_value = MOCK_SUITE_RESPONSE
     client.create_new_test_run.return_value = uuid.uuid4()
+    client.check_run_exists.return_value = False
     if not suite_exists:
         client.get_test_suites.return_value = MOCK_NO_SUITES
+        client.get_suite_if_exists.return_value = None
     else:
+        client.get_suite_if_exists.return_value = mock_suite
         client.get_test_suites.return_value = MOCK_SUITES
-        client.get_test_suite.return_value = MOCK_SUITE_RESPONSE_WITH_PAGES
+        client.get_test_suite.return_value = mock_suite
         client.get_runs_for_test_suite.return_value = MOCK_RUNS_RESPONSE
         client.get_summary_statistics.return_value = MOCK_SUMMARY_RESPONSE
         client.get_test_run.return_value = MOCK_RUN_RESPONSE
