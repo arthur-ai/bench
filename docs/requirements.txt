@@ -17,4 +17,4 @@ requests_toolbelt~=1.0.0
 textstat~=0.7.3
 tiktoken~=0.4.0
 transformers==4.29.2
-wordfreq~=3.0.
+wordfreq~=3.0.3
