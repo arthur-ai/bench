@@ -7,7 +7,8 @@ from arthur_bench import __version__
 from arthur_bench.models.models import (
     TestCaseRequest,
 )
-from arthur_bench.client.exceptions import UserValueError
+from arthur_bench.exceptions import UserValueError, ArthurInternalError
+from arthur_bench.client.bench_client import BenchClient
 from arthur_bench.scoring import Scorer, scorer_from_string
 
 from arthur_bench.utils.loaders import (

@@ -10,7 +10,7 @@ from arthur_bench.models.models import (
     ScoringMethodType,
     TestCaseResponse,
 )
-from arthur_bench.client.exceptions import (
+from arthur_bench.exceptions import (
     UserValueError,
     ArthurInternalError,
 )

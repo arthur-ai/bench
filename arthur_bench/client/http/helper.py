@@ -1,7 +1,7 @@
 import logging
 from urllib.parse import urlparse
 
-from arthur_bench.client.exceptions import UserValueError
+from arthur_bench.exceptions import UserValueError
 
 
 logger = logging.getLogger(__name__)
@@ -20,7 +20,7 @@ def construct_url(*parts: str, validate=True, default_https=True) -> str:
     :return: a fully joined url, with NO trailing slash
     """
     # join parts
-    url = '/'.join(s.strip('/') for s in parts)
+    url = "/".join(s.strip("/") for s in parts)
 
     # add scheme
     parsed_url = urlparse(url)
@@ -33,9 +33,15 @@ def construct_url(*parts: str, validate=True, default_https=True) -> str:
             raise UserValueError(f"No scheme provided in URL {url}")
 
     # validate
-    if validate and (parsed_url.scheme is None or parsed_url.scheme == ""
-                     or parsed_url.netloc is None or parsed_url.netloc == ""):
+    if validate and (
+        parsed_url.scheme is None
+        or parsed_url.scheme == ""
+        or parsed_url.netloc is None
+        or parsed_url.netloc == ""
+    ):
         joiner = "', '"
-        raise UserValueError(f"Invalid url, cannot construct URL from parts '{joiner.join(parts)}'")
+        raise UserValueError(
+            f"Invalid url, cannot construct URL from parts '{joiner.join(parts)}'"
+        )
 
     return url

@@ -5,7 +5,7 @@ os.environ[
     "HF_ALLOW_CODE_EVAL"
 ] = "1"  # required for executing code using the HuggingFace code_eval metric
 from typing import List, Optional
-from arthur_bench.client.exceptions import UserValueError
+from arthur_bench.exceptions import UserValueError
 from arthur_bench.scoring import Scorer
 from arthur_bench.scoring.scorer import SINGLE_ITEM_BATCH_DEFAULT
 from tqdm import tqdm

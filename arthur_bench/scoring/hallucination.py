@@ -1,7 +1,7 @@
 from typing import List, Optional
 from arthur_bench.scoring import Scorer
 from arthur_bench.client.rest.client import ArthurClient
-from arthur_bench.client.exceptions import ArthurUserError
+from arthur_bench.exceptions import ArthurUserError
 from arthur_bench.models.scoring import HallucinationScoreRequest
 
 

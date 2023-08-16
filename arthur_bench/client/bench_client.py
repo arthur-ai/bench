@@ -12,7 +12,7 @@ from arthur_bench.models.models import (
     TestSuiteSummary,
 )
 
-from arthur_bench.client.exceptions import ArthurInternalError
+from arthur_bench.exceptions import ArthurInternalError
 
 TBenchClient = TypeVar("TBenchClient", bound="BenchClient")
 

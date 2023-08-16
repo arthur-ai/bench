@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from arthur_bench.client.exceptions import UserTypeError
+from arthur_bench.exceptions import UserTypeError
 from arthur_bench.scoring import Scorer
 
 

@@ -9,8 +9,8 @@ from langchain.prompts.chat import (
     HumanMessagePromptTemplate,
 )
 
+from arthur_bench.exceptions import UserValueError
 from arthur_bench.scoring import Scorer
-from arthur_bench.client.exceptions import UserValueError
 
 system_message_prompt = SystemMessagePromptTemplate.from_template(
     """Given the following context (extracted parts of a long document), a question, and an answer, decide if the final answer is correct.

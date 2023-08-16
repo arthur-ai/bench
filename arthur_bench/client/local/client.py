@@ -11,7 +11,7 @@ from dataclasses import dataclass
 import uuid
 from pathlib import Path
 from arthur_bench.client.bench_client import BenchClient
-from arthur_bench.client.exceptions import NotFoundError, ArthurError, UserValueError
+from arthur_bench.exceptions import NotFoundError, ArthurError, UserValueError
 from arthur_bench.models.models import (
     CreateRunRequest,
     CreateRunResponse,

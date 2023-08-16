@@ -12,7 +12,8 @@ from .word_count_match import WordCountMatch
 from .specificity import Specificity
 from .hedging_language import HedgingLanguage
 from .python_unit_testing import PythonUnitTesting
-from ..client.exceptions import UserValueError
+from arthur_bench.exceptions import UserValueError
+
 
 
 class ScoringMethodName(str, Enum):
