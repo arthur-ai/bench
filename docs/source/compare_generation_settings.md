@@ -1,10 +1,10 @@
-## Compare Generation Settings
+# Compare Generation Settings
 
 In this guide we compare LLM-generated answers to questions using different temperature settings. Higher temperature improves creativity and diversity of answers, but increases the likelihood that responses veer into nonsense.
 
 We use a custom scorer that compares each LLM temperature setting based on how many typos each response contains
 
-### Environment setup
+## Environment setup
 
 In this guide, we use the OpenAI API and use the `pyspellchecker` package for a custom scoring method
 ```
@@ -12,7 +12,7 @@ export OPENAI_API_KEY="sk-..."
 pip install pyspellchecker
 ```
 
-### Data setup
+## Data preparation
 
 We write out some basic questions which we will use to test how much temperature impacts the responses
 
@@ -20,7 +20,7 @@ We write out some basic questions which we will use to test how much temperature
 inputs = ["What planet are we on?", "What time is it?", "What day is it?", "What is love?"]
 ```
 
-### LLM response generation
+## LLM response generation
 
 We use different temperature settings to generate three different lists of responses:
 
@@ -37,7 +37,7 @@ med_temp_responses = [chatgpt_med_temp.predict(x) for x in inputs]
 high_temp_responses = [chatgpt_high_temp.predict(x) for x in inputs]
 ```
 
-### Make test suite
+## Create test suite
 
 For this test suite, we want to measure how corrupted the responses get as we increase the generation temperature.
 
@@ -80,23 +80,23 @@ class CustomSpellingScore(ScoringMethod):
 			# custom score is 1/(2^num_typos)
 			res.append(1.0 / (2**num_typos))
 		return res
-```
 
-Creating and running our custom test suite on the different temperature settings:
-
-```python
 my_suite = TestSuite(
 	"test-spelling", 
 	CustomSpellingScore(), 
     input_text_list=inputs,
 	reference_output_list=baseline_responses
 )
+```
 
+## Run test suite
+
+```python
 my_suite.run("low_temp_responses", candidate_output_list=low_temp_responses)
 my_suite.run("med_temp_responses", candidate_output_list=med_temp_responses)
 my_suite.run("high_temp_responses", candidate_output_list=high_temp_responses)
 ```
 
-### View results
+## View results
 
 Run `bench` from your command line to visualize the run results comparing the different temperature settings.
