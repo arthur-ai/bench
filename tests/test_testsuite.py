@@ -151,7 +151,7 @@ def test_reload_test_suite(params, found_model):
     suite = TestSuite(client=mock_client, **params)
     suite.client.get_suite_if_exists.assert_called_once_with(name=params["name"])
     suite.client.create_test_suite.assert_not_called()
-    assert_test_suite_equal(suite.suite, found_model)
+    assert_test_suite_equal(suite._data, found_model)
     assert suite.scorer is not None
 
 

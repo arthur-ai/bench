@@ -8,6 +8,7 @@ from arthur_bench.models.models import (
     TestCaseOutput,
     ScoringMethod,
     ScoringMethodType,
+    TestCaseResponse,
 )
 from arthur_bench.client.exceptions import (
     UserValueError,
@@ -56,7 +57,7 @@ class TestSuite:
         reference_output_list: Optional[List[str]] = None,
         client: Optional[BenchClient] = None,
     ):
-        self.suite: PaginatedTestSuite
+        self._data: PaginatedTestSuite
         if client is None:
             client = _get_bench_client()
         self.client = client
@@ -85,34 +86,58 @@ class TestSuite:
                 description=description,
                 test_cases=cases,
             )
-            self.suite = self.client.create_test_suite(new_suite)
+            self._data = self.client.create_test_suite(new_suite)
 
         else:
             logger.info(
                 f"Found existing test suite with name {name}. Using existing suite"
             )
 
-            self.suite = suite
-            if self.suite.scoring_method.type == ScoringMethodType.Custom:
+            self._data = suite
+            if self._data.scoring_method.type == ScoringMethodType.Custom:
                 if isinstance(scoring_method, str):
                     raise UserValueError(
                         "cannot reference custom scoring method by string. please provide instantiated scoring method"
                     )
 
                 self.scorer = scoring_method
-                if self.scorer.name() != self.suite.scoring_method.name:
+                if self.scorer.name() != self._data.scoring_method.name:
                     raise UserValueError(
-                        f"Test suite was originally created with scoring method: {self.suite.scoring_method.name} \
+                        f"Test suite was originally created with scoring method: {self._data.scoring_method.name} \
 			  			but provided scoring method has name: {scoring_method.name()}"
                     )
-                if self.scorer.to_dict() != self.suite.scoring_method.config:
+                if self.scorer.to_dict() != self._data.scoring_method.config:
                     logger.warning(
                         "scoring method configuration has changed from test suite creation."
                     )
             else:
                 self.scorer = _initialize_scorer(
-                    self.suite.scoring_method.name, self.suite.scoring_method.config
+                    self._data.scoring_method.name, self._data.scoring_method.config
                 )
+
+    @property
+    def name(self) -> str:
+        return self._data.name
+
+    @property
+    def description(self) -> Optional[str]:
+        return self._data.description
+
+    @property
+    def test_cases(self) -> List[TestCaseResponse]:
+        return self._data.test_cases
+
+    @property
+    def input_texts(self) -> List[str]:
+        return [case.input for case in self._data.test_cases]
+
+    @property
+    def reference_outputs(self) -> List[Optional[str]]:
+        return [case.reference_output for case in self._data.test_cases]
+
+    @property
+    def scoring_method(self) -> str:
+        return self.scorer.name()
 
     def run(
         self,
@@ -151,7 +176,7 @@ class TestSuite:
         """
 
         # make sure no existing test run named run_name is already attached to this suite
-        if self.client.check_run_exists(str(self.suite.id), run_name):
+        if self.client.check_run_exists(str(self._data.id), run_name):
             raise UserValueError(
                 f"A test run with the name {run_name} already exists. "
                 "Give this test run a unique name and re-run."
@@ -166,17 +191,17 @@ class TestSuite:
             context_list=context_list,
         )
 
-        if len(candidate_output_list) != len(self.suite.test_cases):
+        if len(candidate_output_list) != len(self.test_cases):
             raise UserValueError(
-                f"candidate data has {len(candidate_output_list)} tests but expected {len(self.suite.test_cases)} tests"
+                f"candidate data has {len(candidate_output_list)} tests but expected {len(self.test_cases)} tests"
             )
 
-        inputs = [case.input for case in self.suite.test_cases]
-        ids = [case.id for case in self.suite.test_cases]
+        inputs = self.input_texts
+        ids = [case.id for case in self.test_cases]
         # ref outputs should be None if any items are None (we validate nullness must be all-or-none)
         ref_outputs: Optional[List[str]] = []
         if ref_outputs is not None:
-            for case in self.suite.test_cases:
+            for case in self.test_cases:
                 if case.reference_output is None:
                     ref_outputs = None
                     break
@@ -206,7 +231,7 @@ class TestSuite:
             model_version=model_version,
             foundation_model=foundation_model,
             prompt_template=prompt_template,
-            test_suite_id=self.suite.id,
+            test_suite_id=self._data.id,
             client=self.client,
         )
 
@@ -218,4 +243,4 @@ class TestSuite:
     def save(self):
         """Save a test suite to local file system."""
         suite_file = self._test_suite_dir / "suite.json"
-        suite_file.write_text(self.suite.json())
+        suite_file.write_text(self._data.json())
