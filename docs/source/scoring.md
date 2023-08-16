@@ -4,56 +4,22 @@ A **Scoring Method** is the criteria used to quantitatively evaluate LLM outputs
 
 Here is a list of all the scoring methods available by default in Arthur Bench (listed alphabetically):
 
-| Scoring Method                    | Tasks | Requirements |
-|-----------------------------------|-----|-----|
-| BERT Score (`bertscore`)          | any | Reference Output, Candidate Output|
-| Exact Match (`exact_match`)       | any | Reference Output, Candidate Output|
-| Hedging Language (`hedging_language`)   | any | Candidate Output |
-| Python Unit Testing (`python_unit_testing`)   | Python Generation | Candidate Output, Unit Tests (see the [code eval guide](code_eval.md)) |
-| QA Correctness (`qa_correctness`) | Question-Answering| Input, Candidate Output, Context|
-| Readability (`readability`)       | any | Candidate Output |
-| Specificity (`specificity`)       | any | Candidate Output |
-| Summary Quality (`summary_quality`)  | Summarization | Input, Reference Output, Candidate Output|
-| Word Count Match (`word_count_match`)   | any | Reference Output, Candidate Output |
+| Scoring Method                    | Tasks | Type | Requirements | 
+|-----------------------------------|-----|-----|-----|
+| BERT Score (`bertscore`)          | any |  Embedding-Based | Reference Output, Candidate Output|
+| Exact Match (`exact_match`)       | any | Lexicon-Based | Reference Output, Candidate Output|
+| Hedging Language (`hedging_language`)   | any | Embedding-Based | Candidate Output |
+| Python Unit Testing (`python_unit_testing`)   | Python Generation | Code Evaluator| Candidate Output, Unit Tests (see the [code eval guide](code_eval.md)) |
+| QA Correctness (`qa_correctness`) | Question-Answering| Prompt-Based | Input, Candidate Output, Context|
+| Readability (`readability`)       | any | Lexicon-Based | Candidate Output |
+| Specificity (`specificity`)       | any | Lexicon-Based | Candidate Output |
+| Summary Quality (`summary_quality`)  | Summarization |Prompt-Based  | Input, Reference Output, Candidate Output|
+| Word Count Match (`word_count_match`)   | any |Lexicon-Based | Reference Output, Candidate Output |
 
 
-For better understandability we have broken down the scorers by the type of procedure each scorer uses
+For better understandability we have broken down the Scorers based on the type of procedure each Scorer uses.
 
-### Scoring methods that use prompting
-
-| Scoring Method                    | Tasks | Requirements |
-|-----------------------------------|-----|-----|
-| QA Correctness (`qa_correctness`) | Question-Answering| Input, Candidate Output, Context|
-| Summary Quality (`summary_quality`)  | Summarization | Input, Reference Output, Candidate Output|
-
-### Scoring methods that use embedding-similarity
-
-| Scoring Method                    | Tasks | Requirements |
-|-----------------------------------|-----|-----|
-| BERT Score (`bertscore`)          | any | Reference Output, Candidate Output|
-| Hedging Language (`hedging_language`)   | any | Candidate Output |
-
-### Scoring methods that use word presence, frequency, & complexity
-
-| Scoring Method                    | Tasks | Requirements |
-|-----------------------------------|-----|-----|
-| Exact Match (`exact_match`)       | any | Reference Output, Candidate Output|
-| Readability (`readability`)       | any | Candidate Output |
-| Specificity (`specificity`)       | any | Candidate Output |
-| Word Count Match (`word_count_match`)   | any | Reference Output, Candidate Output |
-
-### Scoring methods that evaluate code
-
-| Scoring Method                    | Tasks | Requirements |
-|-----------------------------------|-----|-----|
-| Python Unit Testing (`python_unit_testing`)   | Python Generation | Candidate Output, Unit Tests (see the [code eval guide](code_eval.md)) |
-
-
-For a walkthrough on how to extend the ScoringMethod class to create your own scorer specialized to your data and/or use-case to use with Arthur Bench, check out the [custom scoring guide](custom_scoring.md)
-
-If you would like to contribute scoring methods to the open source Arthur Bench repo, check out our [contributing guide](contributing.md)
-
-### Scoring methods that use prompting
+### Prompt-Based Scoring Methods
 
 #### `qa_correctness`
 
@@ -63,7 +29,7 @@ The QA correctness scorer evaluates the correctness of an answer, given a questi
 
 The Summary Quality scorer evaluates a summary against its source text and a reference summary for comparison. It evaluates summaries on dimensions including relevance and syntax. Each row of the test run will receive a binary 0, indicating that the reference output was scored higher than the candidate output, or 1, indicating that the candidate output was scored higher than the reference output.
 
-### Scoring methods that use embedding-similarity
+### Embedding-Based Scoring Methods
 
 #### `bertscore`
 
@@ -73,7 +39,7 @@ The Summary Quality scorer evaluates a summary against its source text and a ref
 
 The Hedging Language scoring method evaluates whether a candidate response is similar to generic hedging language used by an LLM ("As an AI language model, I don't have personal opinions, emotions, or beliefs"). Each row of the Test Run will receive a binary 0, indicating hedging language *not* used, or 1, indicating hedging language used. These binary values are determined based on the BERTScore between the candidate response and the hedging language - if the similarity is below a threshold, the score is 0, and otherwise if the similarity is above the threshold, the score is 1. The threshold we use by default with this scorer is calibrated to the empirical distribution of BERTScore on hedging language overall.
 
-### Scoring methods that use word presence, frequency, & complexity
+### Lexicon-Based Scoring Methods
 
 #### `exact_match`
 
@@ -91,8 +57,15 @@ The Specificity scorer outputs a score of 0 to 1, where smaller values correspon
 
 For scenarios where there is a preferred output length, `word_count_match` calculates a corresponding score on the scale of 0 to 1. Specifically, this scoring method calculates how similar the number of words in the candidate output is to the number of words in the reference output, where a score of 1.0 indicates that there are the same number of words in the candidate output as in the reference output. Scores less than 1.0 are calculated as ((len_reference-delta)/len_reference) where delta is the absolute difference in word lengths between the candidate and reference outputs. All negative computed values are truncated to 0. 
 
-### Scoring methods that evaluate code
+### Code Evaluators
 
 #### `python_unit_testing`
 
 The Python Unit Testing scorer evaluates candidate solutions to coding tasks against unit tests. This scoring method wraps the [`code_eval`](https://huggingface.co/spaces/evaluate-metric/code_eval) evaluator interface from HuggingFace. It is important to note that this function requires that solution code uses standard python libraries only.
+
+
+
+
+For a walkthrough on how to extend the ScoringMethod class to create your own scorer specialized to your data and/or use-case to use with Arthur Bench, check out the [custom scoring guide](custom_scoring.md)
+
+If you would like to contribute scoring methods to the open source Arthur Bench repo, check out our [contributing guide](contributing.md)
