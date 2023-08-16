@@ -12,9 +12,13 @@ Public datasets on HuggingFace like the [Dolly dataset](https://huggingface.co/d
 
 When no baseline examples easily exist for the inputs you want to evaluate LLM performance on, you can use an existing LLM to generate a good enough set of baseline outputs for the task.
 
-For example, for our summarization test suite, we were able to generate a good enough baseline using we (TODO LINK)
-
 ### Paths to create a test suite
+
+No matter how you prepare your data for a test suite, you use the common interface provided by importing the `TestSuite` class:
+
+```python
+from arthur_bench.run.testsuite import TestSuite
+```
 
 #### strings in memory -> test suite
 
@@ -32,25 +36,19 @@ suite.run('quickstart_run', candidate_output_list=["1932", "up is the opposite o
 This path also allows you to test LLM responses from an API and then pass the responses into a test suite as a set of baseline reference outputs and/or as a run of candidate outputs. For example, you can use `gpt-4` outputs as a baseline for a test suite, and then run `gpt-3.5-turbo` as a candidate to see how it compares.
 
 ```python
-import openai
-def openai_response(input_text, model):
-    return openai.ChatCompletion.create(
-        model=model, 
-        max_tokens=30,
-        messages=[
-            {"role" : "system", "content" : "You are a helpful assistant."},
-            {"role" : "user", "content" : input_text}
-        ])['choices'][0]['message']['content']
+from langchain.chat_models import ChatOpenAI
+gpt35 = ChatOpenAI()
+gpt4 = ChatOpenAI(model_name="gpt-4")
 
 inputs = ["What year was FDR elected?", "What is the opposite of down?"]
-baseline_outputs = [openai_response(x, "gpt-4") for x in inputs]
+baseline_outputs = [gpt4.predict(x) for x in inputs]
+candidate_outputs = [gpt35.predict(x) for x in inputs]
+
 suite = TestSuite(
     'bench_llm_quickstart', 
     input_text_list=inputs, 
     reference_output_list=baseline_outputs
 )
-
-candidate_outputs = [openai_response(x, "gpt-3.5-turbo") for x in inputs]
 suite.run('quickstart_llm_run', candidate_output_list=candidate_outputs)
 ```
 
