@@ -17,7 +17,7 @@ Install Bench with optional dependencies for serving results locally (recommende
 Install Bench with minimum dependencies:
 `pip install --find-links=./directory_with_tar_file 'arthur-bench'`
 
-For further setup instructions visit our [installation guide](docs/setup.md)
+For further setup instructions visit our [installation guide](docs/source/setup.md)
 
 ## Using Bench
 
