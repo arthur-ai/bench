@@ -208,7 +208,6 @@ class PaginatedRuns(BaseModel):
     Paginated list of runs for a test suite.
     """
 
-    test_suite_id: UUID
     test_runs: List[TestRunMetadata]
     page: int
     page_size: int

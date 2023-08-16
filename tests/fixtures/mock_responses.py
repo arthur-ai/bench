@@ -233,7 +233,6 @@ MOCK_RUNS_RESPONSE = PaginatedRuns(
             avg_score=0.8,
         )
     ],
-    test_suite_id="8b7ba080-8d14-42d2-9250-ec0edb96abd7",
     page=1,
     page_size=5,
     total_count=1,
@@ -384,7 +383,6 @@ MOCK_RUNS_RESPONSE_JSON = {
             "updated_at": "2023-06-22T21:56:03.346141",
         }
     ],
-    "test_suite_id": "8b7ba080-8d14-42d2-9250-ec0edb96abd7",
     "total_count": 1,
     "total_pages": 1,
 }
