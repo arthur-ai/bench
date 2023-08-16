@@ -87,9 +87,9 @@ print(run.scores)
 
 Test suites expect scoring method configurations to remain consistent from run to run, so that each runs scores can be compared and reliably tracked throughout time. Let's see what happens if we attempt to use this suite at a later time, but edit the underlying parameters.
 
-```
+```python
 scorer = TrigramRepetition(threshold=7)
-repetition_test = TestSuite('news_summary', scoring_method=scorer)
+repetition_test = TestSuite('custom_trigram_suite', scoring_method=scorer)
 ```
 
 We see the following warning:
