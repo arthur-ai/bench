@@ -5,8 +5,6 @@ from http import HTTPStatus
 from arthur_bench.client.http.requests import HTTPClient
 from arthur_bench.client.bench_client import BenchClient
 
-from arthur_bench.client.exceptions import ArthurUserError, MissingParameterError
-
 from arthur_bench.models.models import (
     PaginatedTestSuites,
     PaginatedRun,
@@ -295,7 +293,6 @@ class ArthurBenchClient(BenchClient):
     def score_hallucination(
         self, json_body: HallucinationScoreRequest
     ) -> HallucinationScoreResponse:
-
         parsed_resp = cast(
             Dict,
             self.http_client.post(
@@ -305,4 +302,3 @@ class ArthurBenchClient(BenchClient):
             ),
         )
         return HallucinationScoreResponse(**parsed_resp)
-    
