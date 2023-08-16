@@ -34,7 +34,8 @@ class ArthurBenchClient(BenchClient):
         """
         Create a new ArthurBenchClient from an HTTPClient
 
-        :param http_client: the :class:`~arthurai.client.http.requests.HTTPClient` to use for underlying requests
+        :param http_client: the :class:`~arthurai.client.http.requests.HTTPClient`
+            to use for underlying requests
         """
         self.http_client = http_client
         self.http_client.set_path_prefix(PATH_PREFIX)
@@ -73,7 +74,7 @@ class ArthurBenchClient(BenchClient):
         parsed_resp = cast(
             Dict,
             self.http_client.get(
-                f"/bench/test_suites",
+                "/bench/test_suites",
                 params=params,
                 validation_response_code=HTTPStatus.OK,
             ),
@@ -82,7 +83,8 @@ class ArthurBenchClient(BenchClient):
 
     def create_test_suite(self, json_body: TestSuiteRequest) -> PaginatedTestSuite:
         """
-        Creates a new test suite from reference data using specified scoring_method for scoring
+        Creates a new test suite from reference data using specified scoring_method for
+        scoring
 
         :param json_body:
         """
@@ -90,7 +92,7 @@ class ArthurBenchClient(BenchClient):
         parsed_resp = cast(
             Dict,
             self.http_client.post(
-                f"/bench/test_suites",
+                "/bench/test_suites",
                 json=json_body.json(
                     exclude={
                         "created_at": True,
@@ -296,7 +298,7 @@ class ArthurBenchClient(BenchClient):
         parsed_resp = cast(
             Dict,
             self.http_client.post(
-                f"/bench/scoring/hallucination",
+                "/bench/scoring/hallucination",
                 json=json_body.json(),
                 validation_response_code=HTTPStatus.CREATED,
             ),

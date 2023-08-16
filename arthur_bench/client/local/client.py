@@ -377,7 +377,7 @@ class LocalBenchClient(BenchClient):
         for f in run_files:
             run_obj = PaginatedRun.parse_file(f)
             avg_score = np.mean([o.score for o in run_obj.test_cases])
-            run_resp = TestRunMetadata(**run_obj.dict(), avg_score=avg_score)  # type: ignore
+            run_resp = TestRunMetadata(**run_obj.dict(), avg_score=avg_score)
             runs.append(run_resp)
 
         if sort is None:
@@ -456,10 +456,17 @@ class LocalBenchClient(BenchClient):
             cases = (
                 duckdb.sql(
                     f"SELECT * FROM ("
-                    f"SELECT test_cases.id, test_cases.input, test_cases.reference_output FROM ("
-                    f"SELECT unnest(test_cases) as test_cases from read_json_auto('{self.root_dir}/{test_suite_name}/suite.json', timestampformat='{TIMESTAMP_FORMAT}'))) "
-                    f"POSITIONAL JOIN (SELECT test_cases.output, test_cases.score FROM ("
-                    f"SELECT unnest(test_cases) as test_cases from read_json_auto('{self.root_dir}/{test_suite_name}/{run_name}/run.json',timestampformat='{TIMESTAMP_FORMAT}')))"
+                    f"SELECT test_cases.id, test_cases.input, "
+                    f"test_cases.reference_output FROM ("
+                    f"SELECT unnest(test_cases) as test_cases from "
+                    f"read_json_auto('{self.root_dir}/{test_suite_name}/suite.json', "
+                    f"timestampformat='{TIMESTAMP_FORMAT}'))) "
+                    f"POSITIONAL JOIN (SELECT test_cases.output, test_cases.score "
+                    f"FROM ("
+                    f"SELECT unnest(test_cases) as test_cases from "
+                    f"read_json_auto("
+                    f"'{self.root_dir}/{test_suite_name}/{run_name}/run.json',"
+                    f"timestampformat='{TIMESTAMP_FORMAT}')))"
                 )
                 .df()
                 .to_dict("records")

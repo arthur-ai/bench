@@ -1,3 +1,4 @@
+# flake8: noqa
 from evaluate import load
 import os
 
@@ -5,10 +6,11 @@ os.environ[
     "HF_ALLOW_CODE_EVAL"
 ] = "1"  # required for executing code using the HuggingFace code_eval metric
 from typing import List, Optional
+from tqdm import tqdm
+
 from arthur_bench.exceptions import UserValueError
 from arthur_bench.scoring import Scorer
 from arthur_bench.scoring.scorer import SINGLE_ITEM_BATCH_DEFAULT
-from tqdm import tqdm
 
 
 class PythonUnitTesting(Scorer):
@@ -17,7 +19,8 @@ class PythonUnitTesting(Scorer):
 
     Scores each candidate_output as a function against a pre-prepared unit test
 
-    Note: considers any code with non-standard python libraries (e.g. numpy) to have an error
+    Note: considers any code with non-standard python libraries (e.g. numpy) to have an
+    error
 
     https://huggingface.co/spaces/evaluate-metric/code_eval
     """
@@ -36,13 +39,16 @@ class PythonUnitTesting(Scorer):
                 ]
             except FileNotFoundError as e:
                 raise UserValueError(
-                    f"Unable to read unit test files from unit_test_dir {unit_test_dir}: "
+                    f"Unable to read unit test files from unit_test_dir "
+                    f"{unit_test_dir}: "
                 ) from e
         else:
             if unit_tests is None:
                 raise ValueError(
-                    "Must create a PythonUnitTesting scoring method with either a unit_test_dir parameter (to read unit tests from a file)"
-                    " or a unit_tests parameter directly (to read unit tests as a list of strings)"
+                    "Must create a PythonUnitTesting scoring method with either a "
+                    "unit_test_dir parameter (to read unit tests from a file)"
+                    " or a unit_tests parameter directly (to read unit tests as a list "
+                    "of strings)"
                 )
             self.unit_tests = unit_tests
 
@@ -81,5 +87,6 @@ class PythonUnitTesting(Scorer):
         context_batch: Optional[List[str]] = None,
     ) -> List[float]:
         raise NotImplementedError(
-            "run_batch is not implemented for this scorer. Use PythonUnitTesting.run(candidates) instead."
+            "run_batch is not implemented for this scorer. "
+            "Use PythonUnitTesting.run(candidates) instead."
         )

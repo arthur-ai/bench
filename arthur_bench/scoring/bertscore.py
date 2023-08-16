@@ -53,5 +53,6 @@ class BERTScore(Scorer):
         # get precision, recall, and F1 score from bert_score package
         p, r, _ = self.model.score(candidate_batch, reference_batch, verbose=False)
 
-        # return a BERTScore using our weighting of precision and recall (instead of F1 which weights them equally)
+        # return a BERTScore using our weighting of precision and recall (instead of F1
+        # which weights them equally)
         return (self.precision_weight * p + self.recall_weight * r).tolist()

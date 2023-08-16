@@ -71,8 +71,9 @@ class Scorer(ABC):
         batch_size: int = SINGLE_ITEM_BATCH_DEFAULT,
     ) -> List[float]:
         """
-        Score a set of test cases. This method doesn't need to be implemented in most cases, but can be overriden to
-        add additional functionality such as task-specific logging.
+        Score a set of test cases. This method doesn't need to be implemented in most
+        cases, but can be overriden to add additional functionality such as
+        task-specific logging.
 
         :param candidate_outputs: candidate generations to score
         :param reference_outputs: reference strings representing target outputs
@@ -120,8 +121,9 @@ class Scorer(ABC):
             if not _can_omit(arg) and arg.name not in config:
                 if warn:
                     logger.warning(
-                        f"scorer requires argument {arg} but argument is not included in json representation. "
-                        "this may effect test suite reloading, consider implementing custom to_dict and from_dict methods"
+                        f"scorer requires argument {arg} but argument is not included "
+                        "in json representation. this may effect test suite reloading, "
+                        "consider implementing custom to_dict and from_dict methods"
                     )
 
         jsonable_config = {}
@@ -130,11 +132,12 @@ class Scorer(ABC):
             try:
                 _ = json.dumps(val)
                 jsonable_config[key] = val
-            except TypeError as e:
+            except TypeError:
                 if warn:
                     logger.warning(
-                        f"not including attribute {key} in config as it is not json serializable. "
-                        "consider implementing custom to_dict and from_dict methods"
+                        f"not including attribute {key} in config as it is not json"
+                        "serializable. consider implementing custom to_dict and "
+                        "from_dict methods"
                     )
         return jsonable_config
 
@@ -156,8 +159,8 @@ class Scorer(ABC):
         """
         Supplies whether a scorer is built-in or custom.
 
-        This method is implemented by checking whether the Scorer class is part of the `arthur_bench.scoring`
-        module.
+        This method is implemented by checking whether the Scorer class is part of the
+        `arthur_bench.scoring` module.
         :return: the type (built-in or custom)
         """
         try:

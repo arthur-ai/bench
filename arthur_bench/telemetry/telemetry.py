@@ -1,3 +1,4 @@
+# flake8: noqa
 from amplitude import Amplitude, BaseEvent
 import uuid
 import os

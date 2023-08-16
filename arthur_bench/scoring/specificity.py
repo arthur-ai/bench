@@ -9,10 +9,12 @@ import re
 
 class Specificity(Scorer):
     """
-    Returns a score from 0.0 to 1.0 indicating how specific the candidate output language is. Higher scores indicate that the language is more specific,
+    Returns a score from 0.0 to 1.0 indicating how specific the candidate output
+    language is. Higher scores indicate that the language is more specific,
     Lower scores indicate more vague language.
 
-    Specificity is computed through detecting words that indicate vagueness (predefined), determing how rare the words used are according to word frequencies calculated by
+    Specificity is computed through detecting words that indicate vagueness (predefined)
+    determing how rare the words used are according to word frequencies calculated by
     popular nlp corpora, and detecting use of proper nouns and numbers.
     """
 
@@ -30,7 +32,8 @@ class Specificity(Scorer):
 
     def get_num_vague_words(self, candidate_output: str) -> int:
         """
-        Returns number of words in candidate_output which are is a list of pre-defined vague words.
+        Returns number of words in candidate_output which are is a list of pre-defined
+        vague words.
         """
         vague_word_list = [
             "around",
@@ -73,8 +76,10 @@ class Specificity(Scorer):
 
     def get_mean_word_freq(self, candidate_output: str) -> float:
         """
-        Returns mean word frequency of candidate output. Higher values indicate that moree common words on average are used in the candidate output.
-        Considers only words with frequency <0.001, truncating probability of words with higher frequencies to 0.001.
+        Returns mean word frequency of candidate output. Higher values indicate that
+        moree common words on average are used in the candidate output.
+        Considers only words with frequency <0.001, truncating probability of words with
+        higher frequencies to 0.001.
         """
         punct_regex = r"[^\w\s\'/]"
         # don't replace apostrophes

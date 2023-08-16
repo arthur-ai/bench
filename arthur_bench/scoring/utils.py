@@ -3,8 +3,8 @@ import logging
 
 class suppress_warnings:
     """
-    A context-manager class to temporarily set the logging level for a logger to ERROR before returning it
-    to its previous state.
+    A context-manager class to temporarily set the logging level for a logger to ERROR
+    before returning it to its previous state.
     """
 
     def __init__(self, logger_name: str):
