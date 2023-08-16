@@ -8,12 +8,12 @@
 
 3. Navigate to the directory with the downloaded bench `.tar` file.
 
-4. `pip`-install the package
+4. `pip`-install the package:
 
-Install Bench to your python environment with optional dependencies for serving results locally (recommended):  
+  - Install Bench to your python environment with optional dependencies for serving results locally (recommended):  
 `pip install --find-links="./" 'arthur-bench[server]'`
 
-Alternatively, install Bench to your python environment with minimum dependencies:
+  - Alternatively, install Bench to your python environment with minimum dependencies:
 `pip install --find-links="./" 'arthur-bench'`
 
 ## Choosing Local vs SaaS:
