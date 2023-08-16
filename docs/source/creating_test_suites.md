@@ -16,6 +16,12 @@ No matter how you prepare your data for a test suite, you use the common interfa
 from arthur_bench.run.testsuite import TestSuite
 ```
 
+You can provide data for your `TestSuite` via:
+1. [`List[str]`](#liststr---testsuite)
+2. [`pd.DataFrame`](#dataframe---testsuite)
+3. [CSV file](#csv---testsuite)
+4. [HuggingFace Dataset](#huggingface-dataset---dataframe---testsuite)
+
 ### `List[str]` -> `TestSuite`
 
 You can create and run a test suite by passing lists of strings directly as the test suite data:
