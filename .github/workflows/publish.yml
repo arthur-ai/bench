@@ -33,6 +33,8 @@ jobs:
     needs: build_frontend
     steps:
       - uses: actions/checkout@v3
+        with: # attempt to persist the build directory
+          clean: false
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
