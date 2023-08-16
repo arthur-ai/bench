@@ -2,7 +2,7 @@ import uuid
 from typing import Optional
 from arthur_bench.models.models import CreateRunRequest
 from arthur_bench.client.bench_client import BenchClient
-from arthur_bench.client.exceptions import ArthurUserError
+from arthur_bench.exceptions import ArthurUserError
 
 
 class TestRun(CreateRunRequest):

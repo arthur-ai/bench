@@ -5,7 +5,7 @@ import requests
 from arthur_bench.client.http.requests import HTTPClient
 from arthur_bench.client.rest.admin.client import ArthurAdminClient
 from arthur_bench.client.rest.admin.models import LoginRequest, AuthenticationInfo
-from arthur_bench.client.exceptions import (
+from arthur_bench.exceptions import (
     UserValueError,
     ForbiddenError,
     UnauthorizedError,

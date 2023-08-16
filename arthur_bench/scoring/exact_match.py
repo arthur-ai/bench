@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from arthur_bench.client.exceptions import UserTypeError
+from arthur_bench.exceptions import UserTypeError
 from arthur_bench.scoring import ScoringMethod
 
 
@@ -8,6 +8,7 @@ class ExactMatch(ScoringMethod):
     """
     Returns 1 if candidate matches reference, 0 if candidate does not match reference.
     """
+
     def __init__(self, case_sensitive=True):
         self.case_sensitive = case_sensitive
 

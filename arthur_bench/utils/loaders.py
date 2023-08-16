@@ -8,7 +8,7 @@ from arthur_bench.models.models import (
     TestSuiteRequest,
 )
 
-from arthur_bench.client.exceptions import UserValueError
+from arthur_bench.exceptions import UserValueError
 
 
 def get_file_extension(filepath: Union[str, os.PathLike]) -> str:

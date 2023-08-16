@@ -12,20 +12,20 @@ from .word_count_match import WordCountMatch
 from .specificity import Specificity
 from .hedging_language import HedgingLanguage
 from .python_unit_testing import PythonUnitTesting
-from ..client.exceptions import UserValueError
+from arthur_bench.exceptions import UserValueError
 
 
 class ScoringMethodEnum(str, Enum):
-    BERTScore = 'bertscore'
-    SummaryQuality = 'summary_quality'
-    QACorrectness = 'qa_correctness'
-    ExactMatch = 'exact_match'
-    Hallucination = 'hallucination'
-    Readability = 'readability'
-    WordCountMatch = 'word_count_match'
-    Specificity = 'specificity'
-    HedgingLanguage = 'hedging_language'
-    PythonUnitTesting = 'python_unit_testing'
+    BERTScore = "bertscore"
+    SummaryQuality = "summary_quality"
+    QACorrectness = "qa_correctness"
+    ExactMatch = "exact_match"
+    Hallucination = "hallucination"
+    Readability = "readability"
+    WordCountMatch = "word_count_match"
+    Specificity = "specificity"
+    HedgingLanguage = "hedging_language"
+    PythonUnitTesting = "python_unit_testing"
 
 
 SCORING_METHOD_CLASS_MAP: Dict[str, type[ScoringMethod]] = {

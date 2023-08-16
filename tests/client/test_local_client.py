@@ -3,7 +3,7 @@ import shutil
 from unittest import mock
 from pathlib import Path
 from arthur_bench.client.local import LocalBenchClient
-from arthur_bench.client.exceptions import UserValueError, NotFoundError
+from arthur_bench.exceptions import UserValueError, NotFoundError
 from arthur_bench.models.models import PaginatedTestSuite
 
 from tests.fixtures.mock_responses import (

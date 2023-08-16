@@ -9,7 +9,7 @@ from arthur_bench.models.models import (
     ScoringMethod as ScoringMethodMetadata,
     ScoringMethodType,
 )
-from arthur_bench.client.exceptions import (
+from arthur_bench.exceptions import (
     UserValueError,
     ArthurInternalError,
 )

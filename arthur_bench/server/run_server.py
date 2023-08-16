@@ -20,7 +20,7 @@ except ImportError as e:
     ) from e
 
 from arthur_bench.client.local.client import _bench_root_dir, LocalBenchClient
-from arthur_bench.client.exceptions import NotFoundError
+from arthur_bench.exceptions import NotFoundError
 from arthur_bench.telemetry.telemetry import send_event, set_track_usage_data
 from arthur_bench.telemetry.config import get_or_persist_id, persist_usage_data
 

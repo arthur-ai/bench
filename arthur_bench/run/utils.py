@@ -8,7 +8,7 @@ from arthur_bench.models.models import (
     TestCaseRequest,
     PaginatedTestSuite,
 )
-from arthur_bench.client.exceptions import UserValueError, ArthurInternalError
+from arthur_bench.exceptions import UserValueError, ArthurInternalError
 from arthur_bench.client.bench_client import BenchClient
 from arthur_bench.scoring import ScoringMethod, scoring_method_class_from_string
 
