@@ -27,6 +27,7 @@ dependencies = [
     'langchain~=0.0.170',
     'sentencepiece==0.1.99',
     'bert_score~=0.3.13',
+    'nltk~=3.8.1',
     'tqdm~=4.65.0',
     'pydantic>=1.10.0,<2.0',
     'pyjwt<3,>=2.6',
@@ -34,7 +35,8 @@ dependencies = [
     'requests_toolbelt~=1.0.0',
     'textstat~=0.7.3',
     'tiktoken~=0.4.0',
-    'transformers==4.29.2'
+    'transformers==4.29.2',
+    'wordfreq~=3.0.3'
 
 ]
 

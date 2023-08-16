@@ -49,4 +49,4 @@ bench
 ```
 Viewing examples in the bench UI will look something like this:
 <p align="center">
-<img src="./_static/img/Bench_UI_Screenshot.png" alt="Examples UI" width="1100"/>
+<img src="docs/source/_static/img/Bench_UI_Screenshot.png" alt="Examples UI" width="1100"/>

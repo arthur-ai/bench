@@ -3,7 +3,7 @@ import sys
 import json
 import logging
 from typing import List, Optional, TypeVar, get_origin, get_args, Union
-from inspect import signature
+from inspect import signature, Parameter
 
 from tqdm import tqdm
 from arthur_bench.models.models import ScoringMethodType
@@ -18,8 +18,12 @@ SINGLE_ITEM_BATCH_DEFAULT = 1
 TScoringMethod = TypeVar("TScoringMethod", bound="ScoringMethod")
 
 
-def _is_optional(field):
-    return get_origin(field) is Union and type(None) in get_args(field)
+def _can_omit(parameter: Parameter):
+    is_optional = get_origin(parameter.annotation) is Union and type(None) in get_args(
+        parameter.annotation
+    )
+    is_kwargs = parameter.name == "args" or parameter.name == "kwargs"
+    return is_optional or is_kwargs
 
 
 class ScoringMethod(ABC):
@@ -104,7 +108,7 @@ class ScoringMethod(ABC):
 
         return all_scores
 
-    def to_dict(self):
+    def to_dict(self, warn=False):
         """
         Provides a json serializable representation of the scoring method.
         """
@@ -113,11 +117,12 @@ class ScoringMethod(ABC):
 
         # warn if arguments missing from initialization for reloading
         for arg in valid_args:
-            if not _is_optional(arg.annotation) and arg.name not in config:
-                logger.warning(
-                    f"scoring method requires argument {arg} but argument is not included in json representation. "
-                    "this may effect test suite reloading, consider implementing custom to_dict and from_dict methods"
-                )
+            if not _can_omit(arg) and arg.name not in config:
+                if warn:
+                    logger.warning(
+                        f"scoring method requires argument {arg} but argument is not included in json representation. "
+                        "this may effect test suite reloading, consider implementing custom to_dict and from_dict methods"
+                    )
 
         jsonable_config = {}
         # remove non serializable args
@@ -126,10 +131,11 @@ class ScoringMethod(ABC):
                 _ = json.dumps(val)
                 jsonable_config[key] = val
             except TypeError as e:
-                logger.warning(
-                    f"not including attribute {key} in config as it is not json serializable. "
-                    "consider implementing custom to_dict and from_dict methods"
-                )
+                if warn:
+                    logger.warning(
+                        f"not including attribute {key} in config as it is not json serializable. "
+                        "consider implementing custom to_dict and from_dict methods"
+                    )
         return jsonable_config
 
     @classmethod

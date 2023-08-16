@@ -112,4 +112,11 @@ export enum EMethodType {
     BERT = 'bertscore',
     SUMMARY = 'summary_quality',
     QA = 'qa_correctness',
+    EXACT_MATCH = 'exact_match',
+    HALLUCINATION = 'hallucination',
+    READABILITY = 'readability',
+    WC_MATCH = 'word_count_match',
+    SPECIFICITY = 'specificity',
+    HEDGING = 'hedging_language',
+    PYTHON_UNIT_TESTING = 'python_unit_testing',
 }

@@ -12,6 +12,10 @@ from tests.helpers import (
 from arthur_bench.run.testsuite import TestSuite
 from arthur_bench.scoring import ScoringMethod
 from tests.fixtures.mock_requests import MOCK_SUITE, MOCK_SUITE_CUSTOM, MOCK_RUN
+from tests.fixtures.mock_responses import (
+    MOCK_SUITE_RESPONSE_WITH_PAGES,
+    MOCK_SUITE_CUSTOM_RESPONSE_WITH_PAGES,
+)
 from tests.fixtures.mock_data import (
     MOCK_DATAFRAME,
     MOCK_INPUTS,
@@ -124,10 +128,33 @@ def mock_load_scoring():
 )
 def test_create_test_suite(params, expected, mock_client):
     suite = TestSuite(client=mock_client, **params)
-    suite.client.get_test_suites.assert_called_once_with(name=params["name"])
+    suite.client.get_suite_if_exists.assert_called_once_with(name=params["name"])
     suite.client.create_test_suite.assert_called_once()
     _, args, _ = suite.client.create_test_suite.mock_calls[0]
     assert_test_suite_equal(args[0], expected, check_page=False)
+
+
+@pytest.mark.parametrize(
+    "params,found_model",
+    [
+        (
+            {"name": "test_suite", "scoring_method": "bertscore"},
+            MOCK_SUITE_RESPONSE_WITH_PAGES,
+        ),
+        (
+            {"name": "test_suite_custom", "scoring_method": CustomScorer()},
+            MOCK_SUITE_CUSTOM_RESPONSE_WITH_PAGES,
+        ),
+    ],
+    ids=["valid_builtin", "valid_custom"],
+)
+def test_reload_test_suite(params, found_model):
+    mock_client = get_mock_client(suite_exists=True, mock_suite=found_model)
+    suite = TestSuite(client=mock_client, **params)
+    suite.client.get_suite_if_exists.assert_called_once_with(name=params["name"])
+    suite.client.create_test_suite.assert_not_called()
+    assert_test_suite_equal(suite.suite, found_model)
+    assert suite.scorer is not None
 
 
 @pytest.mark.parametrize("candidate_column", ["custom_candidate", None])
