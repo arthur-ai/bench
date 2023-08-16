@@ -19,8 +19,6 @@ from arthur_bench.run.utils import (
     _initialize_metadata,
     _load_suite_from_args,
     _load_run_data_from_args,
-    _get_suite_if_exists,
-    _check_run_exists,
     _initialize_scoring_method,
 )
 
@@ -63,7 +61,7 @@ class TestSuite:
         if client is None:
             client = _get_bench_client()
         self.client = client
-        suite = _get_suite_if_exists(self.client, name)
+        suite = client.get_suite_if_exists(name)
         self.scorer: ScoringMethod
 
         if suite is None:
@@ -155,7 +153,7 @@ class TestSuite:
         """
 
         # make sure no existing test run named run_name is already attached to this suite
-        if _check_run_exists(self.client, self.suite.id, run_name):
+        if self.client.check_run_exists(str(self.suite.id), run_name):
             raise UserValueError(
                 f"A test run with the name {run_name} already exists. "
                 "Give this test run a unique name and re-run."
