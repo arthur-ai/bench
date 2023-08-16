@@ -39,7 +39,12 @@ class Specificity(ScoringMethod):
         for v in vague_word_list:
             i = candidate_output.count(v)
             counter+= i
-        return counter
+        len_s = lexicon_count(candidate_output, removepunct=True)
+
+        non_vague_prop = (len_s - counter)/len_s #proportion of words which are not vague
+        non_vague_prop = (non_vague_prop/0.2) -4.0
+        non_vague_prop = max(0.0, non_vague_prop) #normalize
+        return non_vague_prop
 
     def get_mean_word_freq(self, candidate_output:str) -> float:
         """
@@ -56,9 +61,15 @@ class Specificity(ScoringMethod):
         #truncates all probability of words w freq >0.001 to 0.001
         filtered = [0.001 if i >0.001 else i for i in word_freqs]
         if len(filtered)==0:
-            return 0.001
+            wf =  0.001
+        else:
+            wf= sum(filtered)/len(filtered)
 
-        return sum(filtered)/len(filtered)
+        adj_freq = 2.0-(wf/0.0004) #reverse scale and normalize
+        adj_freq = max(0.0, adj_freq)
+        adj_freq = min(1.0, adj_freq)
+
+        return adj_freq
 
     def get_pn_and_num(self, candidate_output:str) -> int:
         """
@@ -69,7 +80,11 @@ class Specificity(ScoringMethod):
         tokens = nltk.word_tokenize(candidate_output)
         tags = nltk.pos_tag(tokens)
         counts = Counter( tag for word,  tag in tags)
-        return counts['NNP']+ counts['CD']
+        pn =  counts['NNP']+ counts['CD']
+        len_s = lexicon_count(candidate_output, removepunct=True)
+        pn_prop= 5.0*(pn/len_s)
+        pn_prop = min(1.0, pn_prop)
+        return pn_prop
 
 
     def run_batch(self, candidate_batch: List[str], reference_batch: Optional[List[str]] = None,
@@ -78,23 +93,12 @@ class Specificity(ScoringMethod):
         res = []
         for i in range(len(candidate_batch)):
             c = candidate_batch[i]
-            len_s = lexicon_count(c, removepunct=True)
 
-            vague_words = self.get_num_vague_words(c)
-            non_vague_prop = (len_s - vague_words)/len_s #proportion of words which are not vague
-            non_vague_prop = (non_vague_prop/0.2) -4.0
-            non_vague_prop = max(0.0, non_vague_prop) #normalize
+            vague_prop = self.get_num_vague_words(c)
+            adj_freq = self.get_mean_word_freq(c)
+            pn_prop = self.get_pn_and_num(c)
 
-            adj_freq = 2.0-(self.get_mean_word_freq(c)/0.0004) #reverse scale and normalize
-            adj_freq = max(0.0, adj_freq)
-            adj_freq = min(1.0, adj_freq)
-
-            pn_num = self.get_pn_and_num(c)
-            pn_prop= 5.0*(pn_num/len_s)
-            pn_prop = min(1.0, pn_prop) #normalize
-
-            s= (0.33*non_vague_prop)+ (0.33*adj_freq) + (0.33*pn_prop) #aggregate
+            s= (0.33*vague_prop)+ (0.33*adj_freq) + (0.33*pn_prop) #aggregate
             res.append(s)
-
 
         return res

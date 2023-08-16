@@ -9,11 +9,26 @@ from arthur_bench.scoring.word_count_match import WordCountMatch
 from arthur_bench.scoring.specificity import Specificity
 from textstat import flesch_reading_ease
 
+
 @pytest.fixture
-def mock_lexicon_count():
-    scorer = MagicMock()
-    scorer.return_value = (10)
-    return scorer
+def mock_get_num_vague_words():
+    mock = Mock()
+    mock.score.return_value = 0.1
+    return mock
+
+@pytest.fixture
+def mock_get_mean_word_freq():
+    mock = Mock()
+    mock.score.return_value = 0.2
+    return mock
+
+@pytest.fixture
+def mock_get_pn_and_num():
+    mock = Mock()
+    mock.score.return_value = 0.3
+    return mock
+
+
 
 
 def test_run_readability():
@@ -45,7 +60,56 @@ def test_run_wcm():
         for i, result in enumerate(wcm_run_result):
             assert torch.isclose(torch.tensor(result), torch.tensor(expected[i]), atol=1e-5)
 
-def test_specificity(mock_lexicon_count):
+def test_specificity_mocks(mock_get_pn_and_num, mock_get_num_vague_words, mock_get_mean_word_freq):
+  with patch("arthur_bench.scoring.specificity.Specificity.get_pn_and_num", mock_get_pn_and_num.score):
+    with patch("arthur_bench.scoring.specificity.Specificity.get_mean_word_freq", mock_get_mean_word_freq.score):
+      with patch("arthur_bench.scoring.specificity.Specificity.get_num_vague_words", mock_get_num_vague_words.score):
+  
+        specificity = Specificity()
+
+        spec_run_result = specificity.run_batch(
+            MOCK_SUMMARY_DATA['candidate_summary'],
+            MOCK_SUMMARY_DATA['summary']
+        )
+        print("spec run:", spec_run_result)
+
+        #assert mock functions called 
+        mock_get_pn_and_num.score.assert_called()
+        mock_get_mean_word_freq.score.assert_called()
+        mock_get_num_vague_words.score.assert_called()
+
+        #assert return correct values
+        expected = [.198, .198, .198, .198]
+        for i, result in enumerate(spec_run_result):
+            assert torch.isclose(torch.tensor(result), torch.tensor(expected[i]), atol=1e-4)
+
+    
+
+def test_specificity(mock_get_mean_word_freq, mock_get_num_vague_words, mock_get_pn_and_num):
+    with (
+        patch('arthur_bench.scoring.specificity.Specificity.get_num_vague_words') as mock_get_num_vague_words,
+        patch('arthur_bench.scoring.specificity.Specificity.get_mean_word_freq') as mock_get_mean_word_freq,
+        patch('arthur_bench.scoring.specificity.Specificity.get_pn_and_num') as mock_get_pn_and_num
+    ):
+
+        specificity = Specificity()
+
+        spec_run_result = specificity.run_batch(
+            MOCK_SUMMARY_DATA['candidate_summary'],
+            MOCK_SUMMARY_DATA['summary']
+        )
+
+        #assert mock functions called 
+        mock_get_num_vague_words.assert_called()
+        mock_get_mean_word_freq.assert_called()
+        mock_get_pn_and_num.assert_called()
+
+        #assert return correct values
+        expected = [.198, .198, .198, .198]
+        for i, result in enumerate(spec_run_result):
+            assert torch.isclose(torch.tensor(result), torch.tensor(expected[i]), atol=1e-4)
+
+def test_specificity():
         specificity = Specificity()
 
         spec_run_result = specificity.run_batch(
