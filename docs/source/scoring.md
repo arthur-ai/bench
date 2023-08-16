@@ -66,7 +66,3 @@ For scenarios where there is a preferred output length, `word_count_match` calcu
 #### `python_unit_testing`
 
 The Python Unit Testing scorer evaluates candidate solutions to coding tasks against unit tests. This scoring method wraps the [`code_eval`](https://huggingface.co/spaces/evaluate-metric/code_eval) evaluator interface from HuggingFace. It is important to note that this function requires that solution code uses standard python libraries only.
-
-
-
-

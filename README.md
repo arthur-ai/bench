@@ -10,13 +10,11 @@ If you have encounted a need for any of the following in your LLM work, then Ben
 
 ## Package installation
 
-1. [Download](https://github.com/arthur-ai/bench/releases) the `.tar` file from the Github releases. 
+Install Bench to your python environment with optional dependencies for serving results locally (recommended):  
+`pip install arthur-bench[server]`
 
-2. Create or activate the python environment within which you would like run Arthur Bench.
-
-3. Navigate to the directory with the downloaded bench `.tar` file.
-
-4. `pip`-install the package
+Alternatively, install Bench to your python environment with minimum dependencies:
+`pip install arthur-bench`
 
 For further setup instructions visit our [installation guide](docs/source/setup.md)
 

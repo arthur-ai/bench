@@ -2,19 +2,11 @@
 
 ## Package installation
 
-1. [Download](https://github.com/arthur-ai/bench/releases) the `.tar` file from the Github releases. 
-
-2. Create or activate the python environment within which you would like run Arthur Bench.
-
-3. Navigate to the directory with the downloaded bench `.tar` file.
-
-4. `pip`-install the package
-
 Install Bench to your python environment with optional dependencies for serving results locally (recommended):  
-`pip install --find-links="./" 'arthur-bench[server]'`
+`pip install arthur-bench[server]`
 
 Alternatively, install Bench to your python environment with minimum dependencies:
-`pip install --find-links="./" 'arthur-bench'`
+`pip install arthur-bench`
 
 ## Choosing Local vs SaaS:
 
@@ -38,7 +30,6 @@ git clone https://github.com/arthur-ai/bench.git
 
 # checkout to the docs-cleanup branch
 cd bench
-git checkout docs-cleanup # TODO: DELETE ONCE WE ARE MERGED INTO MAIN
 
 # set the BENCH_FILE_DIR environment variable to point to the example test suite data
 export BENCH_FILE_DIR="./examples/bench_runs/"
