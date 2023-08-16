@@ -208,17 +208,11 @@ python_suite.run("claude-2", candidate_output_list=claude_solutions)
 
 ### Best practices
 
-#### Prompt Templating
+#### Prompt templating for code extraction
 
-Evaluation becomes more straightforward if you can easily extract the part of an LLM response which is its actual code solution. The simplest way to do that seems to be including an instruction in your prompt or system message that specifies to place code in between python markers in markdown, like this:
+Evaluation becomes more straightforward if you can easily extract the part of an LLM response which is its actual code solution. The simplest way to do that seems to be including an instruction in your prompt or system message that specifies to place code in between "```python markers" in markdown, as we did in the example above.
 
-```python
-<your code here>
-```
-
-We demonstrate an example of using this marker in the prompt template in the example above
-
-#### Task description
+#### Function signature
 
 Performance tends to improve on coding when your task description contains an explicit function signature that you want the solution to adhere to, as well as including example input/output behavior in its docstring.
 
