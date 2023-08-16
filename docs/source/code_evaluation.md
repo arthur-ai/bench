@@ -128,6 +128,7 @@ import pandas as pd
 
 humaneval_code_dataset = load_dataset("openai_humaneval")
 humaneval_df = pd.DataFrame(humaneval_code_dataset["test"])
+humaneval_df_sample = humaneval_df.sample(20, random_state=278487)
 ```
 
 **Prepare unit tests**
@@ -136,8 +137,8 @@ We prepare the unit tests to invoke each candidate function using the `test` and
 
 ```python
 unit_tests = [
-    f'\n{humaneval_df.loc[i]["test"]}\ncheck({humaneval_df.loc[i]["entry_point"]})' 
-    for i in range(len(humaneval_df))
+    f'\n{humaneval_df_sample.loc[i]["test"]}\ncheck({humaneval_df_sample.loc[i]["entry_point"]})' 
+    for i in range(len(humaneval_df_sample))
 ]
 ```
 
@@ -176,8 +177,8 @@ extract_python = lambda x : x.replace('python\n', '').replace('```', '').replace
 
 def get_solutions(model):
     filled_prompt_templates = [
-        prompt_template.replace("<text>", humaneval_df[i]['prompt'])
-        for i in range(len(humaneval_df))
+        prompt_template.replace("<text>", humaneval_df_sample.prompt.values[i]'])
+        for i in range(len(humaneval_df_sample))
     ]
     return [extract_python(model.predict(x)) for x in filled_prompt_templates]
 
@@ -198,8 +199,8 @@ python_scorer = PythonUnitTesting(unit_tests=unit_tests)
 python_suite = TestSuite(
     "humaneval_testsuite", 
     python_scorer,
-    input_text_list=list(humaneval.prompt.values),
-    reference_output_list=list(humaneval_df.canonical_solution.values),
+    input_text_list=list(humaneval_df_sample.prompt.values),
+    reference_output_list=list(humaneval_df_sample.canonical_solution.values),
 )
 
 python_suite.run("gpt-3.5-turbo", candidate_output_list=gpt35_solutions)
