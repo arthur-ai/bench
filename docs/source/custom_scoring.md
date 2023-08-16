@@ -1,23 +1,23 @@
 # Custom Scoring
 
-In this guide, we will walk through the process of evaluating LLM performance using a custom scoring method. We will
+In this guide, we will walk through the process of evaluating LLM performance using a custom scorer. We will
 
-1) Define a custom scoring method
-2) Create a test suite with that scoring method
+1) Define a custom scorer
+2) Create a test suite with that scorer
 3) Run the test suite and view scores
 
-## Define a custom scoring method
+## Define a custom scorer
 
-To create a custom scorer, we will implement the `name` and `run_batch` methods, and optionally override the `requires_reference` method if our scoring method doesn't require reference or target data.
+To create a custom scorer, we will implement the `name` and `run_batch` methods, and optionally override the `requires_reference` method if our scorer doesn't require reference or target data.
 
-This example custom scoring method is called `TrigramRepitition`, which scores responses with a 0.0 if they contain repeated trigrams above a thresholded number of times.
+This example custom scorer is called `TrigramRepitition`, which scores responses with a 0.0 if they contain repeated trigrams above a thresholded number of times.
 
 ```python
-from arthur_bench.scoring import ScoringMethod
+from arthur_bench.scoring import Scorer
 from nltk import trigrams
 from typing import List, Optional
 
-class TrigramRepetition(ScoringMethod):
+class TrigramRepetition(Scorer):
 
     def __init__(self, threshold: int = 5):
         self.threshold = threshold
@@ -47,9 +47,9 @@ class TrigramRepetition(ScoringMethod):
         return repeat_scores
 ```
 
-## Using a custom scoring method in a test suite
+## Using a custom scorer in a test suite
 
-We pass in our custom scoring class as the `scoring_method` parameter to the test suite:
+We pass in our custom scorer as the `scoring_method` parameter to the test suite:
 
 ```python
 from arthur_bench.run.testsuite import TestSuite
@@ -66,7 +66,7 @@ repetition_test = TestSuite(
 
 ## Run the test suite
 
-Now that we've loaded in our custom scoring method, our test suite can be run as usual on any candidate generations.
+Now that we've loaded in our custom scorer, our test suite can be run as usual on any candidate generations.
 
 ```python
 run = repetition_test.run(
@@ -83,9 +83,9 @@ print(run.scores)
 >>> [1.0, 0.0]
 ```
 
-## Scoring Method Validation
+## Scorer Validation
 
-Test suites expect scoring method configurations to remain consistent from run to run, so that each runs scores can be compared and reliably tracked throughout time. Let's see what happens if we attempt to use this suite at a later time, but edit the underlying parameters.
+Test suites expect scorer configurations to remain consistent from run to run, so that each runs scores can be compared and reliably tracked throughout time. Let's see what happens if we attempt to use this suite at a later time, but edit the underlying parameters.
 
 ```python
 scorer = TrigramRepetition(threshold=7)
@@ -98,23 +98,23 @@ We see the following warning:
 scoring method configuration has changed from test suite creation.
 ```
 
-By default, bench will save the json serializable attributes of your scoring method as the configuration. If you need more advanced serialization for validation or re-initialization, implement the `to_dict()` and `from_dict()` methods on your custom class. You can find the full ScoringMethod spec {class}`here <arthur_bench.scoring.scoring_method.ScoringMethod>`.
+By default, bench will save the json serializable attributes of your scorer as the configuration. If you need more advanced serialization for validation or re-initialization, implement the `to_dict()` and `from_dict()` methods on your custom class. You can find the full scorer spec {class}`here <arthur_bench.scoring.scorer.Scorer>`.
 
-## `ScoringMethod` interface
+## `Scorer` interface
 
-All scoring methods in bench implement the {class}`scoring method <arthur_bench.scoring.scoring_method.ScoringMethod>` interface. Let's take a look at that interface:
+All scorers in bench implement the {class}`scorer <arthur_bench.scoring.scorer.scorer>` interface. Let's take a look at that interface:
 ```python
-class ScoringMethod(ABC):
+class Scorer(ABC):
     """
-    Base class for all scoring methods.     
+    Base class for all scorers.     
     """
 
     @staticmethod
     @abstractmethod
     def name() -> str:
         """
-        Get the name of this ScoringMethod
-        :return: the ScoringMethod name
+        Get the name of this Scorer
+        :return: the Scorer name
         """
         raise NotImplementedError
     
@@ -131,15 +131,15 @@ class ScoringMethod(ABC):
         :param candidate_batch: candidate generations to score
         :param reference_batch: reference strings representing target outputs
         :param input_text_batch: optional corresponding inputs
-        :param context_batch: optional corresponding contexts, if needed by scoring method 
+        :param context_batch: optional corresponding contexts, if needed by scorer 
         """
         raise NotImplementedError
 ```
-To create a custom scorer, you need to implement the `name` and `run_batch` methods, and optionally override the `requires_reference` method if your scoring method doesn't require reference or target data.
+To create a custom scorer, you need to implement the `name` and `run_batch` methods, and optionally override the `requires_reference` method if your scorer doesn't require reference or target data.
 
 ## Contributing
 
-If you think you've got a useful scoring method, please consider [contributing](contributing.md)!
+If you think you've got a useful scorer, please consider [contributing](contributing.md)!
 
 
 
