@@ -1,52 +1,77 @@
-## Compare LLM providers
+# Compare LLM Providers
 
-Outline
+In this guide we compare LLMs answers at summarizing text.
 
-In this guide we compare LLM-generated summaries using three different LLM providers, using `gpt-3.5-turbo` as a baseline and then evaluating `claude-2` and a free HuggingFace model as candidates.
+## Environment setup
 
-We use the SummaryQuality scoring method to measure how often the SummaryQuality scorer (which uses `gpt-3.5-turbo` as an evaluator) prefers the candidates over the baseline in an A/B test.
-
-- env
-- test suite data
-- get LLM responses
-- make test suite
-- run tests on each set of responses
-- view results
-
-
-env
+In this guide, we use the OpenAI API and the Cohere API
 ```
+pip install openai cohere
 export OPENAI_API_KEY="sk-..."
-export ANTHROPIC_API_KEY="sk-..."
+export COHERE_API_KEY="..."
 ```
 
-test suite data
+## Data preparation
+
+We load a publically available [congressional bill summarization dataset](https://huggingface.co/datasets/billsum) from HuggingFace.
 
 ```python
-
+import pandas as pd
+from datasets import load_dataset
+billsum = load_dataset("billsum", split="ca_test")
+billsum_df = pd.DataFrame(billsum).sample(50, random_state=278487)
 ```
 
+## LLM response generation
 
-LLM responses
+We use different temperature settings to generate three different lists of responses:
 
 ```python
+from langchain.llms import OpenAI, Cohere
+from langchain.chains import LLMChain
+from langchain.prompts import PromptTemplate
 
+gpt3 = OpenAI(temperature=0.0, max_tokens=100)
+command = Cohere(temperature=0.5, max_tokens=100)
+
+prompt_template = PromptTemplate(
+	input_variables=["text"],
+	template="""
+	You are an expert summarizer of text. A good summary 
+	captures the most important information in the text and doesnt focus too much on small details.
+	Text: {text}
+	Summary:
+	"""
+)
+
+gpt3_chain = LLMChain(llm=gpt3, prompt=prompt_template)
+command_chain = LLMChain(llm=command, prompt=prompt_template)
+
+# generate summaries with truncated text
+gpt3_summaries = [gpt3_chain({"text": bill[:3000]})["text"] for bill in billsum_df.text]
+command_summaries = [command_chain({"text": bill[:3000]})["text"] for bill in billsum_df.text]
 ```
 
-make test suite
+## Create test suite
+
+For this test suite, we want to compare `gpt-3` against `command`. We will use the SummaryQuality scoring metric to A/B test each set of candidate responses against the reference summaries from the dataset
 
 ```python
-
+my_suite = TestSuite(
+	"congressional_bills", 
+	"summary_quality", 
+    input_text_list=list(billsum_df.text),
+	reference_output_list=list(billsum_df.summary)
+)
 ```
 
-run tests on each set of responses
+## Run test suite
 
 ```python
-
+my_suite.run("gpt3_summaries", candidate_output_list=gpt3_summaries)
+my_suite.run("command_summaries", candidate_output_list=command_summaries)
 ```
 
-view results
+## View results
 
-```python
-
-```
+Run `bench` from your command line to visualize the run results comparing the different temperature settings.

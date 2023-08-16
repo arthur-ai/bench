@@ -7,7 +7,7 @@ Make sure you have completed installation from the [setup](setup.md) guide befor
 Set the environment variable BENCH_FILE_DIR to point to the local directory where you want your test results to be saved (this will by default by "./bench_runs", a folder inside the direcrory where you are running your tests). 
 
 ```
-export BENCH_FILE_DIR="your/best/file/dir/"
+export BENCH_FILE_DIR="your/bench/file/dir/"
 ```
 
 ## Creating your first test suite
