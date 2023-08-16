@@ -4,7 +4,7 @@
 
 1. [Download](https://github.com/arthur-ai/bench/releases) the `.tar` file from the Github releases. 
 
-2. Create or activate the python environment within whcih you would like run Arthur Bench.
+2. Create or activate the python environment within which you would like run Arthur Bench.
 
 3. Navigate to the directory with the downloaded bench `.tar` file.
 
