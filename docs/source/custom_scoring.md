@@ -9,6 +9,8 @@ In this guide, we will walk through the process of evaluating LLM performance us
 
 ## Define a custom scorer
 
+First make sure `nltk` is installed as a package to your environment, which our custom scorer uses.
+
 To create a custom scorer, we will implement the `name` and `run_batch` methods, and optionally override the `requires_reference` method if our scorer doesn't require reference or target data.
 
 This example custom scorer is called `TrigramRepitition`, which scores responses with a 0.0 if they contain repeated trigrams above a thresholded number of times.
