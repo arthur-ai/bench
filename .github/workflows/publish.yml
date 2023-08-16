@@ -12,21 +12,6 @@ on:
 # on: workflow_dispatch
 
 jobs:
-  # build_frontend:
-  #   runs-on: ubuntu-latest
-
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - name: Use Node.js
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: '18.x'
-  #     - name: Install dependencies
-  #       working-directory: arthur_bench/server/js
-  #       run: npm i
-  #     - name: Build
-  #       working-directory: arthur_bench/server/js
-  #       run: npm run build
 
   deploy:
     runs-on: ubuntu-latest

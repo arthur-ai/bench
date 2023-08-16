@@ -1,7 +1,4 @@
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
-
-name: Unit Test
+name: mypy
 
 on:
   push:
@@ -25,11 +22,9 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pytest
+        pip install mypy
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
-    - name: Test with pytest
+    - name: mypy
       run: |
-        if [ -f tests/requirements.txt ]; then pip install -r tests/requirements.txt; fi
-        pytest --cov=arthur_bench tests/
-
+        mkdir .mypy_cache -p
+        mypy arthur_bench --ignore-missing-imports --install-types --non-interactive
