@@ -10,7 +10,7 @@ When no baseline examples easily exist for the inputs you want to evaluate LLM p
 
 ## Ways to create a test suite
 
-No matter how you prepare your data for a test suite, you use the common interface provided by importing the `TestSuite` class:
+The `TestSuite` class is the main touch point for creating and running tests in Arthur Bench. No matter how you prepare your data for a test suite, you use the common interface provided by importing the `TestSuite` class:
 
 ```python
 from arthur_bench.run.testsuite import TestSuite
@@ -21,6 +21,8 @@ You can provide data for your `TestSuite` via:
 2. [`pd.DataFrame`](#dataframe---testsuite)
 3. [CSV file](#csv---testsuite)
 4. [HuggingFace Dataset](#huggingface-dataset---dataframe---testsuite)
+
+To see the exact specifications for the `TestSuite` class, visit our [SDK docs](https://docs.arthur.ai/bench/testsuite.html).
 
 ### `List[str]` -> `TestSuite`
 
