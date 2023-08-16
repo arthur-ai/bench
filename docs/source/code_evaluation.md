@@ -46,6 +46,7 @@ check(candidate_function_name)
 ```
 
 **Provide unit tests as strings**
+
 Unit tests can be passed to the `PythonUnitTesting` scorer as a list of strings, which is likely the simpler option if you are loading tests from a benchmark dataset (e.g. `HumanEval` as we do in the example below):
 
 ```python
