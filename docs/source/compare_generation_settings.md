@@ -51,10 +51,10 @@ import string
 from typing import List, Optional
 
 class CustomSpellingScore(ScoringMethod):
-    """
-    Custom scoring which scores each LLM response with the formula 1 / (2 ^ number of typos)
-    This gives a typo-free response a score of 1, and each additional typo further decreases the score
-    """
+	"""
+	Custom scoring which scores each LLM response with the formula 1 / (2 ^ number of typos)
+	This gives a typo-free response a score of 1, and each additional typo further decreases the score
+	"""
 
 	def __init__(self):
 		self.spell_checker = SpellChecker()
@@ -85,7 +85,7 @@ class CustomSpellingScore(ScoringMethod):
 my_suite = TestSuite(
 	"test-spelling", 
 	CustomSpellingScore(), 
-    input_text_list=inputs,
+	input_text_list=inputs,
 	reference_output_list=baseline_responses
 )
 ```
