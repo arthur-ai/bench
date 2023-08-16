@@ -16,11 +16,11 @@ Install Bench to your python environment with optional dependencies for serving 
 Alternatively, install Bench to your python environment with minimum dependencies:
 `pip install arthur-bench`
 
-For further setup instructions visit our [installation guide](https://bench.readthedocs.io/en/develop/setup.html)
+For further setup instructions visit our [installation guide](https://bench.readthedocs.io/en/latest/setup.html)
 
 ## Using Bench
 
-For a more in-depth walkthrough of using bench, visit our [quickstart walkthrough](https://bench.readthedocs.io/en/latest/quickstart.html) and our [test suite creation guide](https://bench.readthedocs.io/en/develop/creating_test_suites.html) on our docs.
+For a more in-depth walkthrough of using bench, visit our [quickstart walkthrough](https://bench.readthedocs.io/en/latest/quickstart.html) and our [test suite creation guide](https://bench.readthedocs.io/en/latest/creating_test_suites.html) on our docs.
 
 To make sure you can run test suites in bench, you can run the following code snippets to create a test suite and run it to give a score to candidate outputs.
 
