@@ -10,9 +10,9 @@ from langchain.prompts.chat import (
     HumanMessagePromptTemplate,
     BasePromptTemplate,
 )
-from arthur_bench.scoring import ScoringMethod
+from arthur_bench.scoring import Scorer
 from arthur_bench.client.exceptions import UserValueError, UserTypeError
-from arthur_bench.scoring.scoring_method import SINGLE_ITEM_BATCH_DEFAULT
+from arthur_bench.scoring.scorer import SINGLE_ITEM_BATCH_DEFAULT
 
 system_message_prompt = SystemMessagePromptTemplate.from_template(
     """You compare two summaries of a text. You respond with a Choice, either a 0, 1, or tie ONLY.
@@ -124,13 +124,13 @@ def truncate_input_text(input_text, ref_output, cand_output) -> Tuple[str, bool]
     return input_text, truncated
 
 
-class SummaryQuality(ScoringMethod):
+class SummaryQuality(Scorer):
     """
     Comprehensive measure of summarization quality compared to a reference summary.
     """
 
     def __init__(self):
-        self.summary_compare = LLMChain(llm=ChatOpenAI(temperature=0), prompt=COMPARE)  # type: ignore
+        self.evaluator = LLMChain(llm=ChatOpenAI(temperature=0), prompt=COMPARE)  # type: ignore
 
     @staticmethod
     def name() -> str:
@@ -189,7 +189,7 @@ class SummaryQuality(ScoringMethod):
         """
         if input_text_batch is None:
             raise UserValueError(
-                "input text is required for this scoring method. Please provide a dataframe column or a list of your "
+                "input text is required for this scorer. Please provide a dataframe column or a list of your "
                 "input text strings in the Test Suite."
             )
         if reference_batch is None:
@@ -207,7 +207,7 @@ class SummaryQuality(ScoringMethod):
         for i in range(len(input_text_batch)):
             # run LLMChain to choose whether summary A or summary B is a better summary of the input text
 
-            choice = self.summary_compare(
+            choice = self.evaluator(
                 {
                     "text": input_text_batch[i],
                     "summary_A": reference_batch[i],

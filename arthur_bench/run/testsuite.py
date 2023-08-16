@@ -1,12 +1,12 @@
 import logging
 import pandas as pd
 from typing import List, Optional, Union
-from arthur_bench.scoring import ScoringMethod
+from arthur_bench.scoring import Scorer
 from arthur_bench.models.models import (
     TestSuiteRequest,
     PaginatedTestSuite,
     TestCaseOutput,
-    ScoringMethod as ScoringMethodMetadata,
+    ScoringMethod,
     ScoringMethodType,
 )
 from arthur_bench.client.exceptions import (
@@ -18,10 +18,10 @@ from arthur_bench.run.testrun import TestRun
 from arthur_bench.run.utils import (
     _load_suite_from_args,
     _load_run_data_from_args,
-    _initialize_scoring_method,
+    _initialize_scorer,
 )
 
-from arthur_bench.scoring.scoring_method import SINGLE_ITEM_BATCH_DEFAULT
+from arthur_bench.scoring.scorer import SINGLE_ITEM_BATCH_DEFAULT
 
 
 logger = logging.getLogger(__name__)
@@ -46,7 +46,7 @@ class TestSuite:
     def __init__(
         self,
         name: str,
-        scoring_method: Union[str, ScoringMethod],
+        scoring_method: Union[str, Scorer],
         description: Optional[str] = None,
         reference_data: Optional[pd.DataFrame] = None,
         reference_data_path: Optional[str] = None,
@@ -61,10 +61,10 @@ class TestSuite:
             client = _get_bench_client()
         self.client = client
         suite = client.get_suite_if_exists(name=name)
-        self.scorer: ScoringMethod
+        self.scorer: Scorer
 
         if suite is None:
-            self.scorer = _initialize_scoring_method(scoring_method_arg=scoring_method)
+            self.scorer = _initialize_scorer(scoring_method_arg=scoring_method)
             cases = _load_suite_from_args(
                 reference_data=reference_data,
                 reference_data_path=reference_data_path,
@@ -74,7 +74,7 @@ class TestSuite:
                 reference_output_list=reference_output_list,
                 requires_reference=self.scorer.requires_reference(),
             )
-            method_meta = ScoringMethodMetadata(
+            method_meta = ScoringMethod(
                 name=self.scorer.name(),
                 type=self.scorer.type(),
                 config=self.scorer.to_dict(warn=True),
@@ -110,7 +110,7 @@ class TestSuite:
                         "scoring method configuration has changed from test suite creation."
                     )
             else:
-                self.scorer = _initialize_scoring_method(
+                self.scorer = _initialize_scorer(
                     self.suite.scoring_method.name, self.suite.scoring_method.config
                 )
 

@@ -108,9 +108,9 @@ my_existing_suite = TestSuite('my_bench_test', 'bertscore')
 
 ## Scoring Methods
 
-A **Scoring Method** is the criteria used to judge the candidate outputs for each run of the test suite. Each {class}`scoring method <arthur_bench.scoring.scoring_method.ScoringMethod>` implements the `run_batch` method to compute a score for a model output. Bench includes both embedding based methods like bert score as well as LLM-guided evaluations.
+A **Scoring Method** is the criteria used to judge the candidate outputs for each run of the test suite. Each {class}`scorer <arthur_bench.scoring.scorer.Scorer>` implements the `run_batch` method to compute a score for a model output. Bench includes both embedding based methods like bert score as well as LLM-guided evaluations.
 
-| Scoring Method                    | Tasks | Requirements |
+| Scorer                    | Tasks | Requirements |
 |-----------------------------------|-----|-----|
 | Exact Match (`exact_match`) | any| Reference Output, Candidate Output|
 | BERT Score (`bertscore`)          | any | Reference Output, Candidate Output|
@@ -123,19 +123,19 @@ The ExactMatch metric evaluates, for each test case, whether the candidate LLM o
 
 #### `bertscore`
 
-[BERTScore](https://arxiv.org/abs/1904.09675) is a quantitative metric to compare the similarity of two pieces of text. Using the `bertscore` scoring method will score each row of the test run as the bert score between the reference output and the candidate output.
+[BERTScore](https://arxiv.org/abs/1904.09675) is a quantitative metric to compare the similarity of two pieces of text. Using the `bertscore` scorer will score each row of the test run as the bert score between the reference output and the candidate output.
 
 #### `summary_quality`
 
-The Summary Quality scoring method is a comprehensive measure of summarization quality compared to a reference. It evaluates summaries on dimensions including relevance and syntax. Each row of the test run will receive a binary 0, indicating that the reference output was scored higher than the candidate output, or 1, indicating that the candidate output was scored higher than the reference output.
+The Summary Quality scorer is a comprehensive measure of summarization quality compared to a reference. It evaluates summaries on dimensions including relevance and syntax. Each row of the test run will receive a binary 0, indicating that the reference output was scored higher than the candidate output, or 1, indicating that the candidate output was scored higher than the reference output.
 
 #### `qa_correctness`
 
-The QA correctness metric evaluates the correctness of an answer, given a question and context. This scoring method does not require a reference output, but does require context. Each row of the Test Run will receive a binary 0, indicating an incorrect output, or 1, indicating a correct output.
+The QA correctness metric evaluates the correctness of an answer, given a question and context. This scorer does not require a reference output, but does require context. Each row of the Test Run will receive a binary 0, indicating an incorrect output, or 1, indicating a correct output.
 
 #### `code_eval`
 
-The CodeEval metric evaluates whether the provided candidate output (an LLM-generated script) passes the unit test provided in the reference output. This scoring method wraps the [`code_eval`](https://huggingface.co/spaces/evaluate-metric/code_eval) metric interface from HuggingFace 
+The CodeEval metric evaluates whether the provided candidate output (an LLM-generated script) passes the unit test provided in the reference output. This scorer wraps the [`code_eval`](https://huggingface.co/spaces/evaluate-metric/code_eval) metric interface from HuggingFace 
 
 ## FAQ
 
