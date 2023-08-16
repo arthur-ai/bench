@@ -20,6 +20,9 @@ from arthur_bench.scoring import Scorer
 from nltk import trigrams
 from typing import List, Optional
 
+# make sure corpus is downloaded
+nltk.download('punkt')
+
 class TrigramRepetition(Scorer):
 
     def __init__(self, threshold: int = 5):
