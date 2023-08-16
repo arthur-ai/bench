@@ -177,7 +177,7 @@ extract_python = lambda x : x.replace('python\n', '').replace('```', '').replace
 
 def get_solutions(model):
     filled_prompt_templates = [
-        prompt_template.replace("<text>", humaneval_df_sample.prompt.values[i]'])
+        prompt_template.replace("<text>", humaneval_df_sample.prompt.values[i])
         for i in range(len(humaneval_df_sample))
     ]
     return [extract_python(model.predict(x)) for x in filled_prompt_templates]
