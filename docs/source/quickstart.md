@@ -53,3 +53,9 @@ Now run `bench` from the command line to launch the local UI and explore the tes
 bench
 ```
 
+## Next Steps
+
+Now that you have set up and ran your first test suite, check out the rest of the [scoring methods](scoring.md) available in Arthur Bench out of the box. 
+
+To learn more about the basic concepts around data and testing in Arthur Bench, visit our [basic concepts guide](concepts.md).
+
