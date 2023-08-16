@@ -30,10 +30,12 @@ logger = logging.getLogger(__name__)
 
 class TestSuite:
     """
-    Reusable pipeline for running a test suite built from reference_data and evaluated using metric
+    Reusable pipeline for running a test suite built from reference_data and evaluated
+    using scoring_method
 
     :param name: name of the test suite
-    :param scoring_method: scoring method to use to evaluate the results of a test run, as a string/enum or class
+    :param scoring_method: scoring method or scorer instance to use to evaluate the
+        results of a test run, as a string/enum or class instance
     :param description: short description of the task tested by this suite
     :param reference_data: dataframe of prompts and reference outputs
     :param reference_data_path: filepath to csv of prompts and reference outputs,
