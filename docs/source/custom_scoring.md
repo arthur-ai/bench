@@ -45,9 +45,9 @@ To create a custom scorer, we will implement the `name` and `run_batch` methods,
 
 In the below example we create a custom scorer to check for repetition in a model generation.
 ```python
-from nltk import trigrams
-
 from arthur_bench.scoring import ScoringMethod
+from nltk import trigrams
+from typing import List, Optional
 
 class TrigramRepetition(ScoringMethod):
     @staticmethod
