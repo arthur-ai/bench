@@ -24,7 +24,7 @@ You can view all scoring methods available out of the box with bench here on our
 
 ## Running your first test suite
 
-To create a **Test Run**, you only need to specify the candidate responses (as a a list of strings, a pandas DataFrame, or a path to a CSV file) and Bench will score the run:
+To create a **Test Run**, you only need to specify the candidate responses. See the [test suite creation guide](creating_test_suites.md) to view all the ways you can run test suites.
 
 ```python
 suite.run('quickstart_run', candidate_output_list=["1932", "up is the opposite of down"])
