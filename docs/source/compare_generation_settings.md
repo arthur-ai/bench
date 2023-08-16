@@ -44,6 +44,7 @@ For this test suite, we want to measure how corrupted the responses get as we in
 Let's define a quick custom scoring method that uses the `pyspellchecker` package to scan for typos in the response, and we will then see how much the typo score changes between the low, medium, and high temperature model generations.
 
 ```python
+from arthur_bench.run import TestSuite
 from arthur_bench.scoring import ScoringMethod
 from spellchecker import SpellChecker
 import string
