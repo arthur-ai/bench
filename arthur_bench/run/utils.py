@@ -137,6 +137,23 @@ def _get_suite_if_exists(
         return suite
     return None
 
+def _check_for_run_in_suite_by_id(
+    client: BenchClient,
+    suite_id: str, 
+    run_name: str,
+    page_size: int,
+    page: int = 1
+) -> None:
+    """Throws an error if a run with the name run_name already exists for the given suite with ID suite_id"""
+    runs = client.get_runs_for_test_suite(
+        suite_id, 
+        page=page, 
+        page_size=page_size
+    )
+    for run_metadata in runs.test_runs:
+        if run_metadata.name == run_name:
+            raise UserValueError(f"A test run with the name {run_name} already exists. Give this test run a unique name and re-run.")
+
 
 def _check_if_run_exists(
     client: BenchClient, suite_name: str, run_name: str
@@ -145,41 +162,45 @@ def _check_if_run_exists(
     Throws an error if a run with the name run_name already exists for the given suite named suite_name
     TODO: add version validation
     """
-    
+    page_size = 100
+    current_page = 1
+    total_pages = 0
+    page = 1
     test_suite_resp = client.get_test_suites(name=suite_name)
     if len(test_suite_resp.test_suites) > 0:
         # we enforce name validation, so there should ever only be one
-        query_params = {"page_size": 100}
         suite = client.get_test_suite(
-            str(test_suite_resp.test_suites[0].id), **query_params
+            str(test_suite_resp.test_suites[0].id), page_size=page_size,
         )
 
-        # check for runs with run_name on the suite
-        runs = client.get_runs_for_test_suite(str(suite.id), **query_params)
-        for run_metadata in runs.test_runs:
-            if run_metadata.name == run_name:
-                raise UserValueError(f"A test run with the name {run_name} already exists. Give this test run a unique name and re-run.")
-            
+        _check_for_run_in_suite_by_id(
+            client=client, 
+            suite_id=str(suite.id), 
+            run_name=run_name, 
+            page_size=page_size
+        )
 
-        current_page: int
-        total_pages: int
         if suite.page is None or suite.total_pages is None:
             raise ArthurInternalError("expected paginated response")
 
         current_page = suite.page + 1
         total_pages = suite.total_pages
         while current_page <= total_pages:
-            query_params["page"] = current_page
+
             suite_next_page = client.get_test_suite(
-                str(test_suite_resp.test_suites[0].id), **query_params
+                str(test_suite_resp.test_suites[0].id), 
+                page_size=page_size, 
+                page=current_page
             )
 
-            # check for runs with run_name on the suite
-            runs = client.get_runs_for_test_suite(str(suite_next_page.id), **query_params)
-            for run_metadata in runs.test_runs:
-                if run_metadata.name == run_name:
-                    raise UserValueError(f"A test run with the name {run_name} already exists. Give this test run a unique name and re-run.")
-                
+            _check_for_run_in_suite_by_id(
+                client=client,
+                suite_id=str(suite_next_page.id),
+                run_name=run_name,
+                page_size=page_size,
+                page=current_page
+                )
+
             if suite_next_page.page is None or suite_next_page.total_pages is None:
                 raise ArthurInternalError("expected paginated response")
             total_pages = suite_next_page.total_pages
