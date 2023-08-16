@@ -97,18 +97,18 @@ class TestSuite:
             if self._data.scoring_method.type == ScoringMethodType.Custom:
                 if isinstance(scoring_method, str):
                     raise UserValueError(
-                        "cannot reference custom scoring method by string. please provide instantiated scoring method"
+                        "cannot reference custom scorer by string. please provide instantiated scorer"
                     )
 
                 self.scorer = scoring_method
                 if self.scorer.name() != self._data.scoring_method.name:
                     raise UserValueError(
-                        f"Test suite was originally created with scoring method: {self._data.scoring_method.name} \
-			  			but provided scoring method has name: {scoring_method.name()}"
+                        f"Test suite was originally created with scorer: {self._data.scoring_method.name} \
+			  			but provided scorer: {scoring_method.name()}"
                     )
                 if self.scorer.to_dict() != self._data.scoring_method.config:
                     logger.warning(
-                        "scoring method configuration has changed from test suite creation."
+                        "scorer configuration has changed from test suite creation."
                     )
             else:
                 self.scorer = _initialize_scorer(
