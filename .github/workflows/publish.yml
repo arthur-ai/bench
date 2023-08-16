@@ -4,12 +4,12 @@
 name: Upload Python Package
 
 # TODO: replace after testing
-# on:
-#   release:
-#     types: [published]
+on:
+  push:
+    branches: ['add-github-pipelines']
 
 
-on: workflow_dispatch
+# on: workflow_dispatch
 
 jobs:
   build_frontend:
