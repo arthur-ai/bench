@@ -23,7 +23,6 @@ MOCK_SUITE = TestSuiteRequest(
         "type": "built_in",
         "config": {
             "precision_weight": 0.1,
-            "recall_weight": 0.9,
             "model_type": "microsoft/deberta-v3-base",
         },
     },
