@@ -4,5 +4,10 @@ Guides
 .. toctree::
    :maxdepth: 2
 
+   concepts.md
+   creating_test_suites.md
+   compare_llm_providers.md
+   compare_prompts.md
+   compare_generation_settings.md
    custom_scoring.md
-   walkthrough.md
+   code_evaluation.md
