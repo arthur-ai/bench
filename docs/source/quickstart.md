@@ -6,16 +6,21 @@ Make sure you have completed installation from the [setup](setup.md) guide befor
 
 Instantiate a test suite with a name, data, and scoring method.
 
-This example creates a test suite from lists of strings directly. You can also create test suites from a pandas DataFrame or from a path to a local CSV file. See the [test suite creation guide](creating_test_suites.md) to view all the ways you can create test suites.
+This example creates a test suite from lists of strings directly with the `exact_match` scoring method. 
 
 ```python
 from arthur_bench.run.testsuite import TestSuite
 suite = TestSuite(
     'bench_quickstart', 
+    'exact_match'
     input_text_list=["What year was FDR elected?", "What is the opposite of down?"], 
     reference_output_list=["1932", "up"]
 )
 ```
+
+You can create test suites from a pandas DataFrame or from a path to a local CSV file. See the [test suite creation guide](creating_test_suites.md) to view all the ways you can create test suites.
+
+You can view all scoring methods available out of the box with bench here on our [scoring](scoring.md) page, as well as [customize](custom_scoring.md) your own.
 
 ### Running your test suite
 
