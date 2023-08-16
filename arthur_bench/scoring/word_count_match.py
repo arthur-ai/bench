@@ -5,6 +5,7 @@ from arthur_bench.scoring.utils import suppress_warnings
 from arthur_bench.exceptions import UserTypeError
 from arthur_bench.scoring import Scorer
 
+
 class WordCountMatch(Scorer):
     """
     Calculates how similar the number of words in the candidate output is to the the number of words in the reference output.

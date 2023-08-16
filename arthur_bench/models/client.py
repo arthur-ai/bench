@@ -8,6 +8,7 @@ from typing import Dict, Optional, Union
 
 from pydantic import BaseModel, Extra, Field
 
+
 class KeyValueObject(BaseModel):
     class Config:
         extra = Extra.allow
