@@ -2,17 +2,17 @@
 
 In this guide, we will walk through the process of evaluating LLM performance using a custom scoring method. We will
 
-1) Define a custom scoring method
-2) Create a test suite with that scoring method
+1) Define a custom scorer
+2) Create a test suite with that scorer
 3) Run the test suite and view scores
 
-### Define a custom scoring method
+### Define a custom scorer
 
-All scoring methods in bench implement the {class}`scoring method <arthur_bench.scoring.scoring_method.ScoringMethod>` interface. Let's take a look at that interface:
+All scorers in bench implement the {class}`Scorer <arthur_bench.scoring.scoring_method.ScoringMethod>` interface. Let's take a look at that interface:
 ```
 class ScoringMethod(ABC):
     """
-    Base class for all scoring methods.     
+    Base class for all scorers. 
     """
 
     @staticmethod
@@ -37,11 +37,11 @@ class ScoringMethod(ABC):
         :param candidate_batch: candidate generations to score
         :param reference_batch: reference strings representing target outputs
         :param input_text_batch: optional corresponding inputs
-        :param context_batch: optional corresponding contexts, if needed by scoring method 
+        :param context_batch: optional corresponding contexts, if needed by scorer
         """
         raise NotImplementedError
 ```
-To create a custom scorer, we will implement the `name` and `run_batch` methods, and optionally override the `requires_reference` method if our scoring method doesn't require reference or target data.
+To create a custom scorer, we will implement the `name` and `run_batch` methods, and optionally override the `requires_reference` method if our scorer doesn't require reference or target data.
 
 In the below example we create a custom scorer to check for repetition in a model generation. The scorer will accept an argument threshold, that specifies the maximum number of acceptable repetitions.
 ```
@@ -81,7 +81,7 @@ class TrigramRepetition(ScoringMethod):
 
 ### Using a custom scoring method in a test suite
 
-In this section, we use our custom scoring method to create a test suite. Our test suite is named `news_summary` and we pass the `TrigramRepetition` class that we defined above as the `scoring_method`.
+In this section, we use our custom scorer to create a test suite. Our test suite is named `news_summary` and we pass the `TrigramRepetition` class that we defined above as the `scoring_method`.
 Additionally, we provide a path to a csv file containing news articles to be used as model inputs during evaluation. Please see our {class}`documentation <arthur_bench.run.testsuite.TestSuite>` for all available data formats. 
 ```
 from arthur_bench.run.testsuite import TestSuite

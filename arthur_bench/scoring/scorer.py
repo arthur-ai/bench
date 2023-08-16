@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 SINGLE_ITEM_BATCH_DEFAULT = 1
 
 
-TScoringMethod = TypeVar("TScoringMethod", bound="ScoringMethod")
+TScorer = TypeVar("TScorer", bound="Scorer")
 
 
 def _can_omit(parameter: Parameter):
@@ -26,17 +26,17 @@ def _can_omit(parameter: Parameter):
     return is_optional or is_kwargs
 
 
-class ScoringMethod(ABC):
+class Scorer(ABC):
     """
-    Base class for all scoring methods.
+    Base class for all scorers.
     """
 
     @staticmethod
     @abstractmethod
     def name() -> str:
         """
-        Get the name of this ScoringMethod
-        :return: the ScoringMethod name
+        Get the name of this Scorer
+        :return: the Scorer name
         """
         raise NotImplementedError
 
@@ -58,7 +58,7 @@ class ScoringMethod(ABC):
         :param candidate_batch: candidate generations to score
         :param reference_batch: reference strings representing target outputs
         :param input_text_batch: optional corresponding inputs
-        :param context_batch: optional corresponding contexts, if needed by scoring method
+        :param context_batch: optional corresponding contexts, if needed by scorer
         """
         raise NotImplementedError
 
@@ -77,7 +77,7 @@ class ScoringMethod(ABC):
         :param candidate_outputs: candidate generations to score
         :param reference_outputs: reference strings representing target outputs
         :param inputs: input strings being tested
-        :param contexts: optional corresponding contexts, if needed by scoring method
+        :param contexts: optional corresponding contexts, if needed by scorer
         :param batch_size: size of batches
         :return: array of scores for batch
         """
@@ -110,7 +110,7 @@ class ScoringMethod(ABC):
 
     def to_dict(self, warn=False):
         """
-        Provides a json serializable representation of the scoring method.
+        Provides a json serializable representation of the scorer.
         """
         config = self.__dict__
         valid_args = [p for p in signature(self.__init__).parameters.values()]
@@ -120,7 +120,7 @@ class ScoringMethod(ABC):
             if not _can_omit(arg) and arg.name not in config:
                 if warn:
                     logger.warning(
-                        f"scoring method requires argument {arg} but argument is not included in json representation. "
+                        f"scorer requires argument {arg} but argument is not included in json representation. "
                         "this may effect test suite reloading, consider implementing custom to_dict and from_dict methods"
                     )
 
@@ -141,7 +141,7 @@ class ScoringMethod(ABC):
     @classmethod
     def from_dict(cls, config: dict):
         """
-        Load a scoring method from a json configuration file.
+        Load a scorer from a json configuration file.
         """
         valid_args = [p for p in signature(cls.__init__).parameters.keys()]
 
@@ -154,9 +154,9 @@ class ScoringMethod(ABC):
     @classmethod
     def type(cls) -> ScoringMethodType:
         """
-        Supplies whether a scoring method is built-in or custom.
+        Supplies whether a scorer is built-in or custom.
 
-        This method is implemented by checking whether the ScoringMethod class is part of the `arthur_bench.scoring`
+        This method is implemented by checking whether the Scorer class is part of the `arthur_bench.scoring`
         module.
         :return: the type (built-in or custom)
         """

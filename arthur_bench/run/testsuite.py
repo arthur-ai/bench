@@ -1,13 +1,14 @@
 import logging
 import pandas as pd
 from typing import List, Optional, Union
-from arthur_bench.scoring import ScoringMethod
+from arthur_bench.scoring import Scorer
 from arthur_bench.models.models import (
     TestSuiteRequest,
     PaginatedTestSuite,
     TestCaseOutput,
-    ScoringMethod as ScoringMethodMetadata,
+    ScoringMethod,
     ScoringMethodType,
+    TestCaseResponse,
 )
 from arthur_bench.client.exceptions import (
     UserValueError,
@@ -18,10 +19,10 @@ from arthur_bench.run.testrun import TestRun
 from arthur_bench.run.utils import (
     _load_suite_from_args,
     _load_run_data_from_args,
-    _initialize_scoring_method,
+    _initialize_scorer,
 )
 
-from arthur_bench.scoring.scoring_method import SINGLE_ITEM_BATCH_DEFAULT
+from arthur_bench.scoring.scorer import SINGLE_ITEM_BATCH_DEFAULT
 
 
 logger = logging.getLogger(__name__)
@@ -29,10 +30,12 @@ logger = logging.getLogger(__name__)
 
 class TestSuite:
     """
-    Reusable pipeline for running a test suite built from reference_data and evaluated using metric
+    Reusable pipeline for running a test suite built from reference_data and evaluated
+    using scoring_method
 
     :param name: name of the test suite
-    :param scoring_method: scoring method to use to evaluate the results of a test run, as a string/enum or class
+    :param scoring_method: scoring method or scorer instance to use to evaluate the
+        results of a test run, as a string/enum or class instance
     :param description: short description of the task tested by this suite
     :param reference_data: dataframe of prompts and reference outputs
     :param reference_data_path: filepath to csv of prompts and reference outputs,
@@ -46,7 +49,7 @@ class TestSuite:
     def __init__(
         self,
         name: str,
-        scoring_method: Union[str, ScoringMethod],
+        scoring_method: Union[str, Scorer],
         description: Optional[str] = None,
         reference_data: Optional[pd.DataFrame] = None,
         reference_data_path: Optional[str] = None,
@@ -56,15 +59,15 @@ class TestSuite:
         reference_output_list: Optional[List[str]] = None,
         client: Optional[BenchClient] = None,
     ):
-        self.suite: PaginatedTestSuite
+        self._data: PaginatedTestSuite
         if client is None:
             client = _get_bench_client()
         self.client = client
         suite = client.get_suite_if_exists(name=name)
-        self.scorer: ScoringMethod
+        self.scorer: Scorer
 
         if suite is None:
-            self.scorer = _initialize_scoring_method(scoring_method_arg=scoring_method)
+            self.scorer = _initialize_scorer(scoring_method_arg=scoring_method)
             cases = _load_suite_from_args(
                 reference_data=reference_data,
                 reference_data_path=reference_data_path,
@@ -74,7 +77,7 @@ class TestSuite:
                 reference_output_list=reference_output_list,
                 requires_reference=self.scorer.requires_reference(),
             )
-            method_meta = ScoringMethodMetadata(
+            method_meta = ScoringMethod(
                 name=self.scorer.name(),
                 type=self.scorer.type(),
                 config=self.scorer.to_dict(warn=True),
@@ -85,34 +88,58 @@ class TestSuite:
                 description=description,
                 test_cases=cases,
             )
-            self.suite = self.client.create_test_suite(new_suite)
+            self._data = self.client.create_test_suite(new_suite)
 
         else:
             logger.info(
                 f"Found existing test suite with name {name}. Using existing suite"
             )
 
-            self.suite = suite
-            if self.suite.scoring_method.type == ScoringMethodType.Custom:
+            self._data = suite
+            if self._data.scoring_method.type == ScoringMethodType.Custom:
                 if isinstance(scoring_method, str):
                     raise UserValueError(
-                        "cannot reference custom scoring method by string. please provide instantiated scoring method"
+                        "cannot reference custom scorer by string. please provide instantiated scorer"
                     )
 
                 self.scorer = scoring_method
-                if self.scorer.name() != self.suite.scoring_method.name:
+                if self.scorer.name() != self._data.scoring_method.name:
                     raise UserValueError(
-                        f"Test suite was originally created with scoring method: {self.suite.scoring_method.name} \
-			  			but provided scoring method has name: {scoring_method.name()}"
+                        f"Test suite was originally created with scorer: {self._data.scoring_method.name} \
+			  			but provided scorer: {scoring_method.name()}"
                     )
-                if self.scorer.to_dict() != self.suite.scoring_method.config:
+                if self.scorer.to_dict() != self._data.scoring_method.config:
                     logger.warning(
-                        "scoring method configuration has changed from test suite creation."
+                        "scorer configuration has changed from test suite creation."
                     )
             else:
-                self.scorer = _initialize_scoring_method(
-                    self.suite.scoring_method.name, self.suite.scoring_method.config
+                self.scorer = _initialize_scorer(
+                    self._data.scoring_method.name, self._data.scoring_method.config
                 )
+
+    @property
+    def name(self) -> str:
+        return self._data.name
+
+    @property
+    def description(self) -> Optional[str]:
+        return self._data.description
+
+    @property
+    def test_cases(self) -> List[TestCaseResponse]:
+        return self._data.test_cases
+
+    @property
+    def input_texts(self) -> List[str]:
+        return [case.input for case in self._data.test_cases]
+
+    @property
+    def reference_outputs(self) -> List[Optional[str]]:
+        return [case.reference_output for case in self._data.test_cases]
+
+    @property
+    def scoring_method(self) -> str:
+        return self.scorer.name()
 
     def run(
         self,
@@ -151,7 +178,7 @@ class TestSuite:
         """
 
         # make sure no existing test run named run_name is already attached to this suite
-        if self.client.check_run_exists(str(self.suite.id), run_name):
+        if self.client.check_run_exists(str(self._data.id), run_name):
             raise UserValueError(
                 f"A test run with the name {run_name} already exists. "
                 "Give this test run a unique name and re-run."
@@ -166,17 +193,17 @@ class TestSuite:
             context_list=context_list,
         )
 
-        if len(candidate_output_list) != len(self.suite.test_cases):
+        if len(candidate_output_list) != len(self.test_cases):
             raise UserValueError(
-                f"candidate data has {len(candidate_output_list)} tests but expected {len(self.suite.test_cases)} tests"
+                f"candidate data has {len(candidate_output_list)} tests but expected {len(self.test_cases)} tests"
             )
 
-        inputs = [case.input for case in self.suite.test_cases]
-        ids = [case.id for case in self.suite.test_cases]
+        inputs = self.input_texts
+        ids = [case.id for case in self.test_cases]
         # ref outputs should be None if any items are None (we validate nullness must be all-or-none)
         ref_outputs: Optional[List[str]] = []
         if ref_outputs is not None:
-            for case in self.suite.test_cases:
+            for case in self.test_cases:
                 if case.reference_output is None:
                     ref_outputs = None
                     break
@@ -206,7 +233,7 @@ class TestSuite:
             model_version=model_version,
             foundation_model=foundation_model,
             prompt_template=prompt_template,
-            test_suite_id=self.suite.id,
+            test_suite_id=self._data.id,
             client=self.client,
         )
 
@@ -218,4 +245,4 @@ class TestSuite:
     def save(self):
         """Save a test suite to local file system."""
         suite_file = self._test_suite_dir / "suite.json"
-        suite_file.write_text(self.suite.json())
+        suite_file.write_text(self._data.json())
