@@ -3,13 +3,10 @@
 
 name: Upload Python Package
 
-# TODO: replace after testing
-on:
+on:  
   push:
-    branches: ['add-github-pipelines']
-
-
-# on: workflow_dispatch
+    tags:
+      - '*'
 
 jobs:
 
