@@ -1,6 +1,6 @@
-## Code Evaluation
+# Code Evaluation
 
-### Basic Usage
+## Basic Usage
 
 Code evaluation refers to the process of checking whether LLM-written code passes unit tests
 
@@ -24,13 +24,9 @@ python_suite = TestSuite(
 )
 ```
 
-### Data Requirements
+## Data Requirements
 
-#### Input prompts & reference outputs
-
-Input prompts and reference outputs (AKA canonical / golden solutions) have **no requirements** in Bench. These components are only for your own analysis, and are not used by the scoring methods under the hood in code evaluation.
-
-#### Unit tests
+### Unit tests
 
 Unit tests must be compatible with the `code_eval` evaluator metric from [HuggingFace](https://huggingface.co/spaces/evaluate-metric/code_eval), which is what the `PythonUnitTesting` scoring method uses under the hood.
 
@@ -42,10 +38,10 @@ The general format of the unit test expected by bench is as follows (the name `c
 
 ```python
 def check(candidate):
-		assert candidate(test_input_0) = test_output_0
-		assert candidate(test_input_1) = test_output_1
-		assert candidate(test_input_2) = test_output_2
-		# ...
+    assert candidate(test_input_0) = test_output_0
+    assert candidate(test_input_1) = test_output_1
+    assert candidate(test_input_2) = test_output_2
+    # ...
 check(candidate_function_name)
 ```
 
@@ -74,7 +70,7 @@ The `PythonUnitTesting` scorer can be created just from that directory name:
 python_scorer = PythonUnitTesting(unit_test_dir=unit_test_dir_name)
 ```
 
-#### Solutions
+### Solutions
 
 Candidate solutions will only be evaluated to be correct if they contain:
 
@@ -105,8 +101,11 @@ import math
 return math.gcd(a, b)
 ```
 
+### Input prompts & reference outputs
 
-### Example Walkthrough
+Input prompts and reference outputs (AKA canonical / golden solutions) have **no requirements** in Bench. These components are only for your own analysis, and are not used by the scoring methods under the hood in code evaluation.
+
+## Example Walkthrough
 
 Here is some example code that you can use to generate and compare python coding solutions using OpenAI's GPT-3.5 and Anthropic's Claude-2 on the [HumanEval dataset](https://huggingface.co/datasets/openai_humaneval) from HuggingFace
 
@@ -153,7 +152,7 @@ def check(candidate):
 check(greatest_common_divisor)
 ```
 
-#### Generate solutions
+**Generate solutions**
 
 ```python
 from langchain.chat_models import ChatOpenAI, ChatAnthropic
@@ -185,7 +184,7 @@ gpt35_solutions = get_solutions(gpt35)
 claude_solutions = get_solutions(claude)
 ```
 
-#### Create test suite
+**Create and run test suite**
 
 Now that you have generated solutions for each model, we can create a test suite and a run for each LLM
 
@@ -201,13 +200,9 @@ python_suite = TestSuite(
     input_text_list=list(humaneval.prompt.values),
     reference_output_list=list(humaneval_df.canonical_solution.values),
 )
-```
 
-#### Run test suite
-
-```python
-python_suite.run("gpt-3.5-turbo",candidate_output_list=gpt35_solutions)
-python_suite.run("claude-2",candidate_output_list=claude_solutions)
+python_suite.run("gpt-3.5-turbo", candidate_output_list=gpt35_solutions)
+python_suite.run("claude-2", candidate_output_list=claude_solutions)
 ```
 
 ### Best practices
