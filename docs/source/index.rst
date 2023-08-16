@@ -20,8 +20,9 @@ Contents
    :maxdepth: 2
 
    self
+   setup.md
    quickstart.md
-   concepts.md
+   scoring.md
    guides
    sdk_reference
    contributing.md
