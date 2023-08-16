@@ -131,6 +131,17 @@ def test_get_test_suite_by_id_not_found(bench_temp_dir_with_suites):
         _ = client.get_test_suite(SUITE_NOT_FOUND)
 
 
+def test_get_suite_if_exists(bench_temp_dir_with_suites):
+    client = LocalBenchClient(bench_temp_dir_with_suites)
+    resp = client.get_suite_if_exists("test_suite")
+    assert_test_suite_equal(resp, MOCK_SUITE_RESPONSE, check_page=False)
+
+
+def test_get_suite_if_exists_not_found(bench_temp_dir_with_suites):
+    client = LocalBenchClient(bench_temp_dir_with_suites)
+    assert client.get_suite_if_exists("invalid name") == None
+
+
 def test_create_test_run(bench_temp_dir_with_suites):
     client = LocalBenchClient(bench_temp_dir_with_suites)
     _ = client.create_new_test_run(SUITE_EXISTS, MOCK_RUN)
@@ -162,6 +173,12 @@ def create_test_run_suite_not_found(bench_temp_dir_with_runs):
     client = LocalBenchClient(bench_temp_dir_with_runs)
     with pytest.raises(NotFoundError):
         _ = client.create_new_test_run(SUITE_NOT_FOUND, MOCK_RUN)
+
+
+def test_check_run_exists(bench_temp_dir_with_runs):
+    client = LocalBenchClient(bench_temp_dir_with_runs)
+    assert client.check_run_exists(SUITE_EXISTS, "test_run") == True
+    assert client.check_run_exists(SUITE_EXISTS, "invalid run") == False
 
 
 def get_summary_statistics(bench_temp_dir_with_runs):

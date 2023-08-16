@@ -60,7 +60,7 @@ class TestSuite:
         if client is None:
             client = _get_bench_client()
         self.client = client
-        suite = client.get_suite_if_exists(name)
+        suite = client.get_suite_if_exists(name=name)
         self.scorer: ScoringMethod
 
         if suite is None:
