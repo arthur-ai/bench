@@ -12,9 +12,9 @@ export BENCH_FILE_DIR="your/bench/file/dir/"
 
 ## Creating your first test suite
 
-Instantiate a test suite with a name, data, and scoring method.
+Instantiate a test suite with a name, data, and scorer.
 
-This example creates a test suite from lists of strings directly with the `exact_match` scoring method. 
+This example creates a test suite from lists of strings directly with the `exact_match` scorer. 
 
 ```python
 from arthur_bench.run.testsuite import TestSuite
@@ -28,7 +28,7 @@ suite = TestSuite(
 
 You can create test suites from a pandas DataFrame or from a path to a local CSV file. See the [test suite creation guide](creating_test_suites.md) to view all the ways you can create test suites.
 
-You can view all scoring methods available out of the box with bench here on our [scoring](scoring.md) page, as well as [customize](custom_scoring.md) your own.
+You can view all scorers available out of the box with bench here on our [scoring](scoring.md) page, as well as [customize](custom_scoring.md) your own.
 
 ## Running your first test suite
 
@@ -55,7 +55,7 @@ bench
 
 ## Next Steps
 
-Now that you have set up and ran your first test suite, check out the rest of the [scoring methods](scoring.md) available in Arthur Bench out of the box. 
+Now that you have set up and ran your first test suite, check out the rest of the [scorers](scoring.md) available in Arthur Bench out of the box. 
 
 To learn more about the basic concepts around data and testing in Arthur Bench, visit our [basic concepts guide](concepts.md).
 

@@ -1,4 +1,4 @@
-Scoring Methods
+Scorers
 ===============
 
 
@@ -7,7 +7,7 @@ Scoring Methods
 .. autosummary::
    :toctree: generated
 
-   scoring_method.ScoringMethod
+   scorer.Scorer
    bertscore.BERTScore
    qa_quality.QAQualityCorrectness
    summary_quality.SummaryQuality

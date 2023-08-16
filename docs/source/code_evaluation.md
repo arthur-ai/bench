@@ -28,7 +28,7 @@ python_suite = TestSuite(
 
 ### Unit tests
 
-Unit tests must be compatible with the `code_eval` evaluator metric from [HuggingFace](https://huggingface.co/spaces/evaluate-metric/code_eval), which is what the `PythonUnitTesting` scoring method uses under the hood.
+Unit tests must be compatible with the `code_eval` evaluator metric from [HuggingFace](https://huggingface.co/spaces/evaluate-metric/code_eval), which is what the `PythonUnitTesting` scorer uses under the hood.
 
 **Format**
 
@@ -104,7 +104,7 @@ return math.gcd(a, b)
 
 ### Input prompts & reference outputs
 
-Input prompts and reference outputs (AKA canonical / golden solutions) have **no requirements** in Bench. These components are only for your own analysis, and are not used by the scoring methods under the hood in code evaluation.
+Input prompts and reference outputs (AKA canonical / golden solutions) have **no requirements** in Bench. These components are only for your own analysis, and are not used by the scorers under the hood in code evaluation.
 
 ## Example Walkthrough
 

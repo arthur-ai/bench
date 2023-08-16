@@ -26,7 +26,7 @@ As an example, consider the task of *Question & Answering* about specific docume
 
 ### Test Suites
 
-A **Test Suite** can hold Input data and Reference Outputs as well as a _Scoring Method_ which will be used to compare the reference outputs to the candidate outputs provided in each **Test Run**. 
+A **Test Suite** can hold Input data and Reference Outputs as well as a _Scorer_ which will be used to evaluate the candidate outputs provided in each **Test Run**. 
 
 For example, for a summarization task, your {class}`Test Suite <arthur_bench.run.testsuite.TestSuite>` might include the documents to summarize, desirable reference summaries, and the {class}`Summary Quality <arthur_bench.scoring.summary_quality.SummaryQuality>` scoring metric.
 

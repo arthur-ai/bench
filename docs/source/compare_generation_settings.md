@@ -6,7 +6,7 @@ We use a custom scorer that compares each LLM temperature setting based on how m
 
 ## Environment setup
 
-In this guide, we use the OpenAI API and use the `pyspellchecker` package for a custom scoring method
+In this guide, we use the OpenAI API and use the `pyspellchecker` package for a custom scorer
 ```
 pip install openai pyspellchecker
 export OPENAI_API_KEY="sk-..."
@@ -41,16 +41,16 @@ high_temp_responses = [chatgpt_high_temp.predict(x) for x in inputs]
 
 For this test suite, we want to measure how corrupted the responses get as we increase the generation temperature.
 
-Let's define a quick custom scoring method that uses the `pyspellchecker` package to scan for typos in the response, and we will then see how much the typo score changes between the low, medium, and high temperature model generations.
+Let's define a quick custom scorer that uses the `pyspellchecker` package to scan for typos in the response, and we will then see how much the typo score changes between the low, medium, and high temperature model generations.
 
 ```python
 from arthur_bench.run.testsuite import TestSuite
-from arthur_bench.scoring import ScoringMethod
+from arthur_bench.scoring import Scorer
 from spellchecker import SpellChecker
 import string
 from typing import List, Optional
 
-class CustomSpellingScore(ScoringMethod):
+class CustomSpellingScore(Scorer):
 	"""
 	Custom scoring which scores each LLM response with the formula 1 / (2 ^ number of typos)
 	This gives a typo-free response a score of 1, and each additional typo further decreases the score

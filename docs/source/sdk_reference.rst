@@ -7,4 +7,4 @@ The main entrypoint for using bench is the :class:`TestSuite <arthur_bench.run.t
    :maxdepth: 2
 
    testsuite
-   scoring_methods
+   scorers
