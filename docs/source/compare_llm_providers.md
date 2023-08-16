@@ -19,7 +19,7 @@ We load a publically available [congressional bill summarization dataset](https:
 import pandas as pd
 from datasets import load_dataset
 billsum = load_dataset("billsum", split="ca_test")
-billsum_df = pd.DataFrame(billsum).sample(50, random_state=278487)
+billsum_df = pd.DataFrame(billsum).sample(10, random_state=278487)
 ```
 
 ## LLM response generation
