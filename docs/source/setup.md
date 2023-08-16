@@ -52,7 +52,7 @@ bench
 
 Viewing examples in the bench UI will look something like this:
 <p align="center">
-<img src="./_static/img/Bench_UI_Screenshot.png" alt="Examples UI" width="750"/>
+<img src="./_static/img/Bench_UI_Screenshot.png" alt="Examples UI" width="1100"/>
 
 When you want to view the local UI for your own test suites going forward, make sure your `BENCH_FILE_DIR` environment variable is configured to point to the location of your new test runs.
 
