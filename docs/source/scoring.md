@@ -2,6 +2,10 @@
 
 A **Scoring Method** is the criteria used to quantitatively evaluate LLM outputs. When you test LLMs with Arthur Bench, you attach a Scoring Method to each test suite you create - this defines how performance will be measured consistently across that test suite.
 
+For a walkthrough on how to extend the ScoringMethod class to create your own scorer specialized to your data and/or use-case to use with Arthur Bench, check out the [custom scoring guide](custom_scoring.md)
+
+If you would like to contribute scoring methods to the open source Arthur Bench repo, check out our [contributing guide](contributing.md)
+
 Here is a list of all the scoring methods available by default in Arthur Bench (listed alphabetically):
 
 | Scoring Method                    | Tasks | Type | Requirements | 
@@ -37,7 +41,7 @@ The Summary Quality scorer evaluates a summary against its source text and a ref
 
 #### `hedging_language`
 
-The Hedging Language scoring method evaluates whether a candidate response is similar to generic hedging language used by an LLM ("As an AI language model, I don't have personal opinions, emotions, or beliefs"). Each row of the Test Run will receive a binary 0, indicating hedging language *not* used, or 1, indicating hedging language used. These binary values are determined based on the BERTScore between the candidate response and the hedging language - if the similarity is below a threshold, the score is 0, and otherwise if the similarity is above the threshold, the score is 1. The threshold we use by default with this scorer is calibrated to the empirical distribution of BERTScore on hedging language overall.
+The Hedging Language scoring method evaluates whether a candidate response is similar to generic hedging language used by an LLM ("As an AI language model, I don't have personal opinions, emotions, or beliefs"). Each row of the Test Run will receive a score between 0.0 and 1.0 indicating the extent to which hedging language is detected in the response (using BERTScore similarity to the target hedging phrase). A score above 0.5 typically suggests the model output contains hedging language.
 
 ### Lexicon-Based Scoring Methods
 
@@ -66,6 +70,3 @@ The Python Unit Testing scorer evaluates candidate solutions to coding tasks aga
 
 
 
-For a walkthrough on how to extend the ScoringMethod class to create your own scorer specialized to your data and/or use-case to use with Arthur Bench, check out the [custom scoring guide](custom_scoring.md)
-
-If you would like to contribute scoring methods to the open source Arthur Bench repo, check out our [contributing guide](contributing.md)
