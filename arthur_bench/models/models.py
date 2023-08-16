@@ -5,7 +5,7 @@ from enum import Enum
 from typing import List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, Field, validator, root_validator
+from pydantic import BaseModel, Field, validator
 
 
 ## COMMON
@@ -49,9 +49,6 @@ class TestSuiteRequest(BaseModel):
     description: Optional[str] = None
     scoring_method: ScoringMethod
     test_cases: List[TestCaseRequest] = Field(..., min_items=1)
-    created_by: str
-    bench_version: str
-    created_at: datetime
 
     @validator("test_cases")
     def null_reference_outputs_all_or_none(cls, v):
@@ -122,9 +119,6 @@ class CreateRunRequest(BaseModel):
     """
     List of outputs and scores for all cases in the test suite
     """
-    created_by: str
-    bench_version: str
-    created_at: datetime
     description: Optional[str] = None
     """
     Optional description of the run
@@ -192,7 +186,7 @@ class PaginatedTestSuite(BaseModel):
     updated_at: datetime
     description: Optional[str] = None
     last_run_time: Optional[datetime] = None
-    num_runs: Optional[int] = 0
+    num_runs: int = 0
     page: Optional[int] = None
     page_size: Optional[int] = None
     total_pages: Optional[int] = None
@@ -214,7 +208,6 @@ class PaginatedRuns(BaseModel):
     Paginated list of runs for a test suite.
     """
 
-    test_suite_id: UUID
     test_runs: List[TestRunMetadata]
     page: int
     page_size: int

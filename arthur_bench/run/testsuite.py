@@ -16,7 +16,6 @@ from arthur_bench.client.exceptions import (
 from arthur_bench.client import BenchClient, _get_bench_client
 from arthur_bench.run.testrun import TestRun
 from arthur_bench.run.utils import (
-    _initialize_metadata,
     _load_suite_from_args,
     _load_run_data_from_args,
     _initialize_scoring_method,
@@ -65,7 +64,6 @@ class TestSuite:
         self.scorer: ScoringMethod
 
         if suite is None:
-            # TODO: separate load functionality? so large models aren't getting loaded unecessarily if test suite creation fails
             self.scorer = _initialize_scoring_method(scoring_method_arg=scoring_method)
             cases = _load_suite_from_args(
                 reference_data=reference_data,
@@ -79,14 +77,13 @@ class TestSuite:
             method_meta = ScoringMethodMetadata(
                 name=self.scorer.name(),
                 type=self.scorer.type(),
-                config=self.scorer.to_dict(),
+                config=self.scorer.to_dict(warn=True),
             )
             new_suite = TestSuiteRequest(
                 name=name,
                 scoring_method=method_meta,
                 description=description,
                 test_cases=cases,
-                **_initialize_metadata(),
             )
             self.suite = self.client.create_test_suite(new_suite)
 
@@ -101,6 +98,8 @@ class TestSuite:
                     raise UserValueError(
                         "cannot reference custom scoring method by string. please provide instantiated scoring method"
                     )
+
+                self.scorer = scoring_method
                 if self.scorer.name() != self.suite.scoring_method.name:
                     raise UserValueError(
                         f"Test suite was originally created with scoring method: {self.suite.scoring_method.name} \
@@ -110,7 +109,6 @@ class TestSuite:
                     logger.warning(
                         "scoring method configuration has changed from test suite creation."
                     )
-                self.scorer = scoring_method
             else:
                 self.scorer = _initialize_scoring_method(
                     self.suite.scoring_method.name, self.suite.scoring_method.config
@@ -210,7 +208,6 @@ class TestSuite:
             prompt_template=prompt_template,
             test_suite_id=self.suite.id,
             client=self.client,
-            **_initialize_metadata(),
         )
 
         if save:

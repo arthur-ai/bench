@@ -8,7 +8,7 @@ from arthur_bench.client.exceptions import ArthurUserError
 class TestRun(CreateRunRequest):
     test_suite_id: uuid.UUID
     client: BenchClient  # type: ignore
-    id: Optional[uuid.UUID]
+    id: Optional[uuid.UUID] = None
 
     class Config:
         arbitrary_types_allowed = True

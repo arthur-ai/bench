@@ -21,14 +21,6 @@ from arthur_bench.utils.loaders import (
 )
 
 
-def _initialize_metadata() -> Dict[str, Any]:
-    return {
-        "created_at": datetime.now().isoformat(),
-        "bench_version": __version__,
-        "created_by": getpass.getuser(),
-    }
-
-
 def _initialize_scoring_method(
     scoring_method_arg: Union[str, ScoringMethod], config: Optional[dict] = None
 ) -> ScoringMethod:

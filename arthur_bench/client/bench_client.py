@@ -1,4 +1,4 @@
-from typing import Optional, TypeVar
+from typing import Optional, TypeVar, List
 from abc import ABC, abstractmethod
 
 from arthur_bench.models.models import (
@@ -23,7 +23,7 @@ class BenchClient(ABC):
         self,
         name: Optional[str] = None,
         sort: Optional[str] = None,
-        scoring_method: Optional[str] = None,
+        scoring_method: Optional[List[str]] = None,
         page: int = 1,
         page_size: int = 5,
     ) -> PaginatedTestSuites:

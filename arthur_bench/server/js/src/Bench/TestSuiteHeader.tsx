@@ -12,6 +12,11 @@ import { DetailedTestSuite } from 'arthur-redux/slices/testSuites/types';
 import MethodTag from '@compound/TestSuiteCard/MethodTag';
 import { useTranslation } from 'react-i18next';
 
+enum Tab {
+    TestRuns = 'runs',
+    InputsOutputs = 'inputs-outputs',
+}
+
 type Props = {
     data: DetailedTestSuite;
 };
@@ -20,12 +25,7 @@ const TestSuiteHeader = ({ data }: Props) => {
     const [showModal, setShowModal] = useState(false);
     const { css } = useFela();
     const { t } = useTranslation(['common']);
-    const { fetchTestRunSummary } = useTestSuites();
 
-    enum Tab {
-        TestRuns = 'runs',
-        InputsOutputs = 'inputs-outputs',
-    }
 
     const tabs: { label: string; id: string; route: Tab }[] = [
         {
@@ -50,10 +50,6 @@ const TestSuiteHeader = ({ data }: Props) => {
             label: data.name,
         },
     ];
-
-    useEffect(() => {
-        fetchTestRunSummary(data.id);
-    }, [data]);
 
     const toggleShowModal = () => {
         setShowModal(!showModal);

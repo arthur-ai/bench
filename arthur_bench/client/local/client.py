@@ -1,11 +1,12 @@
 import os
 import duckdb
+import getpass
 import numpy as np
 import glob
 import json
 from datetime import datetime
 from math import ceil
-from typing import Optional, Union, List
+from typing import Optional, Union, List, Dict, Any
 from dataclasses import dataclass
 import uuid
 from pathlib import Path
@@ -32,7 +33,7 @@ from arthur_bench.models.models import (
 from arthur_bench.utils.loaders import load_suite_from_json, get_file_extension
 
 BENCH_FILE_DIR_KEY = "BENCH_FILE_DIR"
-DEFAULT_BENCH_FILE_DIR = Path(os.getcwd()) / "bench"
+DEFAULT_BENCH_FILE_DIR = Path(os.getcwd()) / "bench_runs"
 
 SUITE_INDEX_FILE = "suite_id_to_name.json"
 RUN_INDEX_FILE = "run_id_to_name.json"
@@ -60,6 +61,15 @@ SORT_QUERY_TO_FUNC = {
 
 def _bench_root_dir() -> Path:
     return Path(os.environ.get(BENCH_FILE_DIR_KEY, DEFAULT_BENCH_FILE_DIR))
+
+
+def _initialize_metadata() -> Dict[str, Any]:
+    timestamp = datetime.now().isoformat()
+    return {
+        "created_at": timestamp,
+        "created_by": getpass.getuser(),
+        "updated_at": timestamp,
+    }
 
 
 def _load_suite_with_optional_id(
@@ -176,6 +186,7 @@ class LocalBenchClient(BenchClient):
         suite_file = self.root_dir / test_suite_name / "suite.json"
         suite = PaginatedTestSuite.parse_file(suite_file)
         suite.last_run_time = runtime
+        suite.num_runs += 1
         suite_file.write_text(suite.json())
 
     def _write_suite_index(self):
@@ -223,6 +234,8 @@ class LocalBenchClient(BenchClient):
                 test_cases=pagination.sorted_pages[pagination.start : pagination.end],
                 created_at=suite.created_at,
                 updated_at=suite.updated_at,
+                last_run_time=suite.last_run_time,
+                num_runs=suite.num_runs,
                 page=pagination.page,
                 page_size=pagination.page_size,
                 total_count=pagination.total_count,
@@ -233,7 +246,7 @@ class LocalBenchClient(BenchClient):
         self,
         name: Optional[str] = None,
         sort: Optional[str] = None,
-        scoring_method: Optional[str] = None,
+        scoring_method: Optional[List[str]] = None,
         page: int = 1,
         page_size: int = DEFAULT_PAGE_SIZE,
     ) -> PaginatedTestSuites:
@@ -252,6 +265,7 @@ class LocalBenchClient(BenchClient):
                             scoring_method=suite.scoring_method,
                             description=suite.description,
                             created_at=suite.created_at,
+                            updated_at=suite.updated_at,
                             last_run_time=suite.last_run_time,
                         )
                     ],
@@ -275,7 +289,7 @@ class LocalBenchClient(BenchClient):
             suite = _load_suite_with_optional_id(f)
             if suite is None:
                 suite = self.get_test_suite_by_name(f.split("/")[-2])
-            if scoring_method is None or suite.scoring_method.name == scoring_method:
+            if scoring_method is None or suite.scoring_method.name in scoring_method:
                 suites.append(
                     TestSuiteMetadata(
                         id=suite.id,
@@ -283,6 +297,7 @@ class LocalBenchClient(BenchClient):
                         scoring_method=suite.scoring_method,
                         description=suite.description,
                         created_at=suite.created_at,
+                        updated_at=suite.updated_at,
                         last_run_time=suite.last_run_time,
                     )
                 )
@@ -316,8 +331,7 @@ class LocalBenchClient(BenchClient):
             ],
             description=json_body.description,
             scoring_method=json_body.scoring_method,
-            created_at=json_body.created_at,
-            updated_at=json_body.created_at,
+            **_initialize_metadata(),
         )
 
         suite_file.write_text(resp.json())
@@ -334,7 +348,7 @@ class LocalBenchClient(BenchClient):
         resp = PaginatedRun(
             id=run_id,
             test_suite_id=uuid.UUID(test_suite_id),
-            updated_at=json_body.created_at,
+            **_initialize_metadata(),
             **json_body.dict(),
         )
 
@@ -372,7 +386,6 @@ class LocalBenchClient(BenchClient):
         pagination = _paginate(runs, page, page_size, sort_key=sort)
 
         return PaginatedRuns(
-            test_suite_id=uuid.UUID(test_suite_id),
             test_runs=pagination.sorted_pages[pagination.start : pagination.end],
             page_size=pagination.page_size,
             page=pagination.page,
