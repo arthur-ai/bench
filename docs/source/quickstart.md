@@ -12,7 +12,7 @@ This example creates a test suite from lists of strings directly with the `exact
 from arthur_bench.run.testsuite import TestSuite
 suite = TestSuite(
     'bench_quickstart', 
-    'exact_match'
+    'exact_match',
     input_text_list=["What year was FDR elected?", "What is the opposite of down?"], 
     reference_output_list=["1932", "up"]
 )
