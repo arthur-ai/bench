@@ -20,7 +20,7 @@ from arthur_bench.run.utils import (
     _load_suite_from_args,
     _load_run_data_from_args,
     _get_suite_if_exists,
-    _check_if_run_exists,
+    _check_run_exists,
     _initialize_scoring_method,
 )
 
@@ -153,6 +153,14 @@ class TestSuite:
         :param prompt_template: prompt template name used to generate outputs
         :returns: TestRun object containing scored outputs
         """
+
+        # make sure no existing test run named run_name is already attached to this suite
+        if _check_run_exists(self.client, self.suite.id, run_name):
+            raise UserValueError(
+                f"A test run with the name {run_name} already exists. "
+                "Give this test run a unique name and re-run."
+            )
+
         candidate_output_list, context_list = _load_run_data_from_args(
             candidate_data=candidate_data,
             candidate_data_path=candidate_data_path,
@@ -161,9 +169,6 @@ class TestSuite:
             context_column=context_column,
             context_list=context_list,
         )
-
-        # make sure no existing test run named run_name is already attached to this suite 
-        _check_if_run_exists(self.client, self.suite.name, run_name)
 
         if len(candidate_output_list) != len(self.suite.test_cases):
             raise UserValueError(

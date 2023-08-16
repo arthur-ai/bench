@@ -147,17 +147,14 @@ def _get_suite_if_exists(
     return None
 
 
-def _check_for_run_in_suite_by_id(
-    client: BenchClient, suite_id: str, run_name: str
-) -> None:
+def _check_run_exists(client: BenchClient, suite_id: str, run_name: str) -> bool:
     """
-    Check that a run with a given name does not already exist for a suite with ID
-    suite_id
+    Check if run with given name if it exists for suite with id suite_id
 
     :param client: BenchClient object for fetching test suite data
     :param suite_id: the id of the test suite to check run names
     :param run_name: the test run name to check for
-    :raises UserValueError: if the run name already exists
+    :return: True if run with name is found, False otherwise
     :raises ArthurInternalError: if using a client that does not support pagination
     """
 
@@ -170,35 +167,9 @@ def _check_for_run_in_suite_by_id(
         runs = client.get_runs_for_test_suite(suite_id, page=page, page_size=page_size)
         for run_metadata in runs.test_runs:
             if run_metadata.name == run_name:
-                raise UserValueError(
-                    f"A test run with the name {run_name} already exists. "
-                    "Give this test run a unique name and re-run."
-                )
+                return True
         if runs.page is None or runs.total_pages is None:
             raise ArthurInternalError("expected paginated response")
         total_pages = runs.total_pages
         current_page = runs.page + 1
-
-
-def _check_if_run_exists(client: BenchClient, suite_name: str, run_name: str) -> None:
-    """
-    Check that a run with a given name does not already exist for a suite with that name
-
-    :param client: BenchClient object for fetching test suite data
-    :param suite_id: the id of the test suite to check run names
-    :param run_name: the test run name to check for
-    :raises UserValueError: if the run name already exists
-    :raises ArthurInternalError: if using a client that does not support pagination
-    """
-
-    test_suite_resp = client.get_test_suites(name=suite_name)
-    if len(test_suite_resp.test_suites) > 0:
-        # we enforce name validation, so there should ever only be one
-        suite = client.get_test_suite(
-            str(test_suite_resp.test_suites[0].id),
-            page_size=100,
-        )
-
-        _check_for_run_in_suite_by_id(
-            client=client, suite_id=str(suite.id), run_name=run_name
-        )
+    return False
