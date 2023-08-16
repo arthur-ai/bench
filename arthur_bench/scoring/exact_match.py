@@ -1,10 +1,10 @@
 from typing import List, Optional
 
 from arthur_bench.exceptions import UserTypeError
-from arthur_bench.scoring import ScoringMethod
+from arthur_bench.scoring import Scorer
 
 
-class ExactMatch(ScoringMethod):
+class ExactMatch(Scorer):
     """
     Returns 1 if candidate matches reference, 0 if candidate does not match reference.
     """

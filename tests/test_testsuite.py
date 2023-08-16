@@ -10,7 +10,7 @@ from tests.helpers import (
     get_mock_client,
 )
 from arthur_bench.run.testsuite import TestSuite
-from arthur_bench.scoring import ScoringMethod
+from arthur_bench.scoring import Scorer
 from tests.fixtures.mock_requests import MOCK_SUITE, MOCK_SUITE_CUSTOM, MOCK_RUN
 from tests.fixtures.mock_responses import (
     MOCK_SUITE_RESPONSE_WITH_PAGES,
@@ -32,9 +32,7 @@ def mock_client():
 
 @pytest.fixture
 def test_suite_default(mock_load_scoring, mock_client):
-    with mock.patch(
-        "arthur_bench.run.testsuite._initialize_scoring_method", mock_load_scoring
-    ):
+    with mock.patch("arthur_bench.run.testsuite._initialize_scorer", mock_load_scoring):
         return TestSuite(
             name="test_suite",
             scoring_method="bertscore",
@@ -43,7 +41,7 @@ def test_suite_default(mock_load_scoring, mock_client):
         )
 
 
-class MockScoringMethod(ScoringMethod):
+class MockScoringMethod(Scorer):
     @staticmethod
     def name():
         return "bertscore"
@@ -62,7 +60,7 @@ class MockScoringMethod(ScoringMethod):
         return [0.9, 0.7]
 
 
-class CustomScorer(ScoringMethod):
+class CustomScorer(Scorer):
     def __init__(self, custom_name="param_name"):
         self.custom_name = custom_name
 
@@ -153,7 +151,7 @@ def test_reload_test_suite(params, found_model):
     suite = TestSuite(client=mock_client, **params)
     suite.client.get_suite_if_exists.assert_called_once_with(name=params["name"])
     suite.client.create_test_suite.assert_not_called()
-    assert_test_suite_equal(suite.suite, found_model)
+    assert_test_suite_equal(suite._data, found_model)
     assert suite.scorer is not None
 
 

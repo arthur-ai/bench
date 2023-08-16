@@ -1,10 +1,10 @@
 import pytest
 from typing import List, Optional
 from unittest.mock import Mock
-from arthur_bench.scoring.scoring_method import ScoringMethod
+from arthur_bench.scoring.scorer import Scorer
 
 
-class MockScorer(ScoringMethod):
+class MockScorer(Scorer):
     def __init__(self, param_1="default_1", param_2: Optional[str] = None):
         self.param_1 = param_1
         self.param_2 = param_2
@@ -44,12 +44,12 @@ class MockScorer(ScoringMethod):
         ([], {"param_1": "default_1", "param_2": None, "param_3": "param_3"}),
     ],
 )
-def test_scoring_method_to_dict(args, expected_dict):
+def test_scorer_to_dict(args, expected_dict):
     scorer = MockScorer(*args)
     assert scorer.to_dict() == expected_dict
 
 
-def test_scoring_method_from_dict():
+def test_scorer_from_dict():
     params = {
         "param_1": "test_1",
         "param_2": "test_2",

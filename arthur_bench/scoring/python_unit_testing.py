@@ -5,13 +5,14 @@ os.environ[
     "HF_ALLOW_CODE_EVAL"
 ] = "1"  # required for executing code using the HuggingFace code_eval metric
 from typing import List, Optional
-from arthur_bench.exceptions.exceptions import UserValueError
+from arthur_bench.exceptions import UserValueError
 from arthur_bench.scoring import ScoringMethod
-from arthur_bench.scoring.scoring_method import SINGLE_ITEM_BATCH_DEFAULT
+from arthur_bench.scoring import Scorer
+from arthur_bench.scoring.scorer import SINGLE_ITEM_BATCH_DEFAULT
 from tqdm import tqdm
 
 
-class PythonUnitTesting(ScoringMethod):
+class PythonUnitTesting(Scorer):
     """
     Wrapping the HuggingFace code_eval metric
 
@@ -27,7 +28,7 @@ class PythonUnitTesting(ScoringMethod):
         unit_test_dir: Optional[str] = None,
         unit_tests: Optional[List[str]] = None,
     ):
-        self.scorer = load("code_eval")  # type: ignore
+        self.evaluator = load("code_eval")  # type: ignore
         if unit_test_dir is not None:
             try:
                 self.unit_tests = [
@@ -67,7 +68,7 @@ class PythonUnitTesting(ScoringMethod):
     ) -> List[float]:
         res = []
         for i in tqdm(range(len(candidate_outputs))):
-            pass_at_k, _ = self.scorer.compute(
+            pass_at_k, _ = self.evaluator.compute(
                 references=[self.unit_tests[i]], predictions=[[candidate_outputs[i]]]
             )
             res.append(pass_at_k["pass@1"])
@@ -81,5 +82,5 @@ class PythonUnitTesting(ScoringMethod):
         context_batch: Optional[List[str]] = None,
     ) -> List[float]:
         raise NotImplementedError(
-            "run_batch is not implemented for this scoring method. Use PythonUnitTesting.run(candidates) instead."
+            "run_batch is not implemented for this scorer. Use PythonUnitTesting.run(candidates) instead."
         )

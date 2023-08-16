@@ -1,5 +1,5 @@
 import uuid
-from typing import Optional
+from typing import Optional, List
 from arthur_bench.models.models import CreateRunRequest
 from arthur_bench.client.bench_client import BenchClient
 from arthur_bench.exceptions import ArthurUserError
@@ -12,6 +12,14 @@ class TestRun(CreateRunRequest):
 
     class Config:
         arbitrary_types_allowed = True
+
+    @property
+    def scores(self) -> List[float]:
+        return [case.score for case in self.test_cases]
+
+    @property
+    def output(self) -> List[str]:
+        return [case.output for case in self.test_cases]
 
     def save(self) -> uuid.UUID:
         """Save a test run."""

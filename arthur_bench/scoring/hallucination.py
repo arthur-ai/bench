@@ -1,11 +1,11 @@
 from typing import List, Optional
-from arthur_bench.scoring import ScoringMethod
+from arthur_bench.scoring import Scorer
 from arthur_bench.client.rest.client import ArthurClient
 from arthur_bench.exceptions import ArthurUserError
 from arthur_bench.models.scoring import HallucinationScoreRequest
 
 
-class Hallucination(ScoringMethod):
+class Hallucination(Scorer):
     """
     Score each output against a context using Arthur's hosted hallucination checker
     A score of 1.0 means the hallucination checker estimates the output is supported by the context
