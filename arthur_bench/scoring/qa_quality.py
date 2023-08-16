@@ -9,7 +9,7 @@ from langchain.prompts.chat import (
     HumanMessagePromptTemplate,
 )
 
-from arthur_bench.scoring import ScoringMethod
+from arthur_bench.scoring import Scorer
 from arthur_bench.client.exceptions import UserValueError
 
 system_message_prompt = SystemMessagePromptTemplate.from_template(
@@ -88,13 +88,13 @@ DECIDE = ChatPromptTemplate.from_messages(
 )
 
 
-class QAQualityCorrectness(ScoringMethod):
+class QAQualityCorrectness(Scorer):
     """
     Given an input question, context string, and model generation, determine if the generation produced a correct answer.
     """
 
     def __init__(self):
-        self.evaluate_answer = LLMChain(llm=ChatOpenAI(temperature=0), prompt=DECIDE)
+        self.evaluator = LLMChain(llm=ChatOpenAI(temperature=0), prompt=DECIDE)
 
     @staticmethod
     def name() -> str:
@@ -128,7 +128,7 @@ class QAQualityCorrectness(ScoringMethod):
 
         res = []
         for i in range(len(input_text_batch)):
-            llmchoice = self.evaluate_answer(
+            llmchoice = self.evaluator(
                 {
                     "question": input_text_batch[i],
                     "context": context_batch[i],

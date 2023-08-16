@@ -6,6 +6,7 @@ In this guide, we will walk through the process of evaluating LLM performance us
 2) Create a test suite with that scorer
 3) Run the test suite and view scores
 
+
 ## Define a custom scorer
 
 To create a custom scorer, we will implement the `name` and `run_batch` methods, and optionally override the `requires_reference` method if our scorer doesn't require reference or target data.
@@ -48,6 +49,7 @@ class TrigramRepetition(Scorer):
 ```
 
 ## Using a custom scorer in a test suite
+
 
 We pass in our custom scorer as the `scoring_method` parameter to the test suite:
 
@@ -140,6 +142,3 @@ To create a custom scorer, you need to implement the `name` and `run_batch` meth
 ## Contributing
 
 If you think you've got a useful scorer, please consider [contributing](contributing.md)!
-
-
-

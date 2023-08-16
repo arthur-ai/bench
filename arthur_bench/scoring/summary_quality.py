@@ -10,9 +10,9 @@ from langchain.prompts.chat import (
     HumanMessagePromptTemplate,
     BasePromptTemplate,
 )
-from arthur_bench.scoring import ScoringMethod
+from arthur_bench.scoring import Scorer
 from arthur_bench.client.exceptions import UserValueError, UserTypeError
-from arthur_bench.scoring.scoring_method import SINGLE_ITEM_BATCH_DEFAULT
+from arthur_bench.scoring.scorer import SINGLE_ITEM_BATCH_DEFAULT
 
 system_message_prompt = SystemMessagePromptTemplate.from_template(
     """You compare two summaries of a text. You respond with a Choice, either a 0, 1, or tie ONLY.
@@ -21,11 +21,7 @@ A good summary captures the most important information in the text and doesnt fo
 A bad summary has information that is conflicting or irrelevant to the original text, or has typos of words in the text."""
 )
 example_summaries_1 = HumanMessagePromptTemplate.from_template(
-    """You compare two summaries of a text. You respond with a Choice, either a 0, 1, or tie ONLY.
-(0 = response 0 is better, 1 = response 1 is better, tie = no significant difference between the responses).
-A good summary captures the most important information in the text and doesnt focus too much on small details.
-A bad summary has information that is conflicting or irrelevant to the original text, or has typos of words in the text.
-Text: (The Hollywood Reporter)Add another fan-favorite
+    """Text: (The Hollywood Reporter)Add another fan-favorite
 character to the cast of next year's X-Men: Apocalypse, with director Bryan Singer announcing
  via Instagram that Olivia Munn will play the telepathic Psylocke in the follow-up to X-Men:
 Days of Future Past. Singer revealed that the Newsroom actress would play Betsy Braddock in
@@ -41,11 +37,7 @@ Choice:"""
 )
 example_choice_1 = AIMessagePromptTemplate.from_template("1")
 example_summaries_2 = HumanMessagePromptTemplate.from_template(
-    """You compare two summaries of a text. You respond with a Choice, either a 0, 1, or tie ONLY.
-(0 = response 0 is better, 1 = response 1 is better, tie = no significant difference between the responses).
-A good summary captures the most important information in the text and doesnt focus too much on small details.
-A bad summary has information that is conflicting or irrelevant to the original text, or has typos of words in the text.
-Text: (The Hollywood Reporter)Add another fan-favorite
+    """Text: (The Hollywood Reporter)Add another fan-favorite
 character to the cast of next year's X-Men: Apocalypse, with director Bryan Singer announcing
  via Instagram that Olivia Munn will play the telepathic Psylocke in the follow-up to X-Men:
 Days of Future Past. Singer revealed that the Newsroom actress would play Betsy Braddock in
@@ -61,11 +53,7 @@ Choice:"""
 )
 example_choice_2 = AIMessagePromptTemplate.from_template("tie")
 comparison_template = HumanMessagePromptTemplate.from_template(
-    """You compare two summaries of a text. You respond with a Choice, either a 0, 1, or tie ONLY.
-(0 = response 0 is better, 1 = response 1 is better, tie = no significant difference between the responses).
-A good summary captures the most important information in the text and doesnt focus too much on small details.
-A bad summary has information that is conflicting or irrelevant to the original text, or has typos of words in the text.
-Text: {text}
+    """Text: {text}
 Response 0: {summary_A}
 Response 1: {summary_B}
 Choice:"""
@@ -124,13 +112,13 @@ def truncate_input_text(input_text, ref_output, cand_output) -> Tuple[str, bool]
     return input_text, truncated
 
 
-class SummaryQuality(ScoringMethod):
+class SummaryQuality(Scorer):
     """
     Comprehensive measure of summarization quality compared to a reference summary.
     """
 
     def __init__(self):
-        self.summary_compare = LLMChain(llm=ChatOpenAI(temperature=0), prompt=COMPARE)  # type: ignore
+        self.evaluator = LLMChain(llm=ChatOpenAI(temperature=0), prompt=COMPARE)  # type: ignore
 
     @staticmethod
     def name() -> str:
@@ -189,7 +177,7 @@ class SummaryQuality(ScoringMethod):
         """
         if input_text_batch is None:
             raise UserValueError(
-                "input text is required for this scoring method. Please provide a dataframe column or a list of your "
+                "input text is required for this scorer. Please provide a dataframe column or a list of your "
                 "input text strings in the Test Suite."
             )
         if reference_batch is None:
@@ -207,7 +195,7 @@ class SummaryQuality(ScoringMethod):
         for i in range(len(input_text_batch)):
             # run LLMChain to choose whether summary A or summary B is a better summary of the input text
 
-            choice = self.summary_compare(
+            choice = self.evaluator(
                 {
                     "text": input_text_batch[i],
                     "summary_A": reference_batch[i],

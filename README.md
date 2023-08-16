@@ -47,6 +47,7 @@ To view the results for these runs in the local UI that comes with the `bench` p
 ```
 bench
 ```
+
 Viewing examples in the bench UI will look something like this:
 <p align="center">
 <img src="docs/source/_static/img/Bench_UI_Screenshot.png" alt="Examples UI" width="1100"/>
