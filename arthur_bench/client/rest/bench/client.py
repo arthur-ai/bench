@@ -295,10 +295,7 @@ class ArthurBenchClient(BenchClient):
     def score_hallucination(
         self, json_body: HallucinationScoreRequest
     ) -> HallucinationScoreResponse:
-        
-        if "ARTHUR_API_URL" not in os.environ:
-            raise ArthurUserError("The Hallucination scoring method is only available to paid Arthur users")
-        
+
         parsed_resp = cast(
             Dict,
             self.http_client.post(
@@ -307,9 +304,5 @@ class ArthurBenchClient(BenchClient):
                 validation_response_code=HTTPStatus.CREATED,
             ),
         )
-        try:
-            return HallucinationScoreResponse(**parsed_resp)
-        except MissingParameterError as e:
-            raise ArthurUserError("The Hallucination scoring method is only available to paid Arthur users. "
-                                  " To use this scoring method, get an Arthur API key and then configure your "
-                                  "ARTHUR_API_URL and ARTHUR_API_KEY environment variables.")
+        return HallucinationScoreResponse(**parsed_resp)
+    
