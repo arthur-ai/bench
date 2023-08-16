@@ -17,11 +17,13 @@ Install Bench with optional dependencies for serving results locally (recommende
 Install Bench with minimum dependencies:
 `pip install --find-links=./directory_with_tar_file 'arthur-bench'`
 
-For further setup instructions visit our [installation guide](https://docs.arthur.com/bench/setup/index.html)
+For further setup instructions visit our [installation guide](docs/setup.md)
 
 ## Using Bench
 
-To make sure you have everything installed correctly, you can run the following code snippets to create a test suite, run it to give a score to candidate outputs.
+For a more in-depth walkthrough of using bench, visit our [quickstart walkthrough](docs/source/quickstart.md) and our [test suite creation guide](docs/source/creating_test_suites.md) on our docs.
+
+To make sure you can run test suites in bench, you can run the following code snippets to create a test suite and run it to give a score to candidate outputs.
 
 ```python
 from arthur_bench.run.testsuite import TestSuite
