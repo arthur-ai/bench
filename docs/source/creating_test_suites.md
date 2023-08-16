@@ -18,9 +18,7 @@ from arthur_bench.run.testsuite import TestSuite
 
 ### `List[str]` -> `TestSuite`
 
-**Toy example**
-
-This simple quickstart example shows how to create and run a test suite by passing lists of strings
+You can create and run a test suite by passing lists of strings directly as the test suite data:
 
 ```python
 suite = TestSuite(
@@ -32,6 +30,8 @@ suite.run('quickstart_run', candidate_output_list=["1932", "up is the opposite o
 ```
 
 This path also allows you to pass LLM responses directly into a test suite as a set of baseline reference outputs and/or as a run of candidate outputs. For example, you can use `gpt-4` outputs as a baseline for a test suite, and then run `gpt-3.5-turbo` as a candidate to see how it compares.
+
+Creating and running the test suite directly from LLM-generated strings:
 
 ```python
 from langchain.chat_models import ChatOpenAI
@@ -56,7 +56,10 @@ If you have your test suite and/or model response data in a pandas DataFrame you
 
 Here is an example test suite built from a dataframe with the default reference data and candidate data column names that `TestSuite` expects (you can also use other column names as we show below)
 
+Creating and running the default DataFrame test suite:
+
 ```python
+import pandas as pd
 df = pd.DataFrame({
     "input": ["What year was FDR elected?", "What is the opposite of down?"],
     "reference_output": ["1932", "up"],
@@ -68,17 +71,16 @@ test_suite = TestSuite(
     "exact_match", 
     reference_data=df
 )
-```
 
-Running test suite:
-
-```python
 test_suite.run("candidate_from_df", candidate_data=df)
 ```
 
-Alternatively you can create and run test suites from dataframes with custom column names:
+Alternatively you can create and run test suites from dataframes with custom column names.
+
+Creating and running the custom DataFrame test suite:
 
 ```python
+import pandas as pd
 df = pd.DataFrame({
     "my_input": ["What year was FDR elected?", "What is the opposite of down?"],
     "baseline_output": ["1932", "up"],
@@ -92,11 +94,7 @@ test_suite = TestSuite(
     input_column="my_input",
     reference_output="baseline_output"
 )
-```
 
-Running test suite:
-
-```python
 test_suite.run(
     "candidate_from_df_custom", 
     candidate_data=df, 
@@ -117,23 +115,19 @@ What year was FDR elected?, 1932, 1932
 What is the opposite of down?, up, up is the opposite of down
 ```
 
-Creating test suite:
+Creating and running the default csv test suite:
 
 ```python
-
 test_suite = TestSuite(
     "suite_from_csv", 
     "exact_match", 
     reference_data_path="/path/to/test_suite_data_default_columns.csv"
 )
-```
 
-Running test suite:
-
-```python
 test_suite.run(
     "candidate_from_csv", 
     candidate_data_path="/path/to/test_suite_data_default_columns.csv"
+)
 ```
 
 Alternatively you can create and run test suites from `.csv` files with custom column names:
@@ -145,7 +139,7 @@ What year was FDR elected?, 1932, 1932
 What is the opposite of down?, up, up is the opposite of down
 ```
 
-Creating test suite:
+Creating and running the custom csv test suite:
 
 ```python
 test_suite = TestSuite(
@@ -155,30 +149,30 @@ test_suite = TestSuite(
     input_column="my_input",
     reference_column="baseline_output"
 )
-```
 
-Running test suite:
-
-```python
 test_suite.run(
     "candidate_from_csv_custom", 
     candidate_data_path="/path/to/test_suite_data_custom_columns.csv",
     candidate_column="gpt35_output"
+)
 ```
 
 ### HuggingFace dataset -> `DataFrame` -> `TestSuite`
 
 Here we create a small question-answering test suite from the Dolly dataset downloaded from HuggingFace. We set up the test suite to use BERTScore to measure similarity between candidate answers and reference answers
 
-Creating test suite:
+Creating and running the dolly test suite:
 
 ```python
+
+# get dolly dataset from huggingface into a pandas dataframe
 import pandas as pd
 from datasets import load_dataset
 dolly = load_dataset("databricks/databricks-dolly-15k")
 dolly_df = pd.DataFrame(dolly["train"])
-dolly_df_sample = dolly_df[dolly_df["category"]=="open_qa"].sample(25, random_state=278487)
 
+# make test suite from a question-answering subset of the data
+dolly_df_sample = dolly_df[dolly_df["category"]=="open_qa"].sample(25, random_state=278487)
 dolly_suite = TestSuite(
     "suite_from_huggingface_dolly", 
     "bertscore", 
@@ -186,11 +180,8 @@ dolly_suite = TestSuite(
     input_column="instruction",
     reference_output="response"
 )
-```
 
-Running test suite:
-
-```python
+# run test suite on gpt-3.5-turbo generated answers to the questions
 from langchain.chat_models import ChatOpenAI
 gpt35 = ChatOpenAI()
 dolly_suite.run(
