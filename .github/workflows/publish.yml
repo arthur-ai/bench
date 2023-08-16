@@ -3,12 +3,16 @@
 
 name: Upload Python Package
 
-on:
-  release:
-    types: [published]
+# TODO: replace after testing
+# on:
+#   release:
+#     types: [published]
+
+
+on: workflow_dispatch
 
 jobs:
-  build:
+  build_frontend:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,9 +21,12 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18.x'
-      - run: cd arthur_bench/server/js
-      - run: npm i
-      - run: npm run build --if-present
+      - name: Install dependencies
+        working-directory: arthur_bench/server/js
+        run: npm i
+      - name: Build
+        working-directory: arthur_bench/server/js
+        run: npm run build
 
   deploy:
     runs-on: ubuntu-latest
@@ -41,9 +48,8 @@ jobs:
         with:
           name: test-python-package
           path: publish/
+      # TODO: remove artifact build and replace with publish after testing
       # - name: Publish package
-      #   run: |
-      #     twine upload --repository-url https://repository.arthur.ai/repository/pypi-local/ -u ${NEXUS_REPOSITORY_USERNAME} -p ${NEXUS_REPOSITORY_PASSWORD} --verbose publish/*
       #   uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
       #   with:
       #     user: __token__
