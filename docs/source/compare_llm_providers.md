@@ -57,7 +57,7 @@ command_summaries = [command_chain({"text": bill[:3000]})["text"] for bill in bi
 For this test suite, we want to compare `gpt-3` against `command`. We will use the SummaryQuality scoring metric to A/B test each set of candidate responses against the reference summaries from the dataset
 
 ```python
-from arthur_bench.run import TestSuite
+from arthur_bench.run.testsuite import TestSuite
 my_suite = TestSuite(
 	"congressional_bills", 
 	"summary_quality", 
