@@ -150,7 +150,7 @@ We prepare the unit tests to invoke each candidate function using the `test` and
 
 ```python
 unit_tests = [
-    f'\n{humaneval_df_sample.loc[i]["test"]}\ncheck({humaneval_df_sample.loc[i]["entry_point"]})' 
+    f'\n{humaneval_df_sample.test.values[i]}\ncheck({humaneval_df_sample.entry_point.values[i]})' 
     for i in range(len(humaneval_df_sample))
 ]
 ```
