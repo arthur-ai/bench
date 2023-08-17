@@ -65,7 +65,7 @@ prompt1_summaries = [gpt3_prompt_new_chain({"text": bill[:3000]})["text"] for bi
 For this test suite, we want to compare `gpt-3` against `command`. We will use the BERTScore scoring metric to measure how much the candidate summaries approach the reference summaries as we increase the amount of use-case specific detail in the prompt.
 
 ```python
-from arthur_bench.run import TestSuite
+from arthur_bench.run.testsuite import TestSuite
 my_suite = TestSuite(
 	"congressional_bills_to_reference", 
 	"bertscore", 
