@@ -6,7 +6,7 @@
 
 Testing LLMs involves preparing the following data for your use case:
 - **Inputs** to the LLM. Depending on the task at hand, these inputs are likely formatted to follow a **prompt template**.
-- **Reference Outputs**: these are your baseline outputs. This would likely be either a ground truth response to the input, or the outputs from a baseline that you are evaluating against.
+- **Reference Outputs**: these are your baseline outputs, which are _optional_ in Arthur Bench but recommended to get a comprehensive understanding of your model's performance relative to its expected outputs. These reference outputs would likely be either ground truth responses to the inputs, or could be outputs from a baseline LLM that you are evaluating against.
 - **Candidate Outputs**: these are the outputs from your candidate LLM that you are scoring.
 - **Context**: contextual information used to produce the candidate output, e.g. for retrieval-augmented Question & Answering tasks.
 
