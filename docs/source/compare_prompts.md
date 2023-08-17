@@ -30,11 +30,11 @@ example_bill_summary = billsum["test"][6]["summary"]
 We use different temperature settings to generate three different lists of responses:
 
 ```python
-from langchain.llms import OpenAI
+from langchain.chat_models import ChatOpenAI
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 
-gpt3 = OpenAI(temperature=0.0, max_tokens=500)
+gpt35 = ChatOpenAI(temperature=0.0, max_tokens=100)
 
 prompt0_template= PromptTemplate(
 	input_variables=["text"],
