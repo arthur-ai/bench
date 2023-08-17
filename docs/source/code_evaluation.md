@@ -110,15 +110,16 @@ Input prompts and reference outputs (AKA canonical / golden solutions) have **no
 
 Here is some example code that you can use to generate and compare python coding solutions using OpenAI's GPT-3.5 and Anthropic's Claude-2 on the [HumanEval dataset](https://huggingface.co/datasets/openai_humaneval) from HuggingFace
 
-**Environment variables**
+### Environment setup
 
 First we set environment variables for `OPENAI_API_KEY` and `ANTHROPIC_API_KEY` before running our generation code
 ```
+pip install openai anthropic
 export "OPENAI_API_KEY"="sk-..."
 export "ANTHROPIC_API_KEY"="sk-ant-..."
 ```
 
-**Load HumanEval data**
+### Data preparation
 
 Our dataset is the HumanEval dataset from HuggingFace loaded into a pandas DataFrame
 
