@@ -28,6 +28,7 @@ const LineChart = (props: TLineChartProps) => {
         id,
         dataTestId,
         isLoading,
+        hasDefaultTooltip = false,
         height = '400px',
         options,
         markArea,
@@ -137,7 +138,8 @@ const LineChart = (props: TLineChartProps) => {
             ...(!disableTooltip && {
                 tooltip: {
                     trigger: 'point',
-                    formatter: tooltipFormatter || defaultTooltipFormatter,
+                    // bench graphs need the default tooltip formatter
+                    formatter: !hasDefaultTooltip ? (tooltipFormatter || defaultTooltipFormatter) : null,
                     extraCssText:
                         'font-family: "Mono-Regular"; border-radius: 6px; padding: 4px 12px;',
                     borderColor: 'transparent',

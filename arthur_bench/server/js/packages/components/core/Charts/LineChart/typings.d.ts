@@ -24,6 +24,7 @@ export type TLineChartProps = {
     xAxisTitle?: string;
     yAxisTitle?: string;
     height?: string;
+    hasDefaultTooltip?: boolean;
     options?: EChartsOption;
     tooltipFormatter?: any;
     xAxisLabelFormatter?: string | ((value: string, index: number) => string);
