@@ -73,7 +73,7 @@ prompt1_summaries = [
 
 ## Create test suite
 
-For this test suite, we will use the BERTScore scoring metric to measure how much the candidate summaries approach the reference summaries by upgrading our prompt with task-specific detail and an example.
+For this test suite, we will use BERTScore to measure how much the candidate summaries approach the reference summaries by upgrading our prompt with task-specific detail and an example.
 
 ```python
 from arthur_bench.run.testsuite import TestSuite
