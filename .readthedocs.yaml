@@ -13,6 +13,10 @@ build:
     # nodejs: "20"
     # rust: "1.70"
     # golang: "1.20"
+  jobs:
+  pre_build:
+    - sphinx-apidoc -o docs/source/sdk arthur_bench "arthur_bench/logger/*" "arthur_bench/models/client.py" -MET --templatedir docs/source/_templates
+
 
 # Build documentation in the "docs/" directory with Sphinx
 sphinx:
@@ -33,8 +37,3 @@ sphinx:
 python:
    install:
    - requirements: docs/source/requirements.txt
-
-
-jobs:
-  pre_build:
-    - sphinx-apidoc -o source/sdk arthur_bench "arthur_bench/logger/*" "arthur_bench/models/client.py" -MET --templatedir .docs/source/_templates
