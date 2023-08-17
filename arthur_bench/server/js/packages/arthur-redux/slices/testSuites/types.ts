@@ -1,7 +1,7 @@
 export type TTestSuite = {
     id: string;
     name: string;
-    scoring_method: EMethodType;
+    scoring_method: TScoringMethod;
     last_run_time: string;
     updated_at: string;
     created_at: string;
@@ -39,7 +39,7 @@ export type DetailedTestSuite = {
     id: string;
     description: string;
     name: string;
-    scoring_method: EMethodType;
+    scoring_method: TScoringMethod;
     last_run_time: string;
     num_runs: number;
     test_cases: TestSuiteCase[];
@@ -103,8 +103,20 @@ export type TTestSuitesState = {
     pagination: TPagination;
 };
 
+export type TScoringMethod = {
+    name: EMethodType;
+    type: string
+}
+
 export enum EMethodType {
     BERT = 'bertscore',
     SUMMARY = 'summary_quality',
     QA = 'qa_correctness',
+    EXACT_MATCH = 'exact_match',
+    HALLUCINATION = 'hallucination',
+    READABILITY = 'readability',
+    WC_MATCH = 'word_count_match',
+    SPECIFICITY = 'specificity',
+    HEDGING = 'hedging_language',
+    PYTHON_UNIT_TESTING = 'python_unit_testing',
 }

@@ -58,7 +58,7 @@ const TestSuiteDetailsModal = ({
                         <div className={css(styles.dataChunkLabel)}>
                             {t('testSuite.scoringMethod')}
                         </div>
-                        <MethodTag name={testSuite.scoring_method}/>
+                        <MethodTag name={testSuite.scoring_method.name}/>
                     </div>
                     <div className={css(styles.dataChunk)}>
                         <div className={css(styles.dataChunkLabel)}>

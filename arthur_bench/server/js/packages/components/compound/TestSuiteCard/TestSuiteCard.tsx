@@ -49,7 +49,7 @@ const TestSuiteCard = ({
                 >
                     {suite.name}
                 </span>
-                <MethodTag name={suite.scoring_method} />
+                <MethodTag name={suite.scoring_method.name} />
                 <span className={css(styles.date)}>
                     Latest Run:{' '}
                     {suite.last_run_time

@@ -1,0 +1,19 @@
+Scorers
+===============
+
+
+.. currentmodule:: arthur_bench.scoring
+
+.. autosummary::
+   :toctree: generated
+
+   scorer.Scorer
+   bertscore.BERTScore
+   qa_quality.QAQualityCorrectness
+   summary_quality.SummaryQuality
+   exact_match.ExactMatch
+   readability.Readability
+   word_count_match.WordCountMatch
+   specificity.Specificity
+   hedging_language.HedgingLanguage
+

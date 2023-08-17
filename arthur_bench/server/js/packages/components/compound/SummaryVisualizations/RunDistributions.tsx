@@ -31,11 +31,13 @@ const RunDistributions = ({ summaries, total }: Props) => {
 
     return (
         <LineChart
+            id={params.testSuiteId}
             graphData={values}
             showLegend
             height={'300px'}
             yAxisTitle={'% of Tests'}
             xAxisTitle={'Avg Test Scores'}
+            hasDefaultTooltip={true}
         />
     );
 };
