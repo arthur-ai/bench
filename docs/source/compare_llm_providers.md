@@ -48,8 +48,8 @@ gpt3_chain = LLMChain(llm=gpt3, prompt=prompt_template)
 command_chain = LLMChain(llm=command, prompt=prompt_template)
 
 # generate summaries with truncated text
-gpt3_summaries = [gpt3_chain({"text": bill[:3000]})["text"] for bill in billsum_df.text]
-command_summaries = [command_chain({"text": bill[:3000]})["text"] for bill in billsum_df.text]
+gpt3_summaries = [gpt3_chain.run(bill[:3000]) for bill in billsum_df.text]
+command_summaries = [command_chain.run(bill[:3000])  for bill in billsum_df.text]
 ```
 
 ## Create test suite
