@@ -61,7 +61,7 @@ from arthur_bench.run.testsuite import TestSuite
 my_suite = TestSuite(
 	"congressional_bills", 
 	"summary_quality", 
-    input_text_list=list(billsum_df.text),
+	input_text_list=list(billsum_df.text),
 	reference_output_list=list(billsum_df.summary)
 )
 ```
