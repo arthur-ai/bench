@@ -26,24 +26,31 @@ class ArthurAdminClient:
         """
         Create a new ArthurAdminClient from an HTTPClient
 
-        :param http_client: the :class:`~arthurai.client.http.requests.HTTPClient` to use for underlying requests
+        :param http_client: the :class:`~arthurai.client.http.requests.HTTPClient` to
+        use for underlying requests
         """
         self.http_client = http_client
         self.http_client.set_path_prefix(PATH_PREFIX)
 
     def login(self, json_body: LoginRequest) -> Tuple[User, RequestsCookieJar]:
         """
-        If the login attempt is successful, the user will be returned in the response body and an HttpOnly, set-cookie \"Authorization\" header will be returned that contains a JWT to be used in subsequent requests to the API in either the \"Authorization\" or cookie header
+        If the login attempt is successful, the user will be returned in the response
+        body and an HttpOnly, set-cookie \"Authorization\" header will be returned
+        that contains a JWT to be used in subsequent requests to the API in either
+        the \"Authorization\" or cookie header
 
         :param json_body:
         """
 
-        raw_resp = cast(requests.Response, self.http_client.post(
-            f"/login",
-            json=json_body.dict(),
-            validation_response_code=HTTPStatus.OK,
-            return_raw_response=True,
-        ))
+        raw_resp = cast(
+            requests.Response,
+            self.http_client.post(
+                "/login",
+                json=json_body.dict(),
+                validation_response_code=HTTPStatus.OK,
+                return_raw_response=True,
+            ),
+        )
         return User(**raw_resp.json()), raw_resp.cookies
 
     def get_current_user(self) -> UserResponse:
@@ -52,9 +59,10 @@ class ArthurAdminClient:
 
         """
 
-        parsed_resp = cast(Dict, self.http_client.get(
-            f"/users/me", validation_response_code=HTTPStatus.OK
-        ))
+        parsed_resp = cast(
+            Dict,
+            self.http_client.get("/users/me", validation_response_code=HTTPStatus.OK),
+        )
         return UserResponse(**parsed_resp)
 
     def authenticate(self) -> AuthenticationInfo:
@@ -63,7 +71,10 @@ class ArthurAdminClient:
 
         """
 
-        parsed_resp = cast(Dict, self.http_client.get(
-            f"/users/me/auth_info", validation_response_code=HTTPStatus.OK
-        ))
+        parsed_resp = cast(
+            Dict,
+            self.http_client.get(
+                "/users/me/auth_info", validation_response_code=HTTPStatus.OK
+            ),
+        )
         return AuthenticationInfo(**parsed_resp)

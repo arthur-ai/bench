@@ -15,7 +15,6 @@ from .python_unit_testing import PythonUnitTesting
 from arthur_bench.exceptions import UserValueError
 
 
-
 class ScoringMethodName(str, Enum):
     BERTScore = "bertscore"
     SummaryQuality = "summary_quality"

@@ -8,8 +8,10 @@ from arthur_bench.models.scoring import HallucinationScoreRequest
 class Hallucination(Scorer):
     """
     Score each output against a context using Arthur's hosted hallucination checker
-    A score of 1.0 means the hallucination checker estimates the output is supported by the context
-    A score of 0.0 means the hallucination checker found information in the output unsupported by the context
+    A score of 1.0 means the hallucination checker estimates the output is supported by
+    the context
+    A score of 0.0 means the hallucination checker found information in the output
+    unsupported by the context
     """
 
     def __init__(self):

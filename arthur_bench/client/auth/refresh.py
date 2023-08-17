@@ -23,7 +23,8 @@ class AuthRefresher:
     @staticmethod
     def _get_refresh_wait_time(current_token: str) -> timedelta:
         """
-        Given a JWT token with an 'exp' field, return how long to wait before refreshing the token
+        Given a JWT token with an 'exp' field, return how long to wait before refreshing
+          the token
         :param current_token: the current token being used, containing an 'exp' field
         :return: the amount of time to wait before fetching a new token
         """
@@ -49,9 +50,10 @@ class AuthRefresher:
         """
         Authorization header update function for an HTTPClient
 
-        Fetches a new session token and returns the new token, and how long to wait before refreshing
-        it (by calling this method again)
-        :return: Headers to update (Authorization), and time to wait before refreshing again
+        Fetches a new session token and returns the new token, and how long to wait
+        before refreshing it (by calling this method again)
+        :return: Headers to update (Authorization), and time to wait before refreshing
+            again
         """
         password = b64decode(self._password_encoded).decode()
         auth_token = user_login(

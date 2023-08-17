@@ -8,7 +8,7 @@ from uuid import UUID
 from pydantic import BaseModel, Field, validator
 
 
-## COMMON
+# COMMON
 
 
 class ScoringMethodType(str, Enum):
@@ -22,7 +22,7 @@ class ScoringMethod(BaseModel):
     config: dict = {}
 
 
-## REQUESTS
+# REQUESTS
 
 
 class TestCaseRequest(BaseModel):
@@ -129,7 +129,8 @@ class CreateRunRequest(BaseModel):
     """
     foundation_model: Optional[str] = None
     """
-    Optional foundation model name identifiying the pretrained model used to generate outputs
+    Optional foundation model name identifiying the pretrained model used to generate
+    outputs
     """
     prompt_template: Optional[str] = None
     """
@@ -144,7 +145,7 @@ class CreateRunRequest(BaseModel):
         allow_population_by_field_name = True
 
 
-## RESPONSES
+# RESPONSES
 
 
 class TestSuiteMetadata(BaseModel):
@@ -251,7 +252,8 @@ class RunResult(BaseModel):
 
 class PaginatedRun(BaseModel):
     """
-    Paginated list of prompts, reference outputs, and model outputs for a particular run.
+    Paginated list of prompts, reference outputs, and model outputs for a particular
+    run.
     """
 
     id: UUID

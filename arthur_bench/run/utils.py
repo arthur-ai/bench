@@ -1,14 +1,10 @@
-import getpass
 import pandas as pd
-from typing import Dict, Any, Optional, List, Tuple, Union
-from datetime import datetime
+from typing import Optional, List, Tuple, Union
 
-from arthur_bench import __version__
 from arthur_bench.models.models import (
     TestCaseRequest,
 )
-from arthur_bench.exceptions import UserValueError, ArthurInternalError
-from arthur_bench.client.bench_client import BenchClient
+from arthur_bench.exceptions import UserValueError
 from arthur_bench.scoring import Scorer, scorer_from_string
 
 from arthur_bench.utils.loaders import (
@@ -44,7 +40,8 @@ def _load_suite_from_args(
     if requires_reference:
         if reference_column is None and reference_output_list is None:
             raise UserValueError(
-                "scoring method requires reference data but no reference data was provided"
+                "scoring method requires reference data but no reference data was "
+                "provided"
             )
     else:
         reference_column = None
@@ -58,7 +55,8 @@ def _load_suite_from_args(
     else:
         raise UserValueError(
             "must specify data using either reference_data data frame, "
-            "reference_data_path csv or input_text_list and reference_output_list strings"
+            "reference_data_path csv or input_text_list and reference_output_list "
+            "strings"
         )
 
 

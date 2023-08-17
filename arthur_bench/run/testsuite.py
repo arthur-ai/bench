@@ -40,10 +40,14 @@ class TestSuite:
     :param reference_data: dataframe of prompts and reference outputs
     :param reference_data_path: filepath to csv of prompts and reference outputs,
             required if not specifying reference_data
-    :param input_column: the column of reference_data containing prompts, defaults to 'prompt'
-    :param reference_column: the column of reference_data containing reference outputs, defaults to 'reference'
-    :param input_text_list: list of strings of input texts that can be provided instead of dataframe columns
-    :param reference_output_list: list of strings of reference outputs that can be provided instead of dataframe columns
+    :param input_column: the column of reference_data containing prompts, defaults to
+        'prompt'
+    :param reference_column: the column of reference_data containing reference outputs,
+        defaults to 'reference'
+    :param input_text_list: list of strings of input texts that can be provided instead
+        of dataframe columns
+    :param reference_output_list: list of strings of reference outputs that can be
+        provided instead of dataframe columns
     """
 
     def __init__(
@@ -99,14 +103,16 @@ class TestSuite:
             if self._data.scoring_method.type == ScoringMethodType.Custom:
                 if isinstance(scoring_method, str):
                     raise UserValueError(
-                        "cannot reference custom scorer by string. please provide instantiated scorer"
+                        "cannot reference custom scorer by string. please provide "
+                        "instantiated scorer"
                     )
 
                 self.scorer = scoring_method
                 if self.scorer.name() != self._data.scoring_method.name:
                     raise UserValueError(
-                        f"Test suite was originally created with scorer: {self._data.scoring_method.name} \
-			  			but provided scorer: {scoring_method.name()}"
+                        f"Test suite was originally created with scorer: "
+                        f"{self._data.scoring_method.name}"
+                        f"but provided scorer: {scoring_method.name()}"
                     )
                 if self.scorer.to_dict() != self._data.scoring_method.config:
                     logger.warning(
@@ -162,12 +168,16 @@ class TestSuite:
 
         :param run_name: name for the test run
         :param candidate_data: dataframe of candidate responses to test prompts
-        :param candidate_data_path: filepath to csv containing candidate responses to test prompts
-        :param candidate_column: the column of candidate data containing candidate responses,
-                defaults to 'candidate_output'
-        :param candidate_output_list: list of strings of candidate outputs that can be provided instead of dataframe
-        :param context_column: the column of reference_data containing supporting context for answering Question & Answering tasks
-        :param context_list: list of strings containing supporting context for answering question and answering tasks
+        :param candidate_data_path: filepath to csv containing candidate responses to
+            test prompts
+        :param candidate_column: the column of candidate data containing candidate
+            responses, defaults to 'candidate_output'
+        :param candidate_output_list: list of strings of candidate outputs that can be
+            provided instead of dataframe
+        :param context_column: the column of reference_data containing supporting
+            context for answering Question & Answering tasks
+        :param context_list: list of strings containing supporting context for answering
+             question and answering tasks
         :param save: whether to save the run results to file
         :param batch_size: the batch_size to use when computing scores
         :param model_name: model name for model used to generate outputs
@@ -177,7 +187,8 @@ class TestSuite:
         :returns: TestRun object containing scored outputs
         """
 
-        # make sure no existing test run named run_name is already attached to this suite
+        # make sure no existing test run named run_name is already attached to this
+        #  suite
         if self.client.check_run_exists(str(self._data.id), run_name):
             raise UserValueError(
                 f"A test run with the name {run_name} already exists. "
@@ -195,12 +206,14 @@ class TestSuite:
 
         if len(candidate_output_list) != len(self.test_cases):
             raise UserValueError(
-                f"candidate data has {len(candidate_output_list)} tests but expected {len(self.test_cases)} tests"
+                f"candidate data has {len(candidate_output_list)} tests but "
+                f"expected {len(self.test_cases)} tests"
             )
 
         inputs = self.input_texts
         ids = [case.id for case in self.test_cases]
-        # ref outputs should be None if any items are None (we validate nullness must be all-or-none)
+        # ref outputs should be None if any items are None (we validate nullness must be
+        #  all-or-none)
         ref_outputs: Optional[List[str]] = []
         if ref_outputs is not None:
             for case in self.test_cases:
