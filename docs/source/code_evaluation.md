@@ -45,6 +45,18 @@ def check(candidate):
 check(candidate_function_name)
 ```
 
+For example, here is the unit test for the `greatest_common_divisor` task from the HumanEval dataset:
+
+```python
+def check(candidate):
+    assert candidate(3, 7) == 1
+    assert candidate(10, 15) == 5
+    assert candidate(49, 14) == 7
+    assert candidate(144, 60) == 12
+
+check(greatest_common_divisor)
+```
+
 **Provide unit tests as strings**
 
 Unit tests can be passed to the `PythonUnitTesting` scorer as a list of strings, which is likely the simpler option if you are loading tests from a benchmark dataset (e.g. `HumanEval` as we do in the example below):
@@ -132,7 +144,7 @@ humaneval_df = pd.DataFrame(humaneval_code_dataset["test"])
 humaneval_df_sample = humaneval_df.sample(20, random_state=278487)
 ```
 
-**Prepare unit tests**
+### Prepare unit tests
 
 We prepare the unit tests to invoke each candidate function using the `test` and `entry_point` fields of the HumanEval dataset:
 
@@ -143,19 +155,7 @@ unit_tests = [
 ]
 ```
 
-To view an example, here is the unit test for the `greatest_common_divisor` task:
-
-```python
-def check(candidate):
-    assert candidate(3, 7) == 1
-    assert candidate(10, 15) == 5
-    assert candidate(49, 14) == 7
-    assert candidate(144, 60) == 12
-
-check(greatest_common_divisor)
-```
-
-**Generate solutions**
+### Generate solutions
 
 ```python
 from langchain.chat_models import ChatOpenAI, ChatAnthropic
