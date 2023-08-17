@@ -2,11 +2,11 @@
 
 ## What data should I use?
 
-It is best to use data that is as close to your production use case as possible. If possible, we recommend sampling some historic data and manually validating a set of 25+ cases. If that is not possible, manually selecting some some inputs and using a foundation model to generate a starting set of reference outputs is a good option.
+It is best to use data that is as close to your production use case as possible. We recommend sampling some historic data and manually validating a set of 25+ cases.
 
 Public datasets on HuggingFace like the [Dolly dataset](https://huggingface.co/datasets/databricks/databricks-dolly-15k) and the [HumanEval dataset](https://huggingface.co/datasets/openai_humaneval) can be a great starting place to benchmark on your use case before you have data that is closer to your actual production setting.
 
-When no baseline examples easily exist for the inputs you want to evaluate LLM performance on, you can use an existing LLM to generate a good enough set of baseline outputs for the task.
+When no baseline examples or labels easily exist for the inputs you want to evaluate LLM performance on, you can use an existing LLM to generate a baseline for the task and then iterate from there.
 
 ## Ways to create a test suite
 
