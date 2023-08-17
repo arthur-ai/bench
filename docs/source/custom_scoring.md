@@ -19,7 +19,7 @@ Make sure `nltk` is installed as a package to your environment, which our custom
 pip install nltk
 ```
 
-First make sure `nltk` is installed as a package to your environment, which our custom scorer uses.
+Make sure `nltk` is installed as a package to your environment, which our custom scorer uses.
 
 ```
 pip install nltk
