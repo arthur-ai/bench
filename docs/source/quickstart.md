@@ -2,7 +2,7 @@
 
 Make sure you have completed installation from the [setup](setup.md) guide before moving on to this quickstart.
 
-## Environment Setup
+## Environment setup
 
 The environment variable `BENCH_FILE_DIR` points to the local directory where your test data is saved and visualized by Arthur Bench.
 
@@ -55,7 +55,7 @@ Now run `bench` from the command line to launch the local UI and explore the tes
 bench
 ```
 
-## Next Steps
+## Next steps
 
 Now that you have set up and ran your first test suite, check out the rest of the [scorers](scoring.md) available in Arthur Bench out of the box. 
 
