@@ -3,9 +3,11 @@
 ## Package installation
 
 Install Bench to your python environment with optional dependencies for serving results locally (recommended):  
-`pip install arthur-bench[server]`
+
+`pip install 'arthur-bench[server]'`
 
 Alternatively, install Bench to your python environment with minimum dependencies:
+
 `pip install arthur-bench`
 
 ## Choosing Local vs SaaS:
