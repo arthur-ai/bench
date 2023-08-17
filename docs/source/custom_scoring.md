@@ -9,7 +9,7 @@ In this guide, we will walk through the process of evaluating LLM performance us
 
 ## Define a custom scorer
 
-To create a custom scorer that satisfies the Scorer interface (defined in the section below), we will implement the `name` and `run_batch` methods
+To create a custom scorer that satisfies the Scorer interface (defined in the section below), implement the scoring logic in the `run_batch` method. Additionally, provide your scorer a name in the `name()` method. For our scorer, we override the `requires_reference()` method to return `False` instead of `True`, since this custom scorer evaluates the candidate outputs without the need for a reference.
 
 This example custom scorer is called `TrigramRepitition`, which scores responses with a 0.0 if they contain repeated trigrams above a thresholded number of times.
 
