@@ -32,7 +32,7 @@ from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 
 gpt3 = OpenAI(temperature=0.0, max_tokens=100)
-command = Cohere(temperature=0.5, max_tokens=100)
+command = Cohere(temperature=0.0, max_tokens=100)
 
 prompt_template = PromptTemplate(
 	input_variables=["text"],
