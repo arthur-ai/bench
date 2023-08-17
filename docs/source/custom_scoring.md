@@ -42,6 +42,10 @@ class TrigramRepetition(Scorer):
     @staticmethod
     def name() -> str:
         return "trigram_repetition"
+
+    @staticmethod
+    def requires_reference() -> bool:
+        return False
     
     def run_batch(self, candidate_batch: List[str], reference_batch: Optional[List[str]] = None,
                   input_text_batch: Optional[List[str]] = None, context_batch: Optional[List[str]] = None) -> List[float]:
