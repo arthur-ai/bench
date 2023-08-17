@@ -28,11 +28,8 @@ Running these commands will view launch the bench UI locally ot view the example
 # clone the bench repo
 git clone https://github.com/arthur-ai/bench.git
 
-# checkout to the docs-cleanup branch
-cd bench
-
-# set the BENCH_FILE_DIR environment variable to point to the example test suite data
-export BENCH_FILE_DIR="./examples/bench_runs/"
+# set the BENCH_FILE_DIR environment variable to point to the example test suite data in the repo
+export BENCH_FILE_DIR="./bench/examples/bench_runs/"
 
 # launch the bench UI
 bench
