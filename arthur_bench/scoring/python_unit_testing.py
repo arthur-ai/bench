@@ -60,7 +60,7 @@ class PythonUnitTesting(Scorer):
     def requires_reference() -> bool:
         return False
 
-    def to_dict(self):
+    def to_dict(self, warn=False):
         return {"unit_tests": self.unit_tests}
 
     def run(
