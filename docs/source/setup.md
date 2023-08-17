@@ -46,9 +46,7 @@ When you want to view the local UI for your own test suites going forward, make 
 
 ## SaaS (Coming Soon!)
 
-Bench can be used automatically in conjunction with your team's existing Arthur platform account. If you are using Arthur Bench as a standalone tool without the rest of the Arthur observability platform, you can skip this step.
-
-To connect to the Arthur Platform from Bench, you will need an Arthur Bench account and API key. To obtain an API key, send an email to rowan@arthur.ai.
+Bench can be used automatically in conjunction with your team's existing Arthur platform account. To connect to the Arthur Platform from Bench, you will need an Arthur Bench account and API key.
 
 To log results to the platform, you just need to set the remote url and api key environment variables before creating and running suites. For example,  
 ```
