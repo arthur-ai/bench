@@ -30,7 +30,7 @@ For example, for a summarization evaluation task, your test suite could be creat
 
 1. the documents to summarize
 2. baseline summaries as reference outputs to evaluate against
-3. the [SummaryQuality](https://bench.readthedocs.io/en/latest/scoring.html#summary-quality) scoring method
+3. the [SummaryQuality](https://bench.readthedocs.io/en/latest/scoring.html#summary-quality) scorer
 
 To view how to create test suites from various data formats, view our [creating test suites guide](creating_test_suites.md)
 
