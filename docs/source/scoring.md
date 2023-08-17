@@ -13,7 +13,7 @@ Here is a list of all the scoring methods available by default in Arthur Bench (
 | BERT Score (`bertscore`)          | any |  Embedding-Based | Reference Output, Candidate Output|
 | Exact Match (`exact_match`)       | any | Lexicon-Based | Reference Output, Candidate Output|
 | Hedging Language (`hedging_language`)   | any | Embedding-Based | Candidate Output |
-| Python Unit Testing (`python_unit_testing`)   | Python Generation | Code Evaluator| Candidate Output, Unit Tests (see the [code eval guide](code_eval.md)) |
+| Python Unit Testing (`python_unit_testing`)   | Python Generation | Code Evaluator| Candidate Output, Unit Tests (see the [code eval guide](code_evaluation.md)) |
 | QA Correctness (`qa_correctness`) | Question-Answering| Prompt-Based | Input, Candidate Output, Context|
 | Readability (`readability`)       | any | Lexicon-Based | Candidate Output |
 | Specificity (`specificity`)       | any | Lexicon-Based | Candidate Output |

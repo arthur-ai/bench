@@ -4,37 +4,42 @@
 <p align="center">
 <img src="./_static/img/Reference_df.png" alt="Reference_df" width="750"/>
 
-Using Bench requires a reference dataset, including information such as:
-- **Inputs** to the LLM. For *Summarization* tasks, this may be the document to be summarized. For *Question & Answering* tasks, this may be the question asked.
-- **Reference Outputs**: these are your baseline outputs. Teams can use either human-labeled ground truth annotations or the outputs from your LLM model in production that you are using Bench to compare against.
-- **Candidate Outputs**: these are the outputs from your new candidate LLM.
-- **Context**: contextual information for Question & Answering tasks.
-
-[//]: # (TODO: are the latter  two part of the reference dataset?)
+Testing LLMs involves preparing the following data for your use case:
+- **Inputs** to the LLM. Depending on the task at hand, these inputs are likely formatted to follow a **prompt template**.
+- **Reference Outputs**: these are your baseline outputs, which are _optional_ in Arthur Bench but recommended to get a comprehensive understanding of your model's performance relative to its expected outputs. These reference outputs would likely be either ground truth responses to the inputs, or could be outputs from a baseline LLM that you are evaluating against.
+- **Candidate Outputs**: these are the outputs from your candidate LLM that you are scoring.
+- **Context**: contextual information used to produce the candidate output, e.g. for retrieval-augmented Question & Answering tasks.
 
 As an example, consider the task of *Question & Answering* about specific documents: 
 
  - **Input**: "What war was referred to in the Gettysburg Address?"
- - **Reference Output**: The American Civil War
- - **Candidate Output**: The American War
- - **Context**: _(The Gettysburg Address)_ "Four score and seven years ago our fathers brought forth on this continent, a new nation, conceived in Liberty, and dedicated to the proposition that all men are created equal ... that this nation, under God, shall have a new birth of freedom – and that government of the people, by the people, for the people, shall not perish from the earth."
+ - **Reference Output**: American Civil War
+ - **Candidate Output**: The war referenced in the Gettysburg Address is the American Civil War
+ - **Context**: _(Wikipedia)_ "The Gettysburg Address is a speech that U.S. President Abraham Lincoln delivered during the American Civil War at the dedication of the Soldiers' National Cemetery, now known as Gettysburg National Cemetery, in Gettysburg, Pennsylvania on the afternoon of November 19, 1863, four and a half months after the Union armies defeated Confederate forces in the Battle of Gettysburg, the Civil War's deadliest battle."
 
-## Testing Structure
+## Testing
  
 <p align="center">
 <img src="./_static/img/test_suite_run.png" alt="test_suites_runs" width="750"/>
 
 ### Test Suites
 
-A **Test Suite** can hold Input data and Reference Outputs as well as a _Scorer_ which will be used to evaluate the candidate outputs provided in each **Test Run**. 
+A **Test Suite** stores the input & reference output data for your testing use case along with a [scorer](scoring.md).
 
-For example, for a summarization task, your {class}`Test Suite <arthur_bench.run.testsuite.TestSuite>` might include the documents to summarize, desirable reference summaries, and the {class}`Summary Quality <arthur_bench.scoring.summary_quality.SummaryQuality>` scoring metric.
+For example, for a summarization use case, your test suite could be created with:
 
-To view how to create test suites from different data formats, view our [creating test suites guide](creating_test_suites.md)
+1. the documents to summarize
+2. baseline summaries as reference outputs to evaluate against
+3. the [SummaryQuality](https://bench.readthedocs.io/en/latest/scoring.html#summary-quality) scorer
 
+Test suites allow you to save and reuse your evaluation datasets over time with a consistent scorer to help you understand what drives changes in performance.
 
-### Test Runs
+To view how to create test suites from various data formats, view our [creating test suites guide](creating_test_suites.md)
 
-A **Test Run** contains a set of Candidate Outputs and optional Context, and can additionally specify metadata which indicates how the candidate outputs were generated. For example, on the document summarization task, we might want to create a run to assess the responses of gpt 3.5, using prompt version `my_custom_prompt`.
+### Test runs
 
-To view how to create test runs from different data formats, visit our [test suites guide](creating_test_suites.md)
+When a test suite is run, its `scorer` evaluates the candidate outputs provided in the run and assigns a score to each test case.
+
+To run your test suite on candidate data, pass the data to the `run()` function of your test suite, along with any additional metadata you want to be logged for that run. To view the metadata you can save with your test runs, see the [SDK docs](https://bench.readthedocs.io/en/latest/testsuite.html#arthur_bench.run.testrun.TestRun)
+
+To view how to create test runs from various data formats, visit our [test suites guide](creating_test_suites.md)

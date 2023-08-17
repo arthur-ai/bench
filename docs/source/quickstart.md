@@ -2,12 +2,14 @@
 
 Make sure you have completed installation from the [setup](setup.md) guide before moving on to this quickstart.
 
-## (Optional) Environment Setup
+## Environment setup
 
-Set the environment variable BENCH_FILE_DIR to point to the local directory where you want your test results to be saved (this will by default be "./bench_runs", a folder inside the direcrory wherever you are running your tests from). 
+The environment variable `BENCH_FILE_DIR` points to the local directory where your test data is saved and visualized by Arthur Bench.
+
+If you are running this quickstart right after completing the [setup](setup.md) guide, then take a moment to reset `BENCH_FILE_DIR` to its default value, `"./bench_runs"`. This will direct the bench UI to point to your new quickstart test suite instead of the examples from the setup.
 
 ```
-export BENCH_FILE_DIR="your/bench/file/dir/"
+export BENCH_FILE_DIR="./bench_runs"
 ```
 
 ## Creating your first test suite
@@ -53,7 +55,7 @@ Now run `bench` from the command line to launch the local UI and explore the tes
 bench
 ```
 
-## Next Steps
+## Next steps
 
 Now that you have set up and ran your first test suite, check out the rest of the [scorers](scoring.md) available in Arthur Bench out of the box. 
 

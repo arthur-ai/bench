@@ -9,11 +9,12 @@ Scorers
 
    scorer.Scorer
    bertscore.BERTScore
-   qa_quality.QAQualityCorrectness
-   summary_quality.SummaryQuality
    exact_match.ExactMatch
-   readability.Readability
-   word_count_match.WordCountMatch
-   specificity.Specificity
    hedging_language.HedgingLanguage
-
+   python_unit_testing.PythonUnitTesting
+   qa_quality.QAQualityCorrectness
+   readability.Readability
+   specificity.Specificity
+   summary_quality.SummaryQuality
+   word_count_match.WordCountMatch
+   
