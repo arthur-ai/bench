@@ -3,7 +3,6 @@ import { GRAPHIK_LIGHT } from "resources/fonts"
 
 const styles = {
     container: {
-        height: '90vh',
         padding: '0px 50px',
         color: primary.black,
     },

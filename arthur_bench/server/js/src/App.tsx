@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { useFela, FelaStyle } from 'react-fela';
 import ArthurRoutes from './routes';
+import Layout from '@compound/Layout/Layout';
 
 
 function App() {
@@ -20,7 +21,9 @@ function App() {
     return (
         <main>
             <BrowserRouter>
-                <ArthurRoutes />
+                <Layout>
+                    <ArthurRoutes />
+                </Layout>
             </BrowserRouter>
         </main>
     );
