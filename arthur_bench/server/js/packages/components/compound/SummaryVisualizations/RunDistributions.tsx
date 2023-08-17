@@ -37,6 +37,7 @@ const RunDistributions = ({ summaries, total }: Props) => {
             height={'300px'}
             yAxisTitle={'% of Tests'}
             xAxisTitle={'Avg Test Scores'}
+            hasDefaultTooltip={true}
         />
     );
 };
