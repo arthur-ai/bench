@@ -24,19 +24,21 @@ As an example, consider the task of *Question & Answering* about specific docume
 
 ### Test Suites
 
-A **Test Suite** stores the input & reference output data along with a [scorer](scoring.md).
+A **Test Suite** stores the input & reference output data for your testing use case along with a [scorer](scoring.md).
 
-For example, for a summarization evaluation task, your test suite could be created with:
+For example, for a summarization use case, your test suite could be created with:
 
 1. the documents to summarize
 2. baseline summaries as reference outputs to evaluate against
 3. the [SummaryQuality](https://bench.readthedocs.io/en/latest/scoring.html#summary-quality) scorer
 
+Test suites allow you to save and reuse your evaluation datasets over time with a consistent scorer to help you understand what drives changes in performance.
+
 To view how to create test suites from various data formats, view our [creating test suites guide](creating_test_suites.md)
 
 ### Test runs
 
-When a test suite is run, its `scorer` is used to perform evaluation consistently across the candidate outputs provided in the run. 
+When a test suite is run, its `scorer` evaluates the candidate outputs provided in the run and assigns a score to each test case.
 
 To run your test suite on candidate data, pass the data to the `run()` function of your test suite, along with any additional metadata you want to be logged for that run. To view the metadata you can save with your test runs, see the [SDK docs](https://bench.readthedocs.io/en/latest/testsuite.html#arthur_bench.run.testrun.TestRun)
 
