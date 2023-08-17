@@ -1,14 +1,14 @@
 # Scoring
 
-A **Scoring Method** is the criteria used to quantitatively evaluate LLM outputs. When you test LLMs with Arthur Bench, you attach a Scoring Method to each test suite you create - this defines how performance will be measured consistently across that test suite.
+A **Scorer** is the criteria used to quantitatively evaluate LLM outputs. When you test LLMs with Arthur Bench, you attach a Scorer to each test suite you create - this defines how performance will be measured consistently across that test suite.
 
-For a walkthrough on how to extend the ScoringMethod class to create your own scorer specialized to your data and/or use-case to use with Arthur Bench, check out the [custom scoring guide](custom_scoring.md)
+For a walkthrough on how to extend the Scorer class to create your own scorer specialized to your data and/or use-case to use with Arthur Bench, check out the [custom scoring guide](custom_scoring.md)
 
-If you would like to contribute scoring methods to the open source Arthur Bench repo, check out our [contributing guide](contributing.md)
+If you would like to contribute scorers to the open source Arthur Bench repo, check out our [contributing guide](contributing.md)
 
-Here is a list of all the scoring methods available by default in Arthur Bench (listed alphabetically):
+Here is a list of all the scorers available by default in Arthur Bench (listed alphabetically):
 
-| Scoring Method                    | Tasks | Type | Requirements | 
+| Scorer                    | Tasks | Type | Requirements | 
 |-----------------------------------|-----|-----|-----|
 | BERT Score (`bertscore`)          | any |  Embedding-Based | Reference Output, Candidate Output|
 | Exact Match (`exact_match`)       | any | Lexicon-Based | Reference Output, Candidate Output|
@@ -23,27 +23,27 @@ Here is a list of all the scoring methods available by default in Arthur Bench (
 
 For better understandability we have broken down the Scorers based on the type of procedure each Scorer uses.
 
-## Prompt-Based Scoring Methods
+## Prompt-Based Scorers
 
 ### `qa_correctness`
 
-The QA correctness scorer evaluates the correctness of an answer, given a question and context. This scoring method does not require a reference output, but does require context. Each row of the Test Run will receive a binary 0, indicating an incorrect output, or 1, indicating a correct output.
+The QA correctness scorer evaluates the correctness of an answer, given a question and context. This scorer does not require a reference output, but does require context. Each row of the Test Run will receive a binary 0, indicating an incorrect output, or 1, indicating a correct output.
 
 ### `summary_quality`
 
 The Summary Quality scorer evaluates a summary against its source text and a reference summary for comparison. It evaluates summaries on dimensions including relevance and syntax. Each row of the test run will receive a binary 0, indicating that the reference output was scored higher than the candidate output, or 1, indicating that the candidate output was scored higher than the reference output.
 
-## Embedding-Based Scoring Methods
+## Embedding-Based Scorers
 
 ### `bertscore`
 
-[BERTScore](https://arxiv.org/abs/1904.09675) is a quantitative metric to compare the similarity of two pieces of text. Using the `bertscore` scoring method will score each row of the test run as the bert score between the reference output and the candidate output.
+[BERTScore](https://arxiv.org/abs/1904.09675) is a quantitative metric to compare the similarity of two pieces of text. Using `bertscore` will score each row of the test run as the bert score between the reference output and the candidate output.
 
 ### `hedging_language`
 
-The Hedging Language scoring method evaluates whether a candidate response is similar to generic hedging language used by an LLM ("As an AI language model, I don't have personal opinions, emotions, or beliefs"). Each row of the Test Run will receive a score between 0.0 and 1.0 indicating the extent to which hedging language is detected in the response (using BERTScore similarity to the target hedging phrase). A score above 0.5 typically suggests the model output contains hedging language.
+The Hedging Language scorer evaluates whether a candidate response is similar to generic hedging language used by an LLM ("As an AI language model, I don't have personal opinions, emotions, or beliefs"). Each row of the Test Run will receive a score between 0.0 and 1.0 indicating the extent to which hedging language is detected in the response (using BERTScore similarity to the target hedging phrase). A score above 0.5 typically suggests the model output contains hedging language.
 
-## Lexicon-Based Scoring Methods
+## Lexicon-Based Scorers
 
 ### `exact_match`
 
@@ -59,10 +59,10 @@ The Specificity scorer outputs a score of 0 to 1, where smaller values correspon
 
 ### `word_count_match`
 
-For scenarios where there is a preferred output length, `word_count_match` calculates a corresponding score on the scale of 0 to 1. Specifically, this scoring method calculates how similar the number of words in the candidate output is to the number of words in the reference output, where a score of 1.0 indicates that there are the same number of words in the candidate output as in the reference output. Scores less than 1.0 are calculated as ((len_reference-delta)/len_reference) where delta is the absolute difference in word lengths between the candidate and reference outputs. All negative computed values are truncated to 0. 
+For scenarios where there is a preferred output length, `word_count_match` calculates a corresponding score on the scale of 0 to 1. Specifically, this scorers calculates how similar the number of words in the candidate output is to the number of words in the reference output, where a score of 1.0 indicates that there are the same number of words in the candidate output as in the reference output. Scores less than 1.0 are calculated as ((len_reference-delta)/len_reference) where delta is the absolute difference in word lengths between the candidate and reference outputs. All negative computed values are truncated to 0. 
 
 ## Code Evaluators
 
 ### `python_unit_testing`
 
-The Python Unit Testing scorer evaluates candidate solutions to coding tasks against unit tests. This scoring method wraps the [`code_eval`](https://huggingface.co/spaces/evaluate-metric/code_eval) evaluator interface from HuggingFace. It is important to note that this function requires that solution code uses standard python libraries only.
+The Python Unit Testing scorer evaluates candidate solutions to coding tasks against unit tests. This scorer wraps the [`code_eval`](https://huggingface.co/spaces/evaluate-metric/code_eval) evaluator interface from HuggingFace. It is important to note that this function requires that solution code uses standard python libraries only.
