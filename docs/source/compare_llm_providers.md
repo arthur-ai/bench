@@ -24,7 +24,7 @@ billsum_df = pd.DataFrame(billsum).sample(10, random_state=278487)
 
 ## LLM response generation
 
-We use different temperature settings to generate three different lists of responses:
+We use OpenAI and Cohere to generate summaries of these bills:
 
 ```python
 from langchain.llms import OpenAI, Cohere
