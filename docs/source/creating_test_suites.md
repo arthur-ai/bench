@@ -16,11 +16,11 @@ The `TestSuite` class is the main touch point for creating and running tests in 
 from arthur_bench.run.testsuite import TestSuite
 ```
 
-You can provide data for your `TestSuite` via:
-1. [`List[str]`](#liststr---testsuite)
-2. [`pd.DataFrame`](#dataframe---testsuite)
-3. [CSV file](#csv---testsuite)
-4. [HuggingFace Dataset](#huggingface-dataset---dataframe---testsuite)
+You can provide data for your `TestSuite` via the following options, each of which we give examples of in the sections below:
+1. `List[str]`
+2. `pd.DataFrame`
+3. CSV file
+4. HuggingFace Dataset
 
 To see the exact specifications for the `TestSuite` class, visit our [SDK docs](https://bench.readthedocs.io/en/latest/testsuite.html).
 
