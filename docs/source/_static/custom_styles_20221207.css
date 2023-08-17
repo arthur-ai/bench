@@ -11,7 +11,7 @@ p a, div.toctree-wrapper a, .headerlink, div.related-pages div.title {
 
 /* make bold text less bold */
 strong {
-    font-weight: 500;
+    font-weight: 400;
 }
 
 /* unbold headings and reduce rounding in highlight */
@@ -76,9 +76,4 @@ input.sidebar-search {
 
 input.sidebar-search:focus, input.sidebar-search:hover {
     color: var(--color-sidebar-search-foreground);
-}
-
-/* disable right sidebar */
-.toc-drawer {
-    display: none;
 }

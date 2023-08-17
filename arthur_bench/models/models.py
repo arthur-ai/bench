@@ -12,14 +12,32 @@ from pydantic import BaseModel, Field, validator
 
 
 class ScoringMethodType(str, Enum):
+    """
+    Indicates whether the scoring method was provided by the package or a custom
+    implementation
+    """
+
     BuiltIn = "built_in"
     Custom = "custom"
 
 
 class ScoringMethod(BaseModel):
+    """
+    Scoring method configuration
+    """
+
     name: str
+    """
+    Name of the scorer
+    """
     type: ScoringMethodType
+    """
+    Whether the scoring method was bench default or custom implementation
+    """
     config: dict = {}
+    """
+    Configuration as used by the scorer to_dict and from_dict methods
+    """
 
 
 # REQUESTS
@@ -46,12 +64,28 @@ class TestSuiteRequest(BaseModel):
     """
 
     name: str
+    """
+    Name of the test suite
+    """
     description: Optional[str] = None
+    """
+    Optional description of the test suite
+    """
     scoring_method: ScoringMethod
+    """
+    Scoring configuration to use as criteria for the test suite
+    """
     test_cases: List[TestCaseRequest] = Field(..., min_items=1)
+    """
+    List of input texts and optional reference outputs to consistently score
+    model generations against
+    """
 
     @validator("test_cases")
     def null_reference_outputs_all_or_none(cls, v):
+        """
+        Validate that all or none of test case reference outputs are null
+        """
         last_ref_output_null = None
         for tc in v:
             # get ref output value
@@ -159,6 +193,10 @@ class TestSuiteMetadata(BaseModel):
 
 
 class PaginatedTestSuites(BaseModel):
+    """
+    Paginated list of test suites.
+    """
+
     test_suites: List[TestSuiteMetadata]
     page: int
     page_size: int
@@ -179,6 +217,10 @@ class TestCaseResponse(BaseModel):
 
 
 class PaginatedTestSuite(BaseModel):
+    """
+    Test suite and optional page information
+    """
+
     id: UUID
     name: str
     scoring_method: ScoringMethod
@@ -217,12 +259,20 @@ class PaginatedRuns(BaseModel):
 
 
 class HistogramItem(BaseModel):
+    """
+    Boundaries and count for a single bucket of a run histogram
+    """
+
     count: int
     low: float
     high: float
 
 
 class SummaryItem(BaseModel):
+    """
+    Aggregate statistics for a single run: average score and score distribution
+    """
+
     id: UUID
     name: str
     avg_score: float
@@ -230,6 +280,11 @@ class SummaryItem(BaseModel):
 
 
 class TestSuiteSummary(BaseModel):
+    """
+    Aggregate descriptions of runs of a test suite.
+    Provides averages and score distributions
+    """
+
     summary: List[SummaryItem]
     page: int
     page_size: int
@@ -252,8 +307,8 @@ class RunResult(BaseModel):
 
 class PaginatedRun(BaseModel):
     """
-    Paginated list of prompts, reference outputs, and model outputs for a particular
-    run.
+    Paginated list of prompts, reference outputs, model outputs, and scores for a
+    particular run.
     """
 
     id: UUID
