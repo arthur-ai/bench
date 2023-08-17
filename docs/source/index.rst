@@ -15,7 +15,7 @@ Contents
    quickstart.md
    scoring.md
    guides
-   sdk_reference
+   sdk/arthur_bench
    contributing.md
    telemetry.md
 

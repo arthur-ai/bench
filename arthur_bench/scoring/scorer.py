@@ -28,7 +28,7 @@ def _can_omit(parameter: Parameter):
 
 class Scorer(ABC):
     """
-    Base class for all scorers.
+    Base class for all scorers. Compute a float score for a given model generation.
     """
 
     @staticmethod
@@ -42,6 +42,9 @@ class Scorer(ABC):
 
     @staticmethod
     def requires_reference() -> bool:
+        """
+        True if scorer requires reference output to compute score, False otherwise
+        """
         return True
 
     @abstractmethod
