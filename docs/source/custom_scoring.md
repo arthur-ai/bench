@@ -9,32 +9,33 @@ In this guide, we will walk through the process of evaluating LLM performance us
 
 ## Define a custom scorer
 
-First make sure `nltk` is installed as a package to your environment, which our custom scorer uses.
-
-To create a custom scorer, we will implement the `name` and `run_batch` methods, and optionally override the `requires_reference` method if our scorer doesn't require reference or target data.
+To create a custom scorer that satisfies the Scorer interface (defined in the section below), we will implement the `name` and `run_batch` methods
 
 This example custom scorer is called `TrigramRepitition`, which scores responses with a 0.0 if they contain repeated trigrams above a thresholded number of times.
 
+First make sure `nltk` is installed as a package to your environment, which our custom scorer uses.
+
+```
+pip install nltk
+```
+
 ```python
 from arthur_bench.scoring import Scorer
+import nltk
+# make sure corpus is downloaded
+nltk.download('punkt')
 from nltk import trigrams
 from typing import List, Optional
 
-# make sure corpus is downloaded
-nltk.download('punkt')
 
 class TrigramRepetition(Scorer):
 
-    def __init__(self, threshold: int = 5):
+    def __init__(self, threshold: int = 3):
         self.threshold = threshold
     
     @staticmethod
     def name() -> str:
         return "trigram_repetition"
-
-    @staticmethod
-    def requires_reference() -> bool:
-        return False
     
     def run_batch(self, candidate_batch: List[str], reference_batch: Optional[List[str]] = None,
                   input_text_batch: Optional[List[str]] = None, context_batch: Optional[List[str]] = None) -> List[float]:
