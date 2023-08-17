@@ -24,7 +24,7 @@ billsum_df = pd.DataFrame(billsum).sample(10, random_state=278487)
 
 ## LLM response generation
 
-We use different temperature settings to generate three different lists of responses:
+We use OpenAI and Cohere to generate summaries of these bills:
 
 ```python
 from langchain.llms import OpenAI, Cohere
@@ -32,7 +32,7 @@ from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 
 gpt3 = OpenAI(temperature=0.0, max_tokens=100)
-command = Cohere(temperature=0.5, max_tokens=100)
+command = Cohere(temperature=0.0, max_tokens=100)
 
 prompt_template = PromptTemplate(
 	input_variables=["text"],
@@ -48,8 +48,8 @@ gpt3_chain = LLMChain(llm=gpt3, prompt=prompt_template)
 command_chain = LLMChain(llm=command, prompt=prompt_template)
 
 # generate summaries with truncated text
-gpt3_summaries = [gpt3_chain({"text": bill[:3000]})["text"] for bill in billsum_df.text]
-command_summaries = [command_chain({"text": bill[:3000]})["text"] for bill in billsum_df.text]
+gpt3_summaries = [gpt3_chain.run(bill[:3000]) for bill in billsum_df.text]
+command_summaries = [command_chain.run(bill[:3000]) for bill in billsum_df.text]
 ```
 
 ## Create test suite
@@ -57,11 +57,11 @@ command_summaries = [command_chain({"text": bill[:3000]})["text"] for bill in bi
 For this test suite, we want to compare `gpt-3` against `command`. We will use the SummaryQuality scoring metric to A/B test each set of candidate responses against the reference summaries from the dataset
 
 ```python
-from arthur_bench.run import TestSuite
+from arthur_bench.run.testsuite import TestSuite
 my_suite = TestSuite(
 	"congressional_bills", 
 	"summary_quality", 
-    input_text_list=list(billsum_df.text),
+	input_text_list=list(billsum_df.text),
 	reference_output_list=list(billsum_df.summary)
 )
 ```
