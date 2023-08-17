@@ -27,7 +27,7 @@ example_bill_summary = billsum["test"][6]["summary"]
 
 ## LLM response generation
 
-We use different temperature settings to generate three different lists of responses:
+We use two different prompt templates to generate responses
 
 ```python
 from langchain.chat_models import ChatOpenAI
