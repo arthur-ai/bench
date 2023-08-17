@@ -77,7 +77,7 @@ class TestSuiteRequest(BaseModel):
     """
     test_cases: List[TestCaseRequest] = Field(..., min_items=1)
     """
-    List of input texts and optional reference outputs to consistently score 
+    List of input texts and optional reference outputs to consistently score
     model generations against
     """
 
