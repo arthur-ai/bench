@@ -26,9 +26,13 @@ As an example, consider the task of *Question & Answering* about specific docume
 
 A **Test Suite** stores the input & reference output data along with a [scorer](scoring.md).
 
-For example, for a summarization task, your test suite might include the documents to summarize, baseline reference summaries, and the {class}`Summary Quality <arthur_bench.scoring.summary_quality.SummaryQuality>` scoring metric.
+For example, for a summarization evaluation task, your test suite could be created with:
 
-To view how to create test suites from different data formats, view our [creating test suites guide](creating_test_suites.md)
+1. the documents to summarize
+2. baseline summaries as reference outputs to evaluate against
+3. the [SummaryQuality](https://bench.readthedocs.io/en/latest/scoring.html#summary-quality) scoring method
+
+To view how to create test suites from various data formats, view our [creating test suites guide](creating_test_suites.md)
 
 ### Test runs
 
