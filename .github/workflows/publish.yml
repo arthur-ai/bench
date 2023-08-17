@@ -36,13 +36,8 @@ jobs:
       - name: Build package
         run: |
           python -m build --sdist --wheel --outdir publish
-      - uses: actions/upload-artifact@v3
+      - name: Publish package
+        uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
         with:
-          name: test-python-package
-          path: publish/
-      # TODO: remove artifact build and replace with publish after testing
-      # - name: Publish package
-      #   uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
-      #   with:
-      #     user: __token__
-      #     password: ${{ secrets.PYPI_API_TOKEN }}
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
