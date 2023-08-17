@@ -1,8 +1,8 @@
 # Bench
 
-Bench is a tool for evaluating LLMs for production use cases. Whether you are comparing different LLMs, considering different prompts, or testing generation hyperparameters like temperature and # tokens, Bench provides one touch point for all your LLM performance evalaution.
+Bench is a tool for evaluating LLMs for production use cases. Whether you are comparing different LLMs, considering different prompts, or testing generation hyperparameters like temperature and # tokens, Bench provides one touch point for all your LLM performance evaluation.
 
-If you have encounted a need for any of the following in your LLM work, then Bench can help with your evaluation needs:
+If you have encountered a need for any of the following in your LLM work, then Bench can help with your evaluation:
 
 - to standardize the workflow of LLM evaluation with a common interface across tasks and use cases
 - to test whether open source LLMs can do as well as the top closed-source LLM API providers on your specific data
