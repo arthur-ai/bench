@@ -377,7 +377,7 @@ class LocalBenchClient(BenchClient):
         for f in run_files:
             run_obj = PaginatedRun.parse_file(f)
             avg_score = np.mean([o.score for o in run_obj.test_cases])
-            run_resp = TestRunMetadata(**run_obj.dict(), avg_score=avg_score)
+            run_resp = TestRunMetadata(**run_obj.dict(), avg_score=float(avg_score))
             runs.append(run_resp)
 
         if sort is None:
