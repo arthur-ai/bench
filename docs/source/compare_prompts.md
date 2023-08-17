@@ -46,7 +46,7 @@ prompt_template_new = PromptTemplate(
 	template="""
 	You are an expert summarizer of legal text. A good summary 
 	captures the most important information in the text and doesnt focus too much on small details.
-    Make sure to use your expert legal knowledge in summarizing.
+	Make sure to use your expert legal knowledge in summarizing.
 	Text: {text}
 	Summary:
 	"""
@@ -69,7 +69,7 @@ from arthur_bench.run import TestSuite
 my_suite = TestSuite(
 	"congressional_bills_to_reference", 
 	"bertscore", 
-    input_text_list=list(billsum_df.text),
+	input_text_list=list(billsum_df.text),
 	reference_output_list=list(billsum_df.summary)
 )
 ```
