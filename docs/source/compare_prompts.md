@@ -14,11 +14,15 @@ export OPENAI_API_KEY="sk-..."
 
 We load a publically available [congressional bill summarization dataset](https://huggingface.co/datasets/billsum) from HuggingFace.
 
+We also prepare an example bill with its summary to include in a prompt as an example response.
+
 ```python
 import pandas as pd
 from datasets import load_dataset
-billsum = load_dataset("billsum", split="ca_test")
-billsum_df = pd.DataFrame(billsum).sample(10, random_state=278487)
+billsum = load_dataset("billsum")
+billsum_df = pd.DataFrame(billsum["ca_test"]).sample(10, random_state=278487)
+example_bill = billsum["test"][6]["text"]
+example_bill_summary = billsum["test"][6]["summary"]
 ```
 
 ## LLM response generation
@@ -32,37 +36,44 @@ from langchain.prompts import PromptTemplate
 
 gpt3 = OpenAI(temperature=0.0, max_tokens=500)
 
-prompt_template_old = PromptTemplate(
+prompt0_template= PromptTemplate(
 	input_variables=["text"],
 	template="""
-	What are the basics of this text?
 	Text: {text}
 	Summary:
 	"""
 )
 
-prompt_template_new = PromptTemplate(
-	input_variables=["text"],
+prompt1_template = PromptTemplate(
+	input_variables=["text", "example_bill", "example_bill_summary"],
 	template="""
 	You are an expert summarizer of legal text. A good summary 
 	captures the most important information in the text and doesnt focus too much on small details.
 	Make sure to use your expert legal knowledge in summarizing.
+	===
+	Text: {example_bill}
+	Summary: {example_bill_summary}
+	===
 	Text: {text}
 	Summary:
 	"""
 )
 
-gpt3_prompt_old_chain = LLMChain(llm=gpt3, prompt=prompt_template_old)
-gpt3_prompt_new_chain = LLMChain(llm=gpt3, prompt=prompt_template_new)
+prompt0_chain = LLMChain(llm=gpt35, prompt=prompt0_template)
+prompt1_chain = LLMChain(llm=gpt35, prompt=prompt1_template)
+
 
 # generate summaries with truncated text
-prompt0_summaries = [gpt3_prompt_old_chain({"text": bill[:3000]})["text"] for bill in billsum_df.text]
-prompt1_summaries = [gpt3_prompt_new_chain({"text": bill[:3000]})["text"] for bill in billsum_df.text]
+prompt0_summaries = [prompt0_chain.run(bill[:3000]) for bill in billsum_df.text]
+prompt1_summaries = [
+	prompt1_chain({"text" : bill[:3000], "example_bill" : example_bill, "example_bill_summary" : example_bill_summary})["text"]
+	for bill in billsum_df.text
+]
 ```
 
 ## Create test suite
 
-For this test suite, we want to compare `gpt-3` against `command`. We will use the BERTScore scoring metric to measure how much the candidate summaries approach the reference summaries as we increase the amount of use-case specific detail in the prompt.
+For this test suite, we will use the BERTScore scoring metric to measure how much the candidate summaries approach the reference summaries by upgrading our prompt with task-specific detail and an example.
 
 ```python
 from arthur_bench.run.testsuite import TestSuite
