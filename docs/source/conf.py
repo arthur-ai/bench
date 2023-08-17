@@ -27,7 +27,7 @@ extensions = [
 ]
 
 templates_path = ["_templates"]
-exclude_patterns = []
+exclude_patterns = ["sdk/arthur_bench.rst"]
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -53,31 +53,31 @@ ASH = "#e4e0e4"
 MINT = "#c7fdd1"
 WHITE = "#ffffff"
 BLUE = "#329ad7"
+ORANGE = "#ff7c00"
 
-# # fonts
+# fonts
 FONT_STACK = "Graphik, sans-serif"
 FONT_STACK_MONOSPACE = "IBM Plex Mono, monospace"
 
 # share sidebar configuration between light and dark
 sidebar_theme_variables = {
-    "color-sidebar-background": ASH,
-    "color-sidebar-link-text": EGGPLANT,
-    "color-sidebar-link-text--top-level": EGGPLANT,
+    "color-sidebar-background": FIG,
+    "color-sidebar-link-text": WHITE,
+    "color-sidebar-link-text--top-level": MINT,
     "color-sidebar-item-background--hover": WHITE,
     "color-sidebar-text--hover": EGGPLANT,
     # search
     "color-sidebar-search-text": WHITE,
     "color-sidebar-search-border": ASH,
-    "color-sidebar-search-foreground": ASH,
-    "color-sidebar-search-foreground--inactive": MINT,
+    "color-sidebar-search-foreground": EGGPLANT,
+    "color-sidebar-search-foreground--inactive": ASH,
     "color-sidebar-search-background--focus": WHITE,
-    "color-sidebar-search-background--inactive": WHITE,
 }
 
 # The light_logo and dark_logo properties take a file path relative to the _static folder
 html_theme_options = {
-    "light_logo": "img/Arthur_Logo_PBW.svg",
-    "dark_logo": "img/Arthur_Logo_PBW.svgg",
+    "light_logo": "img/dark-mode-logo.svg",
+    "dark_logo": "img/dark-mode-logo.svg",
     "light_css_variables": {
         # define main base colors
         "color-foreground-primary": EGGPLANT,
@@ -85,17 +85,20 @@ html_theme_options = {
         "color-background-primary": WHITE,
         "color-background-secondary": FIG,
         "color-brand-primary": PURPLE,
+        "color-api-background": ASH,
+        "color-background-border": ASH,
         "color-inline-code-background": ASH,
         "color-icon": FIG,
         # table of contents (right)
         "color-toc-item-text": EGGPLANT,
         "color-toc-item-text--active": FIG,
         # body
-        "color-highlight-on-target": ASH,
-        "color-brand-content": PURPLE,
+        "color-highlight-on-target": MINT,
+        "color-brand-content": BLUE,
         # sidebar
         **sidebar_theme_variables,
         # FONTS
+        "font-stack": FONT_STACK,
         "font-stack--monospace": FONT_STACK_MONOSPACE,
         # TABLE
         "color-table-header-background": WHITE,
@@ -119,6 +122,9 @@ html_theme_options = {
         "color-brand-content": BLUE,
         # sidebar
         **sidebar_theme_variables,
+        "font-stack": FONT_STACK,
+        "font-stack--monospace": FONT_STACK_MONOSPACE,
+        # TABLE
         "color-table-header-background": FIG,
     },
     "sidebar_hide_name": True,
