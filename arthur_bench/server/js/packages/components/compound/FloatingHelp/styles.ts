@@ -6,8 +6,8 @@ export const iconStyle: FelaStyle<any, any> = {
     color: 'white',
     cursor: 'pointer',
     position: 'fixed',
-    right: '5px',
-    bottom: '5px',
+    right: '40px',
+    bottom: '110px',
     zIndex: 11,
 };
 
@@ -21,7 +21,7 @@ export const panelStyle = (open: boolean): FelaStyle<any, any> => ({
     borderRadius: '2px',
     position: 'fixed',
     right: '3%',
-    bottom: '8%',
+    bottom: '15%',
     zIndex: 11,
 });
 
