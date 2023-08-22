@@ -19,10 +19,11 @@ def get_file_extension(filepath: Union[str, os.PathLike]) -> str:
 def _validate_dataframe(data: pd.DataFrame, column: str):
     if column not in data.columns:
         if column == "input":
-            raise UserValueError(f"column {column} not found in reference dataset df."
-                                 "Creating test suite requires input, specify input "
-                                 "column from reference df or provide input_text_list")
-        raise UserValueError(f"column {column} not found in reference dataset df")
+            raise UserValueError(f"column: '{column}' not found in reference df. "
+                                 "Creating a TestSuite requires inputs. Specify "
+                                 "input_column from reference df or provide"
+                                 " input_text_list")
+        raise UserValueError(f"column: '{column}' not found in reference dataframe")
 
 
 def load_suite_from_json(filepath: Union[str, os.PathLike]) -> TestSuiteRequest:
