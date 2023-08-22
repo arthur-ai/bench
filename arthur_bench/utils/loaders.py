@@ -20,8 +20,8 @@ def _validate_dataframe(data: pd.DataFrame, column: str):
     if column not in data.columns:
         if column == "input":
             raise UserValueError(f"column {column} not found in reference dataset df."
-                                  "Creating test suite requires input, specify input "
-                                  "column from reference df or provide input_text_list")
+                                 "Creating test suite requires input, specify input "
+                                 "column from reference df or provide input_text_list")
         raise UserValueError(f"column {column} not found in reference dataset df")
 
 
