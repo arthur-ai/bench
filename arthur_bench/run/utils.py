@@ -40,8 +40,10 @@ def _load_suite_from_args(
     if requires_reference:
         if reference_column is None and reference_output_list is None:
             raise UserValueError(
-                "scoring method requires reference data but no reference data was "
-                "provided"
+                "scoring method requires Reference Outputs but no Reference Output was provided."
+                "Please provide a reference_output_list or a reference_column"
+                "name (if a DataFrame was used). " 
+                "View the Concepts Guide in the documentation for more info."
             )
     else:
         reference_column = None
