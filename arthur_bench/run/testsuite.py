@@ -270,7 +270,7 @@ class TestSuite:
         model = generation_config.to_evaluator()
 
         candidates: List[str] = []
-        for case in self.suite.test_cases:
+        for case in self._data.test_cases:
             resp = model(case.input)
             if isinstance(resp, dict):
                 resp = resp.get("text")
