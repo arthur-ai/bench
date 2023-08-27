@@ -8,7 +8,7 @@ If you have encountered a need for any of the following in your LLM work, then B
 - to test whether open source LLMs can do as well as the top closed-source LLM API providers on your specific data
 - to translate the rankings on LLM leaderboards and benchmarks into scores that you care about for your actual use case
 
-Join the bench community on [Discord](https://discord.gg/s3nzyn7m).
+Join the bench community on [Discord](https://discord.gg/YXVhuvaw).
 
 For bug fixes and feature requests, please file a Github issue.
 
