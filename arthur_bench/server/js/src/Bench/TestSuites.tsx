@@ -68,8 +68,8 @@ const TestSuites = () => {
     return (
         <div>
             <div className={css(styles.banner)}>
-                <h2>Welcome to LLM Bench!</h2>
                 <img src={HeaderImage} alt={'logo'} />
+                <h2>Welcome to LLM Bench!</h2>
             </div>
             <TestSuitesHeader
                 setFilters={setFilters}

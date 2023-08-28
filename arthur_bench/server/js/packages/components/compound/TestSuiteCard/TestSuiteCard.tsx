@@ -1,13 +1,13 @@
 import React from 'react';
-import { useFela } from 'react-fela';
+import {useFela} from 'react-fela';
 import styles from './styles';
-import { Button } from '../../core/Button';
+import {Button, EButtonSize} from '../../core/Button';
 import TestRunTable from '../TestRunTable/TestRunTable';
-import { EIconType } from '../../core/Icon';
-import { useNavigate } from 'react-router-dom';
-import { TTestSuite } from 'arthur-redux/slices/testSuites/types';
-import { useTestSuites } from '../../../../src/Bench/useTestSuites';
-import { parseAndFormatDate } from '../InsightHeadline/InsightHeadline';
+import {EIconType} from '../../core/Icon';
+import {useNavigate} from 'react-router-dom';
+import {TTestSuite} from 'arthur-redux/slices/testSuites/types';
+import {useTestSuites} from '../../../../src/Bench/useTestSuites';
+import {parseAndFormatDate} from '../InsightHeadline/InsightHeadline';
 import MethodTag from './MethodTag';
 
 type cardProps = {
@@ -62,6 +62,7 @@ const TestSuiteCard = ({
                 <Button
                     text={isExpanded ? 'CLOSE TEST RUNS' : 'VIEW TEST RUNS'}
                     isLink={true}
+                    size={EButtonSize.SMALL}
                     clickHandler={() => toggleExpandedIndex(index)}
                     iconStart={
                         isExpanded

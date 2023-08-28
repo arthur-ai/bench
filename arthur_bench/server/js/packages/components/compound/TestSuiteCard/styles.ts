@@ -19,7 +19,7 @@ const styles = {
     name: {
         color: secondary.blue,
         fontFamily: GRAPHIK_LIGHT,
-        fontSize: '24px',
+        fontSize: '18px',
         ':hover': {
             cursor: 'pointer',
             textDecoration: 'underline'

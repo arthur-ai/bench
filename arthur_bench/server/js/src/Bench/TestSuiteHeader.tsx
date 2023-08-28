@@ -7,7 +7,6 @@ import { EIconType } from '@core/Icon';
 import TestSuiteDetailsModal from '@compound/TestSuiteDetailsModal/TestSuiteDetailsModal';
 import styles from './styles';
 import { useFela } from 'react-fela';
-import { useTestSuites } from './useTestSuites';
 import { DetailedTestSuite } from 'arthur-redux/slices/testSuites/types';
 import MethodTag from '@compound/TestSuiteCard/MethodTag';
 import { useTranslation } from 'react-i18next';

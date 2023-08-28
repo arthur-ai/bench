@@ -18,10 +18,12 @@ type RowProps = {
 };
 
 const cellStyle = {
-    width: '450px',
+    maxWidth: '450px',
     textAlign: 'left' as 'left',
     border: `1px solid ${primary.ashGrey}`,
     padding: '25px',
+    overflow: 'auto' as 'auto',
+    fontSize: '16px'
 };
 const Row = ({ runCase }: RowProps) => {
     const { css } = useFela();

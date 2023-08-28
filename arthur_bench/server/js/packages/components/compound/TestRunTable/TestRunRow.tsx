@@ -34,7 +34,7 @@ const TestRunRow = ({ testRun, testSuiteId }: TRowProps) => {
             </TableCell>
             <TableCell className={css(cellStyles('500px'))}>
                 <div className={css(styles.nameCell)}>
-                    <div style={{ fontSize: '16px' }}>{testRun.name}</div>
+                    <div>{testRun.name}</div>
                     {showActions && (
                             <Button
                                 isLink={true}
