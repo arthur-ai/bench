@@ -59,8 +59,8 @@ class SummaryQuality(Scorer):
     Comprehensive measure of summarization quality compared to a reference summary.
     """
 
-    def __init__(self):
-        self.evaluator = LLMChain(llm=ChatOpenAI(temperature=0), prompt=COMPARE)
+    def __init__(self, llm = ChatOpenAI(temperature=0)):
+        self.evaluator = LLMChain(llm=llm, prompt=COMPARE)
 
     @staticmethod
     def name() -> str:
