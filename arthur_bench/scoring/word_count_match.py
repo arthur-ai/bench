@@ -15,7 +15,7 @@ class WordCountMatch(Scorer):
     Thus, if the reference output is shorter than the candidate output, this is
     computed as (len_reference/len_candidate), and otherwise, this is computed as
     (len_candidate/len_reference).
-   
+
     Utilizes lexicon count, removing punctuations: https://pypi.org/project/textstat/
 
     """
