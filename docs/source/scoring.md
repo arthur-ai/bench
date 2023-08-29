@@ -59,7 +59,7 @@ The Specificity scorer outputs a score of 0 to 1, where smaller values correspon
 
 #### `word_count_match`
 
-For scenarios where there is a preferred output length, `word_count_match` calculates a corresponding score on the scale of 0 to 1. Specifically, this scoring method calculates how similar the number of words in the candidate output is to the number of words in the reference output, where a score of 1.0 indicates that there are the same number of words in the candidate output as in the reference output. Scores less than 1.0 are calculated as ((len_reference-delta)/len_reference) where delta is the absolute difference in word lengths between the candidate and reference outputs. All negative computed values are truncated to 0. 
+For scenarios where there is a preferred output length, `word_count_match` calculates a corresponding score on the scale of 0 to 1. Specifically, this scoring method calculates how similar the number of words in the candidate output is to the number of words in the reference output, where a score of 1.0 indicates that there are the same number of words in the candidate output as in the reference output. Scores less than 1.0 are calculated as the ratio between the word lengths of the candidate and reference outputs. Thus, if the reference output is shorter than the candidate output, this is computed as `(len_reference/len_candidate)`, and otherwise, this is computed as `(len_candidate/len_reference)`.
 
 ### Code Evaluators
 
