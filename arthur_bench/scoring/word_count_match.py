@@ -41,8 +41,8 @@ class WordCountMatch(Scorer):
             len_ref = lexicon_count(reference_batch[i], removepunct=True)
             len_cand = lexicon_count(candidate_batch[i], removepunct=True)
             if len_cand > len_ref:
-                word_count_match.append(len_ref/len_cand)
+                word_count_match.append(len_ref / len_cand)
             else:
-                word_count_match.append(len_cand/len_ref)
+                word_count_match.append(len_cand / len_ref)
 
         return word_count_match
