@@ -1,5 +1,6 @@
 import logging
 import tiktoken
+from tiktoken.core import Encoding
 from typing import List, Optional, Tuple
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
@@ -25,7 +26,13 @@ LLM_CHOICE_OPTIONS = {"0": 0.0, "1": 1.0, "tie": 0.5}
 logger = logging.getLogger(__name__)
 
 
-def truncate_input_text(input_text, ref_output, cand_output) -> Tuple[str, bool]:
+def truncate_input_text(
+    input_text,
+    ref_output,
+    cand_output,
+    context_window: int = CONTEXT_WINDOW_MAP[EVALUATOR_MODEL],
+    tiktoken_encoder: Encoding = TIKTOKEN_ENCODER,
+) -> Tuple[str, bool]:
     """Truncates the input_text to fit in LLM evaluator context
 
     Truncate the input text so that the filled-in COMPARE prompt
@@ -37,19 +44,17 @@ def truncate_input_text(input_text, ref_output, cand_output) -> Tuple[str, bool]
     llm_prompt_untruncated = COMPARE.format(
         text=input_text, summary_A=ref_output, summary_B=cand_output
     )
-    input_text_tokens = TIKTOKEN_ENCODER.encode(input_text)
-    llm_prompt_tokens = TIKTOKEN_ENCODER.encode(llm_prompt_untruncated)
+    input_text_tokens = tiktoken_encoder.encode(input_text)
+    llm_prompt_tokens = tiktoken_encoder.encode(llm_prompt_untruncated)
     num_to_truncate_from_input_text_tokens = (
-        len(llm_prompt_tokens)
-        - CONTEXT_WINDOW_MAP[EVALUATOR_MODEL]
-        + TIKTOKEN_ERROR_PADDING
+        len(llm_prompt_tokens) - context_window + TIKTOKEN_ERROR_PADDING
     )
     truncated = False
     if num_to_truncate_from_input_text_tokens > 0:
         input_text_tokens_truncated = input_text_tokens[
             :-num_to_truncate_from_input_text_tokens
         ]
-        input_text = TIKTOKEN_ENCODER.decode(input_text_tokens_truncated)
+        input_text = tiktoken_encoder.decode(input_text_tokens_truncated)
         truncated = True
     return input_text, truncated
 
@@ -59,8 +64,15 @@ class SummaryQuality(Scorer):
     Comprehensive measure of summarization quality compared to a reference summary.
     """
 
-    def __init__(self, llm = ChatOpenAI(temperature=0)):
+    def __init__(
+        self,
+        llm=ChatOpenAI(temperature=0),
+        context_window: int = CONTEXT_WINDOW_MAP[EVALUATOR_MODEL],
+        tiktoken_encoder: Encoding = TIKTOKEN_ENCODER,
+    ):
         self.evaluator = LLMChain(llm=llm, prompt=COMPARE)
+        self.context_window = context_window
+        self.tiktoken_encoder = tiktoken_encoder
 
     @staticmethod
     def name() -> str:
@@ -91,7 +103,11 @@ class SummaryQuality(Scorer):
         num_truncated = 0
         for i in range(len(inputs)):
             inp, truncated = truncate_input_text(
-                inputs[i], reference_outputs[i], candidate_outputs[i]
+                inputs[i],
+                reference_outputs[i],
+                candidate_outputs[i],
+                self.context_window,
+                self.tiktoken_encoder,
             )
             num_truncated += int(truncated)
 
@@ -101,7 +117,7 @@ class SummaryQuality(Scorer):
         if num_truncated > 0:
             logger.warning(
                 f"Truncated {num_truncated} out of {len(inputs)} total summary inputs "
-                f"to {CONTEXT_WINDOW_MAP[EVALUATOR_MODEL]} characters"
+                f"to {self.context_window} characters"
             )
 
         return super().run(
