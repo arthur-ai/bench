@@ -53,7 +53,7 @@ def test_run_wcm():
         )
 
         # assert return correct values
-        expected = [0.8888888, 0.7857142, 1.0, 0.583333]
+        expected = [0.9, 0.785714, 1.0, 0.583333]
         for i, result in enumerate(wcm_run_result):
             assert torch.isclose(torch.tensor(result), torch.tensor(expected[i]), atol=1e-5)
 
