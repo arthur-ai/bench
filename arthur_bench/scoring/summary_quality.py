@@ -70,6 +70,12 @@ class SummaryQuality(Scorer):
         context_window: int = CONTEXT_WINDOW_MAP[EVALUATOR_MODEL],
         tiktoken_encoder: Encoding = TIKTOKEN_ENCODER,
     ):
+        if not isinstance(llm, ChatOpenAI):
+            # Customization is fine, but warn that it should be a chat model
+            logger.warning(
+                "Custom LLM is allowed, but unexpected results may occur if it is not a"
+                " chat model"
+            )
         self.evaluator = LLMChain(llm=llm, prompt=COMPARE)
         self.context_window = context_window
         self.tiktoken_encoder = tiktoken_encoder
