@@ -1,11 +1,15 @@
+import logging
 from typing import List, Optional
 
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
+from langchain.chat_models.base import BaseChatModel
 
 from arthur_bench.exceptions import UserValueError
 from arthur_bench.scoring import Scorer
 from arthur_bench.scoring.prompts.qa_correctness import DECIDE
+
+logger = logging.getLogger(__name__)
 
 
 class QAQualityCorrectness(Scorer):
@@ -14,8 +18,16 @@ class QAQualityCorrectness(Scorer):
     generation produced a correct answer.
     """
 
-    def __init__(self):
-        self.evaluator = LLMChain(llm=ChatOpenAI(temperature=0), prompt=DECIDE)
+    def __init__(self, llm: Optional[BaseChatModel] = None):
+        if llm is None:
+            llm = ChatOpenAI(temperature=0)
+        else:
+            # Customization is fine, but warn that it should be a chat model
+            logger.warning(
+                "Custom LLM is allowed, but unexpected results may occur if it is not a"
+                " chat model"
+            )
+        self.evaluator = LLMChain(llm=llm, prompt=DECIDE)
 
     @staticmethod
     def name() -> str:
