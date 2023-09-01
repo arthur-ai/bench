@@ -4,6 +4,7 @@ from tiktoken.core import Encoding
 from typing import List, Optional, Tuple
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
+from langchain.chat_models.base import BaseChatModel
 
 from arthur_bench.exceptions import UserValueError, UserTypeError
 
@@ -31,7 +32,7 @@ def truncate_input_text(
     ref_output,
     cand_output,
     context_window: int = CONTEXT_WINDOW_MAP[EVALUATOR_MODEL],
-    tiktoken_encoder: Encoding = TIKTOKEN_ENCODER,
+    tokenizer: Encoding = TIKTOKEN_ENCODER,
 ) -> Tuple[str, bool]:
     """Truncates the input_text to fit in LLM evaluator context
 
@@ -44,8 +45,8 @@ def truncate_input_text(
     llm_prompt_untruncated = COMPARE.format(
         text=input_text, summary_A=ref_output, summary_B=cand_output
     )
-    input_text_tokens = tiktoken_encoder.encode(input_text)
-    llm_prompt_tokens = tiktoken_encoder.encode(llm_prompt_untruncated)
+    input_text_tokens = tokenizer.encode(input_text)
+    llm_prompt_tokens = tokenizer.encode(llm_prompt_untruncated)
     num_to_truncate_from_input_text_tokens = (
         len(llm_prompt_tokens) - context_window + TIKTOKEN_ERROR_PADDING
     )
@@ -54,7 +55,7 @@ def truncate_input_text(
         input_text_tokens_truncated = input_text_tokens[
             :-num_to_truncate_from_input_text_tokens
         ]
-        input_text = tiktoken_encoder.decode(input_text_tokens_truncated)
+        input_text = tokenizer.decode(input_text_tokens_truncated)
         truncated = True
     return input_text, truncated
 
@@ -66,10 +67,15 @@ class SummaryQuality(Scorer):
 
     def __init__(
         self,
-        llm=ChatOpenAI(temperature=0),
+        llm: Optional[BaseChatModel] = None,
         context_window: int = CONTEXT_WINDOW_MAP[EVALUATOR_MODEL],
-        tiktoken_encoder: Encoding = TIKTOKEN_ENCODER,
+        tokenizer: Optional[Encoding] = None,
     ):
+        if llm is None:
+            llm = ChatOpenAI(temperature=0)
+        if tokenizer is None:
+            tokenizer = TIKTOKEN_ENCODER
+
         if not isinstance(llm, ChatOpenAI):
             # Customization is fine, but warn that it should be a chat model
             logger.warning(
@@ -78,7 +84,7 @@ class SummaryQuality(Scorer):
             )
         self.evaluator = LLMChain(llm=llm, prompt=COMPARE)
         self.context_window = context_window
-        self.tiktoken_encoder = tiktoken_encoder
+        self.tokenizer = tokenizer
 
     @staticmethod
     def name() -> str:
@@ -113,7 +119,7 @@ class SummaryQuality(Scorer):
                 reference_outputs[i],
                 candidate_outputs[i],
                 self.context_window,
-                self.tiktoken_encoder,
+                self.tokenizer,
             )
             num_truncated += int(truncated)
 
