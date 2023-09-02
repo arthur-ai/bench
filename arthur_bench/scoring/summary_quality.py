@@ -76,7 +76,7 @@ class SummaryQuality(Scorer):
         if tokenizer is None:
             tokenizer = TIKTOKEN_ENCODER
 
-        if not isinstance(llm, ChatOpenAI):
+        if not isinstance(llm, BaseChatModel):
             # Customization is fine, but warn that it should be a chat model
             logger.warning(
                 "Custom LLM is allowed, but unexpected results may occur if it is not a"
