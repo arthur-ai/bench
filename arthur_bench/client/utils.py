@@ -8,10 +8,10 @@ from arthur_bench.client.rest import ArthurClient
 
 def _get_bench_client() -> BenchClient:
     client: BenchClient
-    url = os.getenv("ARTHUR_API_URL")
-    if url:  # if remote url is specified use remote client
+    use_remote = os.getenv("ARTHUR_BENCH_AUTOLOG")
+    if use_remote:  # if remote url is specified use remote client
         try:
-            client = ArthurClient(url=url).bench
+            client = ArthurClient().bench
         except (UserValueError, MissingParameterError) as e:
             raise UserValueError(
                 f"You must provide authentication when using remote url: {e}"
