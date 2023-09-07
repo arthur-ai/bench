@@ -1,4 +1,6 @@
+import os
 import pytest
+from unittest import mock
 from unittest.mock import Mock, patch
 
 from tests.fixtures.mock_data import MOCK_SUMMARY_DATA
@@ -13,6 +15,7 @@ def mock_llm_chain():
 
 
 # Test the run_batch method
+@mock.patch.dict(os.environ, {"OPENAI_API_KEY": "MOCK_API_KEY"})
 def test_run_batch(mock_llm_chain):
     with patch(
         "arthur_bench.scoring.summary_quality.LLMChain", return_value=mock_llm_chain
@@ -51,6 +54,7 @@ def test_run_batch(mock_llm_chain):
         ({"text": "invalid"}, [-1.0]),
     ],
 )
+@mock.patch.dict(os.environ, {"OPENAI_API_KEY": "MOCK_API_KEY"})
 def test_run_batch_with_different_llm_returns(llm_return, expected, mock_llm_chain):
     mock_llm_chain.return_value = llm_return
     with patch(
