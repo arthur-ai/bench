@@ -44,6 +44,7 @@ class Hallucination(Scorer):
                 response=candidate_batch[i], context=context_batch[i]
             )
             response = self.client.bench.score_hallucination(request)
-            score = float(response["hallucination"])
+            # score 0 if there is a hallucination, 1 if no hallucination found
+            score = float(not response.hallucination)
             res.append(score)
         return res
