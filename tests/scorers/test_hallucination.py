@@ -3,6 +3,7 @@ from unittest.mock import Mock, patch
 
 from tests.helpers import get_mock_client
 from arthur_bench.scoring.hallucination import Hallucination
+from arthur_bench.models.scoring import HallucinationScoreResponse
 from tests.fixtures.mock_data import MOCK_SUMMARY_DATA
 
 
@@ -11,10 +12,9 @@ def mock_client():
     mock_client = get_mock_client()
     mock_client.bench = Mock()
     mock_client.bench.score_hallucination = Mock()
-    mock_client.bench.score_hallucination.return_value = {
-        "hallucination": "0",
-        "reason": "this is the reason",
-    }
+    mock_client.bench.score_hallucination.return_value = HallucinationScoreResponse(
+        hallucination=False, reason="this is the reason"
+    )
     return mock_client
 
 
@@ -42,4 +42,4 @@ def test_run_batch(mock_client):
             )
 
         # assert correct return values for mock responses
-        assert result == [0.0] * len(MOCK_SUMMARY_DATA)
+        assert result == [1.0] * len(MOCK_SUMMARY_DATA)
