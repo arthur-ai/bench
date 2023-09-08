@@ -300,7 +300,7 @@ class ArthurBenchClient(BenchClient):
             self.http_client.post(
                 "/bench/scoring/hallucination",
                 json=json_body.json(),
-                validation_response_code=HTTPStatus.CREATED,
+                validation_response_code=HTTPStatus.OK,
             ),
         )
         return HallucinationScoreResponse(**parsed_resp)
