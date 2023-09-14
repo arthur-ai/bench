@@ -11,7 +11,13 @@ In this guide, we will walk through the process of evaluating LLM performance us
 
 To create a custom scorer that satisfies the Scorer interface (defined in the section below), implement the scoring logic in the `run_batch` method. Additionally, provide your scorer a name in the `name()` method. 
 
-This example custom scorer is called `TrigramRepitition`, which scores responses with a 0.0 if they contain repeated trigrams above a thresholded number of times. For our scorer, we override the `requires_reference()` method to return `False` instead of `True`, since this custom scorer evaluates the candidate outputs without the need for a reference.
+This example custom scorer is called `TrigramRepetition`, which scores responses with a 0.0 if they contain repeated trigrams above a thresholded number of times. For our scorer, we override the `requires_reference()` method to return `False` instead of `True`, since this custom scorer evaluates the candidate outputs without the need for a reference.
+
+Make sure `nltk` is installed as a package to your environment, which our custom scorer uses.
+
+```
+pip install nltk
+```
 
 Make sure `nltk` is installed as a package to your environment, which our custom scorer uses.
 

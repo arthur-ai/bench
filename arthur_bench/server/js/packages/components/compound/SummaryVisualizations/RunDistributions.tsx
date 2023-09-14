@@ -4,7 +4,7 @@ import {
     TDistribution,
     TestRunSummary,
 } from 'arthur-redux/slices/testSuites/types';
-import { TGraphDataItem } from '@core/Charts/LineChart/';
+import { TGraphDataItem } from '../../core/Charts/LineChart/';
 import { useParams } from 'react-router-dom';
 
 const getValues = (summaries: TestRunSummary[], testRunId: string, total: number): TGraphDataItem[] => {
