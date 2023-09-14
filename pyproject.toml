@@ -55,6 +55,11 @@ docs = [
 [project.scripts]
 bench = "arthur_bench.server.run_server:run"
 
+[project.urls]
+Homepage = "https://www.arthur.ai/arthur-bench"
+Documentation = "https://bench.readthedocs.io/"
+Repository = "https://github.com/arthur-ai/bench"
+
 [metadata]
 url = 'http://arthur.ai'
 
