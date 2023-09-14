@@ -51,6 +51,7 @@ Bench can be used automatically in conjunction with your team's existing Arthur 
 To log results to the platform, you just need to set the remote url and api key environment variables before creating and running suites. For example,  
 ```
 import os
+os.environ['ARTHUR_BENCH_AUTOLOG'] = True
 os.environ['ARTHUR_API_URL'] = 'https://app.arthur.ai'
 os.environ['ARTHUR_API_KEY'] = 'FILL ME IN'
 ```
