@@ -4,7 +4,6 @@
     "private": true,
     "dependencies": {
         "@reduxjs/toolkit": "^1.8.3",
-        "@storybook/addon-actions": "^6.5.9",
         "@types/luxon": "^3.0.0",
         "@types/react": "^18.0.17",
         "api": "file:packages/api",
