@@ -8,7 +8,7 @@ from arthur_bench.client.rest import ArthurClient
 
 def _get_bench_client() -> BenchClient:
     client: BenchClient
-    use_remote = os.getenv("ARTHUR_BENCH_AUTOLOG")
+    use_remote = os.getenv("ARTHUR_BENCH_AUTOLOG", "false").lower() == "true"
     if use_remote:  # if remote url is specified use remote client
         try:
             client = ArthurClient().bench
