@@ -5,7 +5,7 @@ Bench is an open source python library for evaluating generative text models for
 
 Get started by visiting our :doc:`quickstart page<quickstart>`, reading about :doc:`key concepts <concepts>`,  or viewing our `Github <https://github.com/arthur-ai/bench>`_.
 
-Join the bench community on `Discord <https://discord.gg/s3nzyn7m>`_.
+Join the bench community on `Discord <https://discord.gg/tdfUAtaVHz>`_.
 
 Contents
 ========
