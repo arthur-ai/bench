@@ -9,14 +9,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@reduxjs/toolkit": "^1.8.3",
-    "luxon": "^3.0.1",
-    "redux": "^4.2.0",
-    "redux-api-middleware": "^3.2.1",
-    "redux-logger": "^3.0.6"
+    "@reduxjs/toolkit": "1.8.3",
+    "luxon": "3.0.1",
+    "redux": "4.2.0",
+    "redux-api-middleware": "3.2.1",
+    "redux-logger": "3.0.6"
   },
   "devDependencies": {
-    "@types/redux-api-middleware": "^3.2.3",
-    "@types/redux-logger": "^3.0.9"
+    "@types/redux-api-middleware": "3.2.3",
+    "@types/redux-logger": "3.0.9"
   }
 }
