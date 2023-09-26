@@ -41,6 +41,12 @@ MOCK_CODE_EVAL_RESULT_FAIL = ({'pass@1': 0.0}, defaultdict(list, {0: [(0, {'task
 
 MOCK_SUMMARY_DATA = pd.DataFrame(
     {
+        "input_text": [
+            "Summarize this article:",
+            "Summarize this article:",
+            "Summarize this article:",
+            "Summarize this article:",
+        ],
         "source": [
             "Breaking News: Earthquake measuring 7.2 magnitude strikes California. The earthquake originated near the city of Los Angeles and was felt across the region. Several buildings have collapsed, and there are reports of injuries and casualties. Rescue operations are underway.",
             "Just had the most amazing dinner at this new restaurant in town! The food was delicious, and the service was top-notch. I highly recommend it to everyone looking for a great dining experience.",

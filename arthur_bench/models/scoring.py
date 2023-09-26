@@ -6,14 +6,21 @@ class HallucinationScoreRequest(BaseModel):
     Request for hallucination classification
     """
 
-    response: str
+    user_input: str
     """
-    Model generated response
+    User input with which to determine if the model generated response is supported
     """
+
     context: str
     """
     Context with which to determine if the model generated response is supported
     """
+
+    response: str
+    """
+    Model generated response
+    """
+    
 
 
 class HallucinationScoreResponse(BaseModel):

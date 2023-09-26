@@ -35,8 +35,8 @@ class Hallucination(Scorer):
         input_text_batch: Optional[List[str]] = None,
         context_batch: Optional[List[str]] = None,
     ) -> List[float]:
-        if context_batch is None:
-            raise ArthurUserError("context is required for hallucination scoring")
+        if context_batch is None or input_text_batch is None:
+            raise ArthurUserError("user input and context is required for hallucination scoring")
 
         res = []
         for i in range(len(candidate_batch)):

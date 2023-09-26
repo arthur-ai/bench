@@ -13,7 +13,7 @@ def mock_client():
     mock_client.bench = Mock()
     mock_client.bench.score_hallucination = Mock()
     mock_client.bench.score_hallucination.return_value = HallucinationScoreResponse(
-        hallucination=False, reason="this is the reason"
+        hallucination=False, reason="Nothing wrong caught by the hallucination detector"
     )
     return mock_client
 
@@ -29,6 +29,7 @@ def test_run_batch(mock_client):
         # get run batch result from mock client call
         result = hallucination_score.run_batch(
             MOCK_SUMMARY_DATA["candidate_summary"],
+            input_text_batch=MOCK_SUMMARY_DATA["input_text"],
             context_batch=MOCK_SUMMARY_DATA["source"],
         )
 
@@ -36,8 +37,9 @@ def test_run_batch(mock_client):
         for i in range(len(MOCK_SUMMARY_DATA)):
             hallucination_score.client.bench.score_hallucination.assert_any_call(
                 {
-                    "response": MOCK_SUMMARY_DATA["candidate_summary"][i],
+                    "user_input": MOCK_SUMMARY_DATA["input_text"][i],
                     "context": MOCK_SUMMARY_DATA["source"][i],
+                    "response": MOCK_SUMMARY_DATA["candidate_summary"][i],
                 }
             )
 
