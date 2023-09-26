@@ -41,7 +41,7 @@ class Hallucination(Scorer):
         res = []
         for i in range(len(candidate_batch)):
             request = HallucinationScoreRequest(
-                response=candidate_batch[i], context=context_batch[i]
+                user_input=input_text_batch[i], context=context_batch[i], response=candidate_batch[i]
             )
             response = self.client.bench.score_hallucination(request)
             # score 0 if there is a hallucination, 1 if no hallucination found
