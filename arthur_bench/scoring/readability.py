@@ -4,7 +4,7 @@ from arthur_bench.scoring import NumericalScorer
 
 # specified by the flesch reading score github
 # https://github.com/textstat/textstat
-max_flesch_reading_ease_value = 121.22 
+max_flesch_reading_ease_value = 121.22
 
 
 class Readability(NumericalScorer):
@@ -32,10 +32,10 @@ class Readability(NumericalScorer):
         input_text_batch: Optional[List[str]] = None,
         context_batch: Optional[List[str]] = None,
     ) -> List[float]:
-        """Use the flesch reading ease function, 
+        """Use the flesch reading ease function,
         cut off negative values and divide by max value to get score between 0 and 1"""
 
         return [
-            max(flesch_reading_ease(i), 0)/max_flesch_reading_ease_value 
+            max(flesch_reading_ease(i), 0) / max_flesch_reading_ease_value
             for i in candidate_batch
         ]

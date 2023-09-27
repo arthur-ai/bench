@@ -12,7 +12,8 @@ from arthur_bench.exceptions import UserValueError
 from arthur_bench.scoring import CategoricalScorer
 from arthur_bench.scoring.scorer import SINGLE_ITEM_BATCH_DEFAULT
 
-pass_fail_map = {0.0 : "fail", 1.0 : "pass"}
+pass_fail_map = {0.0: "fail", 1.0: "pass"}
+
 
 class PythonUnitTesting(CategoricalScorer):
     """
@@ -56,7 +57,7 @@ class PythonUnitTesting(CategoricalScorer):
     @staticmethod
     def name() -> str:
         return "python_unit_testing"
-    
+
     @staticmethod
     def possible_values() -> List[str]:
         return ["pass", "fail"]

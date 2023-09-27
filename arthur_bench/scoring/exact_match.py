@@ -6,7 +6,7 @@ from arthur_bench.scoring import CategoricalScorer
 
 class ExactMatch(CategoricalScorer):
     """
-    Returns True if candidate matches reference, 
+    Returns True if candidate matches reference,
     False if candidate does not match reference.
     """
 

@@ -7,10 +7,10 @@ from arthur_bench.models.scoring import HallucinationScoreRequest
 
 class Hallucination(CategoricalScorer):
     """
-    Score each output against a context using Arthur's hosted 
-    hallucination checker. A score of False means the scorer 
-    estimates the candidate is supported by the context. A 
-    score of True means the scorer found information in 
+    Score each output against a context using Arthur's hosted
+    hallucination checker. A score of False means the scorer
+    estimates the candidate is supported by the context. A
+    score of True means the scorer found information in
     the candidate unsupported by the context.
     """
 
@@ -20,7 +20,7 @@ class Hallucination(CategoricalScorer):
     @staticmethod
     def name() -> str:
         return "hallucination"
-    
+
     @staticmethod
     def possible_values() -> List[bool]:
         return [True, False]

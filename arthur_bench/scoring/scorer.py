@@ -159,7 +159,6 @@ class Scorer(ABC):
 
 
 class CategoricalScorer(Scorer):
-
     @staticmethod
     @abstractmethod
     def possible_values() -> Union[List[bool], List[int], List[str]]:
@@ -189,7 +188,6 @@ class CategoricalScorer(Scorer):
 
 
 class NumericalScorer(Scorer):
-
     @abstractmethod
     def run_batch(
         self,
