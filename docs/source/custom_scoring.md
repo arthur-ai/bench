@@ -11,7 +11,7 @@ In this guide, we will walk through the process of evaluating LLM performance us
 
 To create a custom scorer that satisfies the Scorer interface (defined in the section below), implement the scoring logic in the `run_batch` method. Additionally, provide your scorer a name in the `name()` method. 
 
-This example custom scorer is called `TrigramRepetition`, which scores responses with a 0.0 if they contain repeated trigrams above a thresholded number of times. For our scorer, we override the `requires_reference()` method to return `False` instead of `True`, since this custom scorer evaluates the candidate outputs without the need for a reference.
+This example custom scorer is called `TrigramRepetition`, which scores responses with False if they contain repeated trigrams above a thresholded number of times. For our scorer, we override the `requires_reference()` method to return `False` instead of `True`, since this custom scorer evaluates the candidate outputs without the need for a reference.
 
 Make sure `nltk` is installed as a package to your environment, which our custom scorer uses.
 
@@ -26,7 +26,7 @@ pip install nltk
 ```
 
 ```python
-from arthur_bench.scoring import Scorer
+from arthur_bench.scoring import CategoricalScorer
 import nltk
 # make sure corpus is downloaded
 nltk.download('punkt')
@@ -34,7 +34,7 @@ from nltk import trigrams
 from typing import List, Optional
 
 
-class TrigramRepetition(Scorer):
+class TrigramRepetition(CategoricalScorer):
 
     def __init__(self, threshold: int = 3):
         self.threshold = threshold
@@ -42,6 +42,10 @@ class TrigramRepetition(Scorer):
     @staticmethod
     def name() -> str:
         return "trigram_repetition"
+
+    @staticmethod
+    def possible_values() -> List[bool]:
+        return [True, False]
 
     @staticmethod
     def requires_reference() -> bool:
@@ -60,7 +64,7 @@ class TrigramRepetition(Scorer):
                 else:
                     counts[tri] = 1
             max_repeat = max(counts.values())
-            repeat_scores.append(float(max_repeat < self.threshold))
+            repeat_scores.append(max_repeat < self.threshold)
         return repeat_scores
 ```
 
@@ -98,7 +102,7 @@ print(run.scores)
 ```
 
 ```python
->>> [1.0, 0.0]
+>>> [True, False]
 ```
 
 ## Scorer Validation
@@ -120,7 +124,7 @@ By default, bench will save the json serializable attributes of your scorer as t
 
 ## `Scorer` interface
 
-All scorers in bench implement the {class}`scorer <arthur_bench.scoring.scorer.scorer>` interface. Let's take a look at that interface:
+All scorers in bench inherit from either the {class}`NumericalScorer <arthur_bench.scoring.scorer.numerical_scorer>` or {class}`CategoricalScorer <arthur_bench.scoring.scorer.categorical_scorer>` classes, both of which implement the {class}`scorer <arthur_bench.scoring.scorer.scorer>` interface. Let's take a look at that interface:
 ```python
 class Scorer(ABC):
     """
@@ -153,7 +157,7 @@ class Scorer(ABC):
         """
         raise NotImplementedError
 ```
-To create a custom scorer, you need to implement the `name` and `run_batch` methods, and optionally override the `requires_reference` method if your scorer doesn't require reference or target data.
+To create a custom scorer, you need to implement the `name` and `run_batch` methods, implement the `possible_values()` method if your scorer is categorical, and optionally override the `requires_reference` method if your scorer doesn't require reference or target data.
 
 ## Contributing
 

@@ -45,12 +45,12 @@ Let's define a quick custom scorer that uses the `pyspellchecker` package to sca
 
 ```python
 from arthur_bench.run.testsuite import TestSuite
-from arthur_bench.scoring import Scorer
+from arthur_bench.scoring import NumericalScorer
 from spellchecker import SpellChecker
 import string
 from typing import List, Optional
 
-class CustomSpellingScore(Scorer):
+class CustomSpellingScore(NumericalScorer):
 	"""
 	Custom scoring which scores each LLM response with the formula 1 / (2 ^ number of typos)
 	This gives a typo-free response a score of 1, and each additional typo further decreases the score
