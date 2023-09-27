@@ -4,7 +4,7 @@ import torch
 
 
 from tests.fixtures.mock_data import MOCK_SUMMARY_DATA
-from arthur_bench.scoring.readability import Readability
+from arthur_bench.scoring.readability import Readability, max_flesch_reading_ease_value
 from arthur_bench.scoring.word_count_match import WordCountMatch
 from arthur_bench.scoring.specificity import Specificity
 from textstat import flesch_reading_ease
@@ -40,7 +40,8 @@ def test_run_readability():
         # assert return correct values
         expected = [44.41, 91.27, 68.77, 64.37]
         for i, result in enumerate(readability_run_result):
-            assert torch.isclose(torch.tensor(result), torch.tensor(expected[i]), atol=1e-5)
+            normalized_expected_result = expected[i] / max_flesch_reading_ease_value
+            assert torch.isclose(torch.tensor(result), torch.tensor(normalized_expected_result), atol=1e-5)
 
 
 def test_run_wcm():

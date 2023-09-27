@@ -179,12 +179,15 @@ class SummaryQuality(CategoricalScorer):
                 }
             )
 
-            # return -1.0 if the LLMChain returns an invalid result
+            # return -1 if the LLMChain returns an invalid result
             if "text" in choice:
-                score = choice["text"][:3]
-                if score in self.possible_values():
-                    res.append(score)
-                else:
+                try:
+                    score = int(choice["text"][:3])
+                    if score in self.possible_values():
+                        res.append(score)
+                    else:
+                        res.append(-1)
+                except ValueError:
                     res.append(-1)
             else:
                 res.append(-1)
