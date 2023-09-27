@@ -46,7 +46,7 @@ class Scorer(ABC):
         True if scorer requires reference output to compute score, False otherwise
         """
         return True
-    
+
     @abstractmethod
     def run_batch(
         self,
