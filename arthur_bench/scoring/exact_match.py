@@ -35,7 +35,7 @@ class ExactMatch(CategoricalScorer):
             )
         if not self.case_sensitive:
             return [
-                float(reference_batch[i].lower() == candidate_batch[i].lower())
+                reference_batch[i].lower() == candidate_batch[i].lower()
                 for i in range(len(reference_batch))
             ]
         return [
