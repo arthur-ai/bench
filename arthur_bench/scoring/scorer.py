@@ -46,6 +46,24 @@ class Scorer(ABC):
         True if scorer requires reference output to compute score, False otherwise
         """
         return True
+    
+    @abstractmethod
+    def run_batch(
+        self,
+        candidate_batch: List[str],
+        reference_batch: Optional[List[str]] = None,
+        input_text_batch: Optional[List[str]] = None,
+        context_batch: Optional[List[str]] = None,
+    ) -> list:
+        """
+        Score a batch of candidate generations with numerical float scores
+
+        :param candidate_batch: candidate generations to score
+        :param reference_batch: reference strings representing target outputs
+        :param input_text_batch: optional corresponding inputs
+        :param context_batch: optional corresponding contexts, if needed by scorer
+        """
+        raise NotImplementedError
 
     def run(
         self,

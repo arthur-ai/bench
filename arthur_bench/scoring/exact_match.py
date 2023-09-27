@@ -27,7 +27,7 @@ class ExactMatch(CategoricalScorer):
         reference_batch: Optional[List[str]] = None,
         input_text_batch: Optional[List[str]] = None,
         context_batch: Optional[List[str]] = None,
-    ) -> List[float]:
+    ) -> List[bool]:
         if reference_batch is None:
             raise UserTypeError(
                 "Reference Outputs must be provided for Exact Match scorer. Please "

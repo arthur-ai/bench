@@ -38,7 +38,7 @@ class Hallucination(CategoricalScorer):
         reference_batch: Optional[List[str]] = None,
         input_text_batch: Optional[List[str]] = None,
         context_batch: Optional[List[str]] = None,
-    ) -> List[float]:
+    ) -> List[bool]:
         if context_batch is None:
             raise ArthurUserError("context is required for hallucination scoring")
 
