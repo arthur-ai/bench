@@ -1,6 +1,6 @@
 from bert_score import BERTScorer
 from typing import List, Optional
-from arthur_bench.scoring import Scorer
+from arthur_bench.scoring import NumericalScorer
 from arthur_bench.scoring.utils import suppress_warnings
 
 DEFAULT_MODEL = "microsoft/deberta-v3-base"
@@ -12,7 +12,7 @@ PRECISION_WEIGHT = 0.1
 RECALL_WEIGHT = 0.9
 
 
-class BERTScore(Scorer):
+class BERTScore(NumericalScorer):
     """
     Tailored bert score implementation.
 

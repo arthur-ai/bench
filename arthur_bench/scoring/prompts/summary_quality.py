@@ -8,8 +8,8 @@ from langchain.prompts.chat import (
 )
 
 system_message_prompt = SystemMessagePromptTemplate.from_template(
-    """You compare two summaries of a text. You respond with a Choice, either a 0, 1, or tie ONLY.
-(0 = response 0 is better, 1 = response 1 is better, tie = no significant difference between the responses).
+    """You compare two summaries of a text. You respond with a Choice, either a 0, 1, or 2 ONLY.
+(0 = response 0 is better, 1 = response 1 is better, 2 = no significant difference between the responses).
 A good summary captures the most important information in the text and doesnt focus too much on small details.
 A bad summary has information that is conflicting or irrelevant to the original text, or has typos of words in the text."""
 )
@@ -44,7 +44,7 @@ Bryan Singer has revealed that Olivia Munn will star as Psylocke in next year's 
 apocalypse - a character created more than 20 years ago for the x-men.
 Choice:"""
 )
-example_choice_2 = AIMessagePromptTemplate.from_template("tie")
+example_choice_2 = AIMessagePromptTemplate.from_template("2")
 comparison_template = HumanMessagePromptTemplate.from_template(
     """Text: {text}
 Response 0: {summary_A}

@@ -1,14 +1,14 @@
 import logging
 import tiktoken
 from tiktoken.core import Encoding
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Union
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 from langchain.chat_models.base import BaseChatModel
 
 from arthur_bench.exceptions import UserValueError, UserTypeError
 
-from arthur_bench.scoring import Scorer
+from arthur_bench.scoring import CategoricalScorer
 from arthur_bench.scoring.scorer import SINGLE_ITEM_BATCH_DEFAULT
 from arthur_bench.scoring.prompts.summary_quality import COMPARE
 
@@ -22,7 +22,6 @@ CONTEXT_WINDOW_MAP = {
 EVALUATOR_MODEL = "gpt-3.5-turbo"
 TIKTOKEN_ENCODER = tiktoken.get_encoding("cl100k_base")
 TIKTOKEN_ERROR_PADDING = 150
-LLM_CHOICE_OPTIONS = {"0": 0.0, "1": 1.0, "tie": 0.5}
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +59,7 @@ def truncate_input_text(
     return input_text, truncated
 
 
-class SummaryQuality(Scorer):
+class SummaryQuality(CategoricalScorer):
     """
     Comprehensive measure of summarization quality compared to a reference summary.
     """
@@ -89,6 +88,10 @@ class SummaryQuality(Scorer):
     @staticmethod
     def name() -> str:
         return "summary_quality"
+    
+    @staticmethod
+    def possible_values() -> List[int]:
+        return [0, 1, 2]
 
     def to_dict(self, warn=False):
         return {}
@@ -142,7 +145,7 @@ class SummaryQuality(Scorer):
         reference_batch: Optional[List[str]] = None,
         input_text_batch: Optional[List[str]] = None,
         context_batch: Optional[List[str]] = None,
-    ) -> List[float]:
+    ) -> List[int]:
         """
         Summary quality requires input_text_batch.
         """
@@ -178,7 +181,11 @@ class SummaryQuality(Scorer):
 
             # return -1.0 if the LLMChain returns an invalid result
             if "text" in choice:
-                res.append(LLM_CHOICE_OPTIONS.get(choice["text"][:3], -1.0))
+                score = choice["text"][:3]
+                if score in self.possible_values():
+                    res.append(score)
+                else:
+                    res.append(-1)
             else:
-                res.append(-1.0)
+                res.append(-1)
         return res

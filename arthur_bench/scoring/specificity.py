@@ -1,13 +1,13 @@
 from textstat import lexicon_count
 from typing import List, Optional
-from arthur_bench.scoring import Scorer
+from arthur_bench.scoring import NumericalScorer
 from wordfreq import word_frequency
 from collections import Counter
 import nltk
 import re
 
 
-class Specificity(Scorer):
+class Specificity(NumericalScorer):
     """
     Returns a score from 0.0 to 1.0 indicating how specific the candidate output
     language is. Higher scores indicate that the language is more specific,

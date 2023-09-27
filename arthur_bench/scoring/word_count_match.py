@@ -2,10 +2,10 @@ from textstat import lexicon_count
 from typing import List, Optional
 
 from arthur_bench.exceptions import UserTypeError
-from arthur_bench.scoring import Scorer
+from arthur_bench.scoring import NumericalScorer
 
 
-class WordCountMatch(Scorer):
+class WordCountMatch(NumericalScorer):
     """
     Calculates how similar the number of words in the candidate output is to the the
     number of words in the reference output. Scores span from 0 to 1.

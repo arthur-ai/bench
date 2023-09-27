@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Dict
 
-from .scorer import Scorer
+from .scorer import Scorer, CategoricalScorer, NumericalScorer
 from .bertscore import BERTScore
 from .qa_quality import QAQualityCorrectness
 from .summary_quality import SummaryQuality

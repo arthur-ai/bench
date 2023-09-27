@@ -1,12 +1,12 @@
 from typing import List, Optional
 
 from arthur_bench.exceptions import UserTypeError
-from arthur_bench.scoring import Scorer
+from arthur_bench.scoring import CategoricalScorer
 
 
-class ExactMatch(Scorer):
+class ExactMatch(CategoricalScorer):
     """
-    Returns 1 if candidate matches reference, 0 if candidate does not match reference.
+    Returns True if candidate matches reference, False if candidate does not match reference.
     """
 
     def __init__(self, case_sensitive=True):
@@ -15,6 +15,10 @@ class ExactMatch(Scorer):
     @staticmethod
     def name() -> str:
         return "exact_match"
+    
+    @staticmethod
+    def possible_values() -> List[bool]:
+        return [True, False]
 
     def run_batch(
         self,
@@ -34,6 +38,6 @@ class ExactMatch(Scorer):
                 for i in range(len(reference_batch))
             ]
         return [
-            float(reference_batch[i] == candidate_batch[i])
+            reference_batch[i] == candidate_batch[i]
             for i in range(len(reference_batch))
         ]

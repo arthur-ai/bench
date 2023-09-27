@@ -1,18 +1,18 @@
 import logging
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 from langchain.chat_models.base import BaseChatModel
 
 from arthur_bench.exceptions import UserValueError
-from arthur_bench.scoring import Scorer
+from arthur_bench.scoring import CategoricalScorer
 from arthur_bench.scoring.prompts.qa_correctness import DECIDE
 
 logger = logging.getLogger(__name__)
 
 
-class QAQualityCorrectness(Scorer):
+class QAQualityCorrectness(CategoricalScorer):
     """
     Given an input question, context string, and model generation, determine if the
     generation produced a correct answer.
@@ -32,6 +32,10 @@ class QAQualityCorrectness(Scorer):
     @staticmethod
     def name() -> str:
         return "qa_correctness"
+    
+    @staticmethod
+    def possible_values() -> List[str]:
+        return ["0", "1", "NA"]
 
     @staticmethod
     def requires_reference() -> bool:
@@ -46,7 +50,7 @@ class QAQualityCorrectness(Scorer):
         reference_batch: Optional[List[str]] = None,
         input_text_batch: Optional[List[str]] = None,
         context_batch: Optional[List[str]] = None,
-    ) -> List[float]:
+    ) -> List[str]:
         """
         Reference batch is not used for this scoring method, QA correctness requires an
         input_text_batch and context_batch
@@ -72,8 +76,8 @@ class QAQualityCorrectness(Scorer):
                     "answer": candidate_batch[i],
                 }
             )["text"]
-            if llmchoice not in ["0", "1", "NA"]:
+            if llmchoice not in self.possible_values():
                 llmchoice = "-1"
-            llmchoice = {"0": 0.0, "1": 1.0, "NA": -1.0, "-1": -1.0}[llmchoice]
+            llmchoice = llmchoice
             res.append(llmchoice)
         return res
