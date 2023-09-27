@@ -6,7 +6,8 @@ from arthur_bench.scoring import CategoricalScorer
 
 class ExactMatch(CategoricalScorer):
     """
-    Returns True if candidate matches reference, False if candidate does not match reference.
+    Returns True if candidate matches reference, 
+    False if candidate does not match reference.
     """
 
     def __init__(self, case_sensitive=True):
@@ -15,7 +16,7 @@ class ExactMatch(CategoricalScorer):
     @staticmethod
     def name() -> str:
         return "exact_match"
-    
+
     @staticmethod
     def possible_values() -> List[bool]:
         return [True, False]

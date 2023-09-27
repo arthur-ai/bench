@@ -1,7 +1,7 @@
 import logging
 import tiktoken
 from tiktoken.core import Encoding
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Tuple
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 from langchain.chat_models.base import BaseChatModel
@@ -88,7 +88,7 @@ class SummaryQuality(CategoricalScorer):
     @staticmethod
     def name() -> str:
         return "summary_quality"
-    
+
     @staticmethod
     def possible_values() -> List[int]:
         return [0, 1, 2]

@@ -168,7 +168,6 @@ class CategoricalScorer(Scorer):
         :return: the Scorer values
         """
         raise NotImplementedError
-    
 
     @abstractmethod
     def run_batch(
@@ -187,8 +186,8 @@ class CategoricalScorer(Scorer):
         :param context_batch: optional corresponding contexts, if needed by scorer
         """
         raise NotImplementedError
-    
-    
+
+
 class NumericalScorer(Scorer):
 
     @abstractmethod
@@ -208,5 +207,3 @@ class NumericalScorer(Scorer):
         :param context_batch: optional corresponding contexts, if needed by scorer
         """
         raise NotImplementedError
-
-    

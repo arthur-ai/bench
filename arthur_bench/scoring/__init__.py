@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Dict
+from typing import Dict, Union
 
 from .scorer import Scorer, CategoricalScorer, NumericalScorer
 from .bertscore import BERTScore
@@ -28,7 +28,7 @@ class ScoringMethodName(str, Enum):
     PythonUnitTesting = "python_unit_testing"
 
 
-SCORING_METHOD_CLASS_MAP: Dict[str, type[Scorer]] = {
+SCORING_METHOD_CLASS_MAP: Dict[str, Union[type[NumericalScorer], type[CategoricalScorer]]] = {
     ScoringMethodName.BERTScore: BERTScore,
     ScoringMethodName.QACorrectness: QAQualityCorrectness,
     ScoringMethodName.SummaryQuality: SummaryQuality,

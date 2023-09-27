@@ -1,5 +1,5 @@
 import logging
-from typing import List, Optional, Union
+from typing import List, Optional
 
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
@@ -32,7 +32,7 @@ class QAQualityCorrectness(CategoricalScorer):
     @staticmethod
     def name() -> str:
         return "qa_correctness"
-    
+
     @staticmethod
     def possible_values() -> List[str]:
         return ["0", "1", "NA"]

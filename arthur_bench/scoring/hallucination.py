@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+from typing import List, Optional
 from arthur_bench.scoring import CategoricalScorer
 from arthur_bench.client.rest.client import ArthurClient
 from arthur_bench.exceptions import ArthurUserError
@@ -7,9 +7,11 @@ from arthur_bench.models.scoring import HallucinationScoreRequest
 
 class Hallucination(CategoricalScorer):
     """
-    Score each output against a context using Arthur's hosted hallucination checker
-    A score of False means the scorer estimates the candidate is supported by the context
-    A score of True means the scorer found information in the candidate unsupported by the context
+    Score each output against a context using Arthur's hosted 
+    hallucination checker. A score of False means the scorer 
+    estimates the candidate is supported by the context. A 
+    score of True means the scorer found information in 
+    the candidate unsupported by the context.
     """
 
     def __init__(self):
