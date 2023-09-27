@@ -10,7 +10,7 @@ from tests.helpers import (
     get_mock_client,
 )
 from arthur_bench.run.testsuite import TestSuite
-from arthur_bench.scoring import Scorer
+from arthur_bench.scoring import NumericalScorer
 from tests.fixtures.mock_requests import MOCK_SUITE, MOCK_SUITE_CUSTOM, MOCK_RUN
 from tests.fixtures.mock_responses import (
     MOCK_SUITE_RESPONSE_WITH_PAGES,
@@ -41,7 +41,7 @@ def test_suite_default(mock_load_scoring, mock_client):
         )
 
 
-class MockScoringMethod(Scorer):
+class MockScoringMethod(NumericalScorer):
     @staticmethod
     def name():
         return "bertscore"
@@ -60,7 +60,7 @@ class MockScoringMethod(Scorer):
         return [0.9, 0.7]
 
 
-class CustomScorer(Scorer):
+class CustomScorer(NumericalScorer):
     def __init__(self, custom_name="param_name"):
         self.custom_name = custom_name
 

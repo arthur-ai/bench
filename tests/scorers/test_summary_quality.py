@@ -41,17 +41,17 @@ def test_run_batch(mock_llm_chain):
             )
 
         # assert correct return values for mock LLMChain outputs
-        assert result == [0.0] * len(MOCK_SUMMARY_DATA)
+        assert result == [0] * len(MOCK_SUMMARY_DATA)
 
 
 # Test the run_batch method with different return values from LLMChain
 @pytest.mark.parametrize(
     "llm_return,expected",
     [
-        ({"text": "0"}, [0.0]),
-        ({"text": "1"}, [1.0]),
-        ({"text": "tie"}, [0.5]),
-        ({"text": "invalid"}, [-1.0]),
+        ({"text": "0"}, [0]),
+        ({"text": "1"}, [1]),
+        ({"text": "2"}, [2]),
+        ({"text": "invalid"}, [-1]),
     ],
 )
 @mock.patch.dict(os.environ, {"OPENAI_API_KEY": "MOCK_API_KEY"})

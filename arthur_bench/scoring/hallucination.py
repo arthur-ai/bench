@@ -8,10 +8,8 @@ from arthur_bench.models.scoring import HallucinationScoreRequest
 class Hallucination(CategoricalScorer):
     """
     Score each output against a context using Arthur's hosted hallucination checker
-    A score of True means the hallucination checker estimates the output is supported by
-    the context
-    A score of False means the hallucination checker found information in the output
-    unsupported by the context
+    A score of False means the scorer estimates the candidate is supported by the context
+    A score of True means the scorer found information in the candidate unsupported by the context
     """
 
     def __init__(self):
@@ -48,5 +46,5 @@ class Hallucination(CategoricalScorer):
                 response=candidate_batch[i], context=context_batch[i]
             )
             response = self.client.bench.score_hallucination(request)
-            res.append(not response.hallucination)
+            res.append(response.hallucination)
         return res
