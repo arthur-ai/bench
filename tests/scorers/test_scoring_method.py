@@ -16,6 +16,15 @@ class MockScorer(Scorer):
     def name():
         return "mock"
 
+    def run_batch(
+        self,
+        candidate_batch: List[str],
+        reference_batch: List[str] = None,
+        input_text_batch: List[str] = None,
+        context_batch: List[str] = None,
+    ) -> List[float]:
+        pass
+
     def modify(self, param_4):
         self.param_4 = param_4
 
