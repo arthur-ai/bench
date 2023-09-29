@@ -173,6 +173,6 @@ class Scorer(ABC):
                 module_path = Path(module)
                 if module_path.match("**/arthur_bench/scoring/**"):
                     return ScoringMethodType.BuiltIn
-                return ScoringMethodType.Custom
+            return ScoringMethodType.Custom
         except AttributeError:
             return ScoringMethodType.Custom
