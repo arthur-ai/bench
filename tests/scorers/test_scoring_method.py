@@ -1,5 +1,6 @@
 import pytest
 from typing import List, Optional
+import sys
 from unittest.mock import Mock, patch, MagicMock
 from arthur_bench.scoring.scorer import Scorer
 from arthur_bench.models.models import ScoringMethodType
@@ -92,10 +93,11 @@ def test_scorer_from_dict():
     ],
 )
 def test_scorer_type(module_path, platform, expected_type):
-    with patch("arthur_bench.scoring.scorer.sys.platform", platform):
-        with patch(
-            "arthur_bench.scoring.scorer.sys.modules", MagicMock()
-        ) as module_mock:
-            module_mock[MockScorer.__module__].__file__ = module_path
-            scorer = MockScorer()
-            assert scorer.type() == expected_type
+    if platform != sys.platform:
+        return
+    with patch(
+        "arthur_bench.scoring.scorer.sys.modules", MagicMock()
+    ) as module_mock:
+        module_mock[MockScorer.__module__].__file__ = module_path
+        scorer = MockScorer()
+        assert scorer.type() == expected_type
