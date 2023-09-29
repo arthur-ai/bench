@@ -2,6 +2,7 @@ from abc import abstractmethod, ABC
 import sys
 import json
 import logging
+from pathlib import Path
 from typing import List, Optional, TypeVar, get_origin, get_args, Union
 from inspect import signature, Parameter
 
@@ -168,9 +169,10 @@ class Scorer(ABC):
         """
         try:
             module = sys.modules[cls.__module__].__file__
-            if module is not None and "arthur_bench/scoring" in module:
-                return ScoringMethodType.BuiltIn
-            else:
-                return ScoringMethodType.Custom
+            if module is not None:
+                module_path = Path(module)
+                if module_path.match("**/arthur_bench/scoring/**"):
+                    return ScoringMethodType.BuiltIn
+            return ScoringMethodType.Custom
         except AttributeError:
             return ScoringMethodType.Custom
