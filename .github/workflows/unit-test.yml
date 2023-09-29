@@ -32,6 +32,6 @@ jobs:
 
       - name: Test with pytest
         run: |
-          if [ -f tests/requirements.txt ]; then pip install -r tests/requirements.txt; fi
+          pip install -r tests/requirements.txt
           pytest --cov=arthur_bench tests/
 
