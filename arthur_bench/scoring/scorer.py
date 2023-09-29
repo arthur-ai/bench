@@ -171,7 +171,7 @@ class Scorer(ABC):
             module = sys.modules[cls.__module__].__file__
             if module is not None:
                 module_path = Path(module)
-                if module_path.match('**/arthur_bench/scoring/**'):
+                if module_path.match("**/arthur_bench/scoring/**"):
                     return ScoringMethodType.BuiltIn
                 return ScoringMethodType.Custom
         except AttributeError:
