@@ -1,6 +1,6 @@
 # Add Scorer Configurations
 
-In the quickstart, we showed how to use the `exact_match` scorer. By default, the `exact_match` scorer is case sensitive. This means, the scorer returns the value of `1` only when the candidate output matches the content and the capitalization of the reference output. 
+In the quickstart, we showed how to use the `exact_match` scorer. By default, the `exact_match` scorer is case sensitive. This means, the scorer returns the value of `1.0` only when the candidate output matches the content and the capitalization of the reference output. 
 
 If we want to ignore capitalization differences, we can add a configuration to the `exact_match` scorer.
 
