@@ -26,6 +26,20 @@ def _can_omit(parameter: Parameter):
     return is_optional or is_kwargs
 
 
+class Feedback:
+    score: Optional[float]
+    label: Optional[str]
+    reason: Optional[str]
+    
+    def __init__(self, score=None, label=None, reason=None):
+        self.score = score
+        self.label = label
+        self.reason = reason
+
+    def __eq__(self, other) -> bool:
+        return (self.score, self.label, self.reason) == (other.score, other.label, other.reason)
+
+
 class Scorer(ABC):
     """
     Base class for all scorers. Compute a float score for a given model generation.
@@ -54,7 +68,7 @@ class Scorer(ABC):
         reference_batch: Optional[List[str]] = None,
         input_text_batch: Optional[List[str]] = None,
         context_batch: Optional[List[str]] = None,
-    ) -> list:
+    ) -> List[Feedback]:
         """
         Score a batch of candidate generations with numerical float scores
 
@@ -72,7 +86,7 @@ class Scorer(ABC):
         inputs: Optional[List[str]] = None,
         contexts: Optional[List[str]] = None,
         batch_size: int = SINGLE_ITEM_BATCH_DEFAULT,
-    ) -> Any:
+    ) -> List[Feedback]:
         """
         Score a set of test cases. This method doesn't need to be implemented in most
         cases, but can be overriden to add additional functionality such as
@@ -174,52 +188,3 @@ class Scorer(ABC):
                 return ScoringMethodType.Custom
         except AttributeError:
             return ScoringMethodType.Custom
-
-
-class CategoricalScorer(Scorer):
-    @staticmethod
-    @abstractmethod
-    def possible_values() -> Union[List[bool], List[int], List[str]]:
-        """
-        Get the possible output values of this Scorer
-        :return: the Scorer values
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def run_batch(
-        self,
-        candidate_batch: List[str],
-        reference_batch: Optional[List[str]] = None,
-        input_text_batch: Optional[List[str]] = None,
-        context_batch: Optional[List[str]] = None,
-    ) -> Union[List[bool], List[int], List[str]]:
-        """
-        Score a batch of candidate generations with categorical scores.
-
-        :param candidate_batch: candidate generations to score
-        :param reference_batch: reference strings representing target outputs
-        :param input_text_batch: optional corresponding inputs
-        :param context_batch: optional corresponding contexts, if needed by scorer
-        """
-        raise NotImplementedError
-
-
-class NumericalScorer(Scorer):
-    @abstractmethod
-    def run_batch(
-        self,
-        candidate_batch: List[str],
-        reference_batch: Optional[List[str]] = None,
-        input_text_batch: Optional[List[str]] = None,
-        context_batch: Optional[List[str]] = None,
-    ) -> List[float]:
-        """
-        Score a batch of candidate generations with numerical float scores
-
-        :param candidate_batch: candidate generations to score
-        :param reference_batch: reference strings representing target outputs
-        :param input_text_batch: optional corresponding inputs
-        :param context_batch: optional corresponding contexts, if needed by scorer
-        """
-        raise NotImplementedError

@@ -10,7 +10,7 @@ from tests.helpers import (
     get_mock_client,
 )
 from arthur_bench.run.testsuite import TestSuite
-from arthur_bench.scoring import NumericalScorer
+from arthur_bench.scoring import Scorer, Feedback
 from tests.fixtures.mock_requests import MOCK_SUITE, MOCK_SUITE_CUSTOM, MOCK_RUN
 from tests.fixtures.mock_responses import (
     MOCK_SUITE_RESPONSE_WITH_PAGES,
@@ -41,7 +41,7 @@ def test_suite_default(mock_load_scoring, mock_client):
         )
 
 
-class MockScoringMethod(NumericalScorer):
+class MockScoringMethod(Scorer):
     @staticmethod
     def name():
         return "bertscore"
@@ -56,11 +56,11 @@ class MockScoringMethod(NumericalScorer):
         candidate_batch: List[str],
         input_text_batch: Optional[List[str]] = None,
         context_batch: Optional[List[str]] = None,
-    ) -> List[float]:
-        return [0.9, 0.7]
+    ) -> List[Feedback]:
+        return [Feedback(score=0.9), Feedback(score=0.7)]
 
 
-class CustomScorer(NumericalScorer):
+class CustomScorer(Scorer):
     def __init__(self, custom_name="param_name"):
         self.custom_name = custom_name
 
@@ -74,8 +74,8 @@ class CustomScorer(NumericalScorer):
         candidate_batch: List[str],
         input_text_batch: Optional[List[str]] = None,
         context_batch: Optional[List[str]] = None,
-    ) -> List[float]:
-        return [0.5 for _ in range(len(reference_batch))]
+    ) -> List[Feedback]:
+        return [Feedback(score=0.5) for _ in range(len(reference_batch))]
 
 
 @pytest.fixture(scope="session")

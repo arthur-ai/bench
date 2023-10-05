@@ -8,7 +8,7 @@ from langchain.chat_models.base import BaseChatModel
 
 from arthur_bench.exceptions import UserValueError, UserTypeError
 
-from arthur_bench.scoring import CategoricalScorer
+from arthur_bench.scoring import Scorer, Feedback
 from arthur_bench.scoring.scorer import SINGLE_ITEM_BATCH_DEFAULT
 from arthur_bench.scoring.prompts.summary_quality import COMPARE
 
@@ -59,7 +59,7 @@ def truncate_input_text(
     return input_text, truncated
 
 
-class SummaryQuality(CategoricalScorer):
+class SummaryQuality(Scorer):
     """
     Comprehensive measure of summarization quality compared to a reference summary.
     """
@@ -89,12 +89,8 @@ class SummaryQuality(CategoricalScorer):
     def name() -> str:
         return "summary_quality"
 
-    @staticmethod
-    def possible_values() -> List[int]:
-        return [0, 1, 2]
-
     def to_dict(self, warn=False):
-        return {}
+        return {"possible_values" : ["-1", "0", "1", "2"]}
 
     def run(
         self,
@@ -103,7 +99,7 @@ class SummaryQuality(CategoricalScorer):
         inputs: Optional[List[str]] = None,
         contexts: Optional[List[str]] = None,
         batch_size: int = SINGLE_ITEM_BATCH_DEFAULT,
-    ) -> list:
+    ) -> List[Feedback]:
         if inputs is None:
             raise TypeError(
                 "Inputs must be provided for Summary Quality scorer, got None"
@@ -145,7 +141,7 @@ class SummaryQuality(CategoricalScorer):
         reference_batch: Optional[List[str]] = None,
         input_text_batch: Optional[List[str]] = None,
         context_batch: Optional[List[str]] = None,
-    ) -> List[int]:
+    ) -> List[Feedback]:
         """
         Summary quality requires input_text_batch.
         """
@@ -182,13 +178,14 @@ class SummaryQuality(CategoricalScorer):
             # return -1 if the LLMChain returns an invalid result
             if "text" in choice:
                 try:
-                    score = int(choice["text"][:3])
-                    if score in self.possible_values():
-                        res.append(score)
+                    candidate_choice = choice["text"][:3]
+                    if candidate_choice in self.to_dict()["possible_values"]:
+                        feedback = Feedback(label=candidate_choice, reason=f"Candidate {candidate_choice} is preferred")
                     else:
-                        res.append(-1)
+                        feedback = Feedback(label="-1", reason="an error occured in the scoring")
                 except ValueError:
-                    res.append(-1)
+                    feedback = Feedback(label="-1", reason="an error occured in the scoring")
             else:
-                res.append(-1)
+                feedback = Feedback(label="-1", reason="an error occured in the scoring")
+            res.append(feedback)
         return res

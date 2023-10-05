@@ -2,6 +2,7 @@ import pytest
 from unittest.mock import Mock, patch
 
 from tests.helpers import get_mock_client
+from arthur_bench.scoring import Feedback
 from arthur_bench.scoring.hallucination import Hallucination
 from arthur_bench.models.scoring import HallucinationScoreResponse
 from tests.fixtures.mock_data import MOCK_SUMMARY_DATA
@@ -42,4 +43,6 @@ def test_run_batch(mock_client):
             )
 
         # assert correct return values for mock responses
-        assert result == [False] * len(MOCK_SUMMARY_DATA)
+        for i, r in enumerate(result):
+            assert r.label == "False"
+            assert r.reason == "this is the reason"

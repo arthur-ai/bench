@@ -1,7 +1,7 @@
 import pytest
 from typing import List, Optional
 from unittest.mock import Mock
-from arthur_bench.scoring.scorer import Scorer
+from arthur_bench.scoring.scorer import Scorer, Feedback
 
 
 class MockScorer(Scorer):
@@ -22,7 +22,7 @@ class MockScorer(Scorer):
         reference_batch: List[str] = None,
         input_text_batch: List[str] = None,
         context_batch: List[str] = None,
-    ) -> List[float]:
+    ) -> List[Feedback]:
         pass
 
     def modify(self, param_4):

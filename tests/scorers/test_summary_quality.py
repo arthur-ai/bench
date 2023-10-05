@@ -29,6 +29,7 @@ def test_run_batch(mock_llm_chain):
             MOCK_SUMMARY_DATA["summary"],
             input_text_batch=MOCK_SUMMARY_DATA["source"],
         )
+        result_labels = [x.label for x in result]
 
         # assert LLMChain called with correct parameters
         for i in range(len(MOCK_SUMMARY_DATA)):
@@ -41,17 +42,17 @@ def test_run_batch(mock_llm_chain):
             )
 
         # assert correct return values for mock LLMChain outputs
-        assert result == [0] * len(MOCK_SUMMARY_DATA)
+        assert result_labels == ["0"] * len(MOCK_SUMMARY_DATA)
 
 
 # Test the run_batch method with different return values from LLMChain
 @pytest.mark.parametrize(
     "llm_return,expected",
     [
-        ({"text": "0"}, [0]),
-        ({"text": "1"}, [1]),
-        ({"text": "2"}, [2]),
-        ({"text": "invalid"}, [-1]),
+        ({"text": "0"}, ["0"]),
+        ({"text": "1"}, ["1"]),
+        ({"text": "2"}, ["2"]),
+        ({"text": "invalid"}, ["-1"]),
     ],
 )
 @mock.patch.dict(os.environ, {"OPENAI_API_KEY": "MOCK_API_KEY"})
@@ -62,7 +63,9 @@ def test_run_batch_with_different_llm_returns(llm_return, expected, mock_llm_cha
     ):
         summary_quality = SummaryQuality()
         result = summary_quality.run_batch(["candidate"], ["reference"], ["input"])
+        result_labels = [x.label for x in result]
+        assert result_labels == expected
         mock_llm_chain.assert_called_once_with(
             {"text": "input", "summary_A": "reference", "summary_B": "candidate"}
         )
-        assert result == expected
+        

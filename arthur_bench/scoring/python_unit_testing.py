@@ -9,13 +9,13 @@ from typing import List, Optional, Union
 from tqdm import tqdm
 
 from arthur_bench.exceptions import UserValueError
-from arthur_bench.scoring import CategoricalScorer
+from arthur_bench.scoring import Scorer, Feedback
 from arthur_bench.scoring.scorer import SINGLE_ITEM_BATCH_DEFAULT
 
 pass_fail_map = {0.0: "fail", 1.0: "pass"}
 
 
-class PythonUnitTesting(CategoricalScorer):
+class PythonUnitTesting(Scorer):
     """
     Wrapping the HuggingFace code_eval metric
 
@@ -59,15 +59,11 @@ class PythonUnitTesting(CategoricalScorer):
         return "python_unit_testing"
 
     @staticmethod
-    def possible_values() -> List[str]:
-        return ["pass", "fail"]
-
-    @staticmethod
     def requires_reference() -> bool:
         return False
 
     def to_dict(self, warn=False):
-        return {"unit_tests": self.unit_tests}
+        return {"unit_tests": self.unit_tests, "possible_values" : ["pass", "fail"]}
 
     def run(
         self,
@@ -76,13 +72,13 @@ class PythonUnitTesting(CategoricalScorer):
         inputs: Optional[List[str]] = None,
         contexts: Optional[List[str]] = None,
         batch_size: int = SINGLE_ITEM_BATCH_DEFAULT,
-    ) -> List[str]:
+    ) -> List[Feedback]:
         res = []
         for i in tqdm(range(len(candidate_outputs))):
             pass_at_k, _ = self.evaluator.compute(
                 references=[self.unit_tests[i]], predictions=[[candidate_outputs[i]]]
             )
-            res.append(pass_fail_map[pass_at_k["pass@1"]])
+            res.append(Feedback(label=pass_fail_map[pass_at_k["pass@1"]]))
         return res
 
     def run_batch(

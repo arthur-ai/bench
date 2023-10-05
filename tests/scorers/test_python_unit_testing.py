@@ -30,7 +30,8 @@ def test_run_batch(mock_code_eval_success_and_failure):
     ):
         unit_testing_scorer = PythonUnitTesting("tests/fixtures/mock_python_unit_tests")
         result = unit_testing_scorer.run([MOCK_CODE_PASS, MOCK_CODE_FAIL])
-        assert result == ["pass", "fail"]
+        result_labels = [x.label for x in result]
+        assert result_labels == ["pass", "fail"]
         unit_testing_scorer.evaluator.compute.assert_has_calls(
             [
                 call(references=[MOCK_UNIT_TEST_PASS], predictions=[[MOCK_CODE_PASS]]),

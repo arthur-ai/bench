@@ -223,7 +223,7 @@ class TestSuite:
                 else:
                     ref_outputs.append(case.reference_output)
         try:
-            all_scores = self.scorer.run(
+            all_results = self.scorer.run(
                 candidate_output_list,
                 ref_outputs,
                 inputs,
@@ -235,8 +235,8 @@ class TestSuite:
             raise ArthurInternalError(f"failed to create run {run_name}") from e
 
         test_case_outputs = [
-            TestCaseOutput(id=id_, output=output, score=score)
-            for id_, output, score in zip(ids, candidate_output_list, all_scores)
+            TestCaseOutput(id=id_, output=output, score=result.score, label=result.label, reason=result.reason)
+            for id_, output, result in zip(ids, candidate_output_list, all_results)
         ]
 
         run = TestRun(

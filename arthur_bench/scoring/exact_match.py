@@ -1,10 +1,10 @@
 from typing import List, Optional
 
 from arthur_bench.exceptions import UserTypeError
-from arthur_bench.scoring import CategoricalScorer
+from arthur_bench.scoring import Scorer, Feedback
 
 
-class ExactMatch(CategoricalScorer):
+class ExactMatch(Scorer):
     """
     Returns True if candidate matches reference,
     False if candidate does not match reference.
@@ -17,9 +17,8 @@ class ExactMatch(CategoricalScorer):
     def name() -> str:
         return "exact_match"
 
-    @staticmethod
-    def possible_values() -> List[bool]:
-        return [True, False]
+    def to_dict(self, warn=False):
+        return {"possible_values" : ["True", "False"]}
 
     def run_batch(
         self,
@@ -27,7 +26,7 @@ class ExactMatch(CategoricalScorer):
         reference_batch: Optional[List[str]] = None,
         input_text_batch: Optional[List[str]] = None,
         context_batch: Optional[List[str]] = None,
-    ) -> List[bool]:
+    ) -> List[Feedback]:
         if reference_batch is None:
             raise UserTypeError(
                 "Reference Outputs must be provided for Exact Match scorer. Please "
@@ -39,6 +38,6 @@ class ExactMatch(CategoricalScorer):
                 for i in range(len(reference_batch))
             ]
         return [
-            reference_batch[i] == candidate_batch[i]
+            Feedback(label=str(reference_batch[i] == candidate_batch[i]))
             for i in range(len(reference_batch))
         ]

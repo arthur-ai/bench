@@ -1,11 +1,11 @@
 from typing import List, Optional
-from arthur_bench.scoring import CategoricalScorer
+from arthur_bench.scoring import Scorer, Feedback
 from arthur_bench.client.rest.client import ArthurClient
 from arthur_bench.exceptions import ArthurUserError
 from arthur_bench.models.scoring import HallucinationScoreRequest
 
 
-class Hallucination(CategoricalScorer):
+class Hallucination(Scorer):
     """
     Score each output against a context using Arthur's hosted
     hallucination checker. A score of False means the scorer
@@ -22,15 +22,11 @@ class Hallucination(CategoricalScorer):
         return "hallucination"
 
     @staticmethod
-    def possible_values() -> List[bool]:
-        return [True, False]
-
-    @staticmethod
     def requires_reference() -> bool:
         return False
 
     def to_dict(self, warn=False):
-        return {}
+        return {"possible_values" : [True, False]}
 
     def run_batch(
         self,
@@ -38,7 +34,7 @@ class Hallucination(CategoricalScorer):
         reference_batch: Optional[List[str]] = None,
         input_text_batch: Optional[List[str]] = None,
         context_batch: Optional[List[str]] = None,
-    ) -> List[bool]:
+    ) -> List[Feedback]:
         if context_batch is None:
             raise ArthurUserError("context is required for hallucination scoring")
 
@@ -48,5 +44,5 @@ class Hallucination(CategoricalScorer):
                 response=candidate_batch[i], context=context_batch[i]
             )
             response = self.client.bench.score_hallucination(request)
-            res.append(response.hallucination)
+            res.append(Feedback(label=str(response.hallucination), reason=response.reason))
         return res

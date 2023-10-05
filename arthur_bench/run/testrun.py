@@ -16,6 +16,14 @@ class TestRun(CreateRunRequest):
     @property
     def scores(self) -> List[float]:
         return [case.score for case in self.test_cases]
+    
+    @property
+    def labels(self) -> List[float]:
+        return [case.label for case in self.test_cases]
+    
+    @property
+    def reasons(self) -> List[float]:
+        return [case.reason for case in self.test_cases]
 
     @property
     def output(self) -> List[str]:

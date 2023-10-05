@@ -1,7 +1,7 @@
 from enum import Enum
-from typing import Dict, Union
+from typing import Dict
 
-from .scorer import Scorer, CategoricalScorer, NumericalScorer
+from .scorer import Scorer, Feedback
 from .bertscore import BERTScore
 from .qa_quality import QAQualityCorrectness
 from .summary_quality import SummaryQuality
@@ -29,7 +29,7 @@ class ScoringMethodName(str, Enum):
 
 
 SCORING_METHOD_CLASS_MAP: Dict[
-    str, Union[type[NumericalScorer], type[CategoricalScorer]]
+    str, type[Scorer]
 ] = {
     ScoringMethodName.BERTScore: BERTScore,
     ScoringMethodName.QACorrectness: QAQualityCorrectness,

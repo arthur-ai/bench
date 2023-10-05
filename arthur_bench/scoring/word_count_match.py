@@ -2,10 +2,10 @@ from textstat import lexicon_count
 from typing import List, Optional
 
 from arthur_bench.exceptions import UserTypeError
-from arthur_bench.scoring import NumericalScorer
+from arthur_bench.scoring import Scorer, Feedback
 
 
-class WordCountMatch(NumericalScorer):
+class WordCountMatch(Scorer):
     """
     Calculates how similar the number of words in the candidate output is to the the
     number of words in the reference output. Scores span from 0 to 1.
@@ -28,7 +28,7 @@ class WordCountMatch(NumericalScorer):
         reference_batch: Optional[List[str]] = None,
         input_text_batch: Optional[List[str]] = None,
         context_batch: Optional[List[str]] = None,
-    ) -> List[float]:
+    ) -> List[Feedback]:
         if reference_batch is None:
             raise UserTypeError(
                 "Reference Outputs must be provided for Word Count Match scorer. "
@@ -40,8 +40,8 @@ class WordCountMatch(NumericalScorer):
             len_cand = lexicon_count(candidate_batch[i], removepunct=True)
             delta = abs(len_ref - len_cand)
             if delta > len_ref:
-                word_count_match.append(0.0)
+                word_count_match.append(Feedback(score=0.0))
             else:
-                word_count_match.append((len_ref - delta) / len_ref)
+                word_count_match.append(Feedback(score=(len_ref - delta) / len_ref))
 
         return word_count_match

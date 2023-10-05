@@ -1,6 +1,6 @@
 from bert_score import BERTScorer
 from typing import List, Optional
-from arthur_bench.scoring import NumericalScorer
+from arthur_bench.scoring import Scorer, Feedback
 from arthur_bench.scoring.utils import suppress_warnings
 
 DEFAULT_MODEL = "microsoft/deberta-v3-base"
@@ -11,7 +11,7 @@ DEFAULT_HEDGE = (
 )
 
 
-class HedgingLanguage(NumericalScorer):
+class HedgingLanguage(Scorer):
     """
     Given an input question and model output, determine if the output contains hedging
     language such as "As an AI language model, I don't have personal opinions, emotions,
@@ -51,4 +51,4 @@ class HedgingLanguage(NumericalScorer):
         # return a BERTScore using F1
         list_bertscore = f.tolist()
 
-        return list_bertscore
+        return [Feedback(score=x) for x in list_bertscore]

@@ -76,6 +76,6 @@ MOCK_SUITE_JSON = """{\
 ]\
 }"""
 
-MOCK_RUN_JSON = """{"name": "test_run", "test_cases": [{"id": "62d2d1b3-d7df-4999-b01c-52e93d34f576", "output": "this is a test run output", "score": 0.9}, {"id": "70eb3014-2b04-4974-bb05-a2e20f2cf367", "output": "this is a good test run output", "score": 0.7}], "description": null, "model_name": "my_very_special_gpt", "foundation_model": null, "prompt_template": null, "model_version": null}"""
+MOCK_RUN_JSON = """{"name": "test_run", "test_cases": [{"id": "62d2d1b3-d7df-4999-b01c-52e93d34f576", "output": "this is a test run output", "score": 0.9, "label": null, "reason": null}, {"id": "70eb3014-2b04-4974-bb05-a2e20f2cf367", "output": "this is a good test run output", "score": 0.7, "label": null, "reason": null}], "description": null, "model_name": "my_very_special_gpt", "foundation_model": null, "prompt_template": null, "model_version": null}"""
 
-MOCK_RUN_JSON_REST = """{"name": "test_run", "test_case_outputs": [{"id": "62d2d1b3-d7df-4999-b01c-52e93d34f576", "output": "this is a test run output", "score": 0.9}, {"id": "70eb3014-2b04-4974-bb05-a2e20f2cf367", "output": "this is a good test run output", "score": 0.7}], "description": null, "model_name": "my_very_special_gpt", "foundation_model": null, "prompt_template": null, "model_version": null}"""
+MOCK_RUN_JSON_REST = """{"name": "test_run", "test_case_outputs": [{"id": "62d2d1b3-d7df-4999-b01c-52e93d34f576", "output": "this is a test run output", "score": 0.9, "label": null, "reason": null}, {"id": "70eb3014-2b04-4974-bb05-a2e20f2cf367", "output": "this is a good test run output", "score": 0.7, "label": null, "reason": null}], "description": null, "model_name": "my_very_special_gpt", "foundation_model": null, "prompt_template": null, "model_version": null}"""

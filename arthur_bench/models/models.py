@@ -138,9 +138,17 @@ class TestCaseOutput(BaseModel):
     """
     Generated output for test case
     """
-    score: float
+    score: Optional[float]
     """
     Score assigned to output
+    """
+    label: Optional[str]
+    """
+    Label assigned to output
+    """
+    reason: Optional[str]
+    """
+    Reason behind the score / label assigned to the output
     """
 
 
