@@ -56,6 +56,6 @@ class BERTScore(Scorer):
         # return a BERTScore using our weighting of precision and recall (instead of F1
         # which weights them equally)
         return [
-            Feedback(score=x) 
+            Feedback(score=x)
             for x in (self.precision_weight * p + self.recall_weight * r).tolist()
         ]

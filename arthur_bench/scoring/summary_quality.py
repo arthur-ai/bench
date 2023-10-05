@@ -181,22 +181,22 @@ class SummaryQuality(Scorer):
                     candidate_choice = choice["text"][:3]
                     if candidate_choice in self.to_dict()["possible_values"]:
                         feedback = Feedback(
-                            label=candidate_choice, 
+                            label=candidate_choice,
                             reason=f"Candidate {candidate_choice} is preferred"
                         )
                     else:
                         feedback = Feedback(
-                            label="-1", 
+                            label="-1",
                             reason="an error occured in the scoring"
                         )
                 except ValueError:
                     feedback = Feedback(
-                        label="-1", 
+                        label="-1",
                         reason="an error occured in the scoring"
                     )
             else:
                 feedback = Feedback(
-                    label="-1", 
+                    label="-1",
                     reason="an error occured in the scoring"
                 )
             res.append(feedback)

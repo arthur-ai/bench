@@ -46,7 +46,7 @@ class Hallucination(Scorer):
             response = self.client.bench.score_hallucination(request)
             res.append(
                 Feedback(
-                    label=str(response.hallucination), 
+                    label=str(response.hallucination),
                     reason=response.reason
                 )
             )
