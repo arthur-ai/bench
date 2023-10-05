@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Dict
 
-from .scorer import Scorer, Feedback
+from .scorer import Scorer, Feedback # flake8: noqa
 from .bertscore import BERTScore
 from .qa_quality import QAQualityCorrectness
 from .summary_quality import SummaryQuality

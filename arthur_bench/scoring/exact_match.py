@@ -34,7 +34,7 @@ class ExactMatch(Scorer):
             )
         if not self.case_sensitive:
             return [
-                reference_batch[i].lower() == candidate_batch[i].lower()
+                Feedback(label=str(reference_batch[i].lower() == candidate_batch[i].lower()))
                 for i in range(len(reference_batch))
             ]
         return [

@@ -14,15 +14,15 @@ class TestRun(CreateRunRequest):
         arbitrary_types_allowed = True
 
     @property
-    def scores(self) -> List[float]:
+    def scores(self) -> List[Optional[float]]:
         return [case.score for case in self.test_cases]
-    
+
     @property
-    def labels(self) -> List[float]:
+    def labels(self) -> List[Optional[str]]:
         return [case.label for case in self.test_cases]
-    
+
     @property
-    def reasons(self) -> List[float]:
+    def reasons(self) -> List[Optional[str]]:
         return [case.reason for case in self.test_cases]
 
     @property

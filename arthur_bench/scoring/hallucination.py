@@ -44,5 +44,10 @@ class Hallucination(Scorer):
                 response=candidate_batch[i], context=context_batch[i]
             )
             response = self.client.bench.score_hallucination(request)
-            res.append(Feedback(label=str(response.hallucination), reason=response.reason))
+            res.append(
+                Feedback(
+                    label=str(response.hallucination), 
+                    reason=response.reason
+                )
+            )
         return res

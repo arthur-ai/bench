@@ -87,7 +87,7 @@ class PythonUnitTesting(Scorer):
         reference_batch: Optional[List[str]] = None,
         input_text_batch: Optional[List[str]] = None,
         context_batch: Optional[List[str]] = None,
-    ) -> List[str]:
+    ) -> List[Feedback]:
         raise NotImplementedError(
             "run_batch is not implemented for this scorer. "
             "Use PythonUnitTesting.run(candidates) instead."

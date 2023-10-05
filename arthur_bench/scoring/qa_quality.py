@@ -72,7 +72,7 @@ class QAQualityCorrectness(Scorer):
                     "answer": candidate_batch[i],
                 }
             )["text"]
-            if llmchoice not in self.possible_values():
+            if llmchoice not in self.to_dict()["possible_values"]:
                 llmchoice = "-1"
             llmchoice = llmchoice
             res.append(Feedback(label=llmchoice))

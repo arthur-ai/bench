@@ -36,6 +36,8 @@ class Readability(Scorer):
         cut off negative values and divide by max value to get score between 0 and 1"""
 
         return [
-            Feedback(score=max(flesch_reading_ease(i), 0) / max_flesch_reading_ease_value)
+            Feedback(
+                score=max(flesch_reading_ease(i), 0) / max_flesch_reading_ease_value
+            )
             for i in candidate_batch
         ]

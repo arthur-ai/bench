@@ -235,7 +235,13 @@ class TestSuite:
             raise ArthurInternalError(f"failed to create run {run_name}") from e
 
         test_case_outputs = [
-            TestCaseOutput(id=id_, output=output, score=result.score, label=result.label, reason=result.reason)
+            TestCaseOutput(
+                id=id_, 
+                output=output, 
+                score=result.score, 
+                label=result.label, 
+                reason=result.reason
+            )
             for id_, output, result in zip(ids, candidate_output_list, all_results)
         ]
 

@@ -41,7 +41,7 @@ class HedgingLanguage(Scorer):
         reference_batch: Optional[List[str]] = None,
         input_text_batch: Optional[List[str]] = None,
         context_batch: Optional[List[str]] = None,
-    ) -> List[float]:
+    ) -> List[Feedback]:
         # convert reference hedge to list
         reference_batch = [DEFAULT_HEDGE] * len(candidate_batch)
 

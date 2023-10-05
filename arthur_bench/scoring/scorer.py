@@ -2,7 +2,7 @@ from abc import abstractmethod, ABC
 import sys
 import json
 import logging
-from typing import Any, List, Optional, TypeVar, get_origin, get_args, Union
+from typing import List, Optional, TypeVar, get_origin, get_args, Union
 from inspect import signature, Parameter
 
 from tqdm import tqdm
@@ -30,14 +30,11 @@ class Feedback:
     score: Optional[float]
     label: Optional[str]
     reason: Optional[str]
-    
+
     def __init__(self, score=None, label=None, reason=None):
         self.score = score
         self.label = label
         self.reason = reason
-
-    def __eq__(self, other) -> bool:
-        return (self.score, self.label, self.reason) == (other.score, other.label, other.reason)
 
 
 class Scorer(ABC):
