@@ -85,14 +85,27 @@ def _load_suite_with_optional_id(
 
 def _summarize_run(run: PaginatedRun) -> SummaryItem:
     scores = [o.score for o in run.test_cases]
-    avg_score = np.mean(scores).item()
-    hist, bin_edges = np.histogram(scores, bins=20, range=(0, max(1, np.max(scores))))
+    labels = [o.label for o in run.test_cases]
     histogram = []
-    for i in range(len(hist)):
-        hist_item = HistogramItem(
-            count=hist[i], low=bin_edges[i], high=bin_edges[i + 1]
-        )
-        histogram.append(hist_item)
+    if None not in scores:
+        avg_score = np.mean(scores).item()  # type: ignore
+        hist, bin_edges = np.histogram(scores, bins=20, range=(0, max(1, np.max(scores))))  # type: ignore
+        for i in range(len(hist)):
+            hist_item = HistogramItem(
+                count=hist[i], low=bin_edges[i], high=bin_edges[i + 1]
+            )
+            histogram.append(hist_item)
+    elif None not in labels:
+        avg_score = None
+        categories, frequencies = np.unique(labels)  # type: ignore
+        for i, (c, f) in enumerate(zip(categories, frequencies)):
+            hist_item = HistogramItem(
+                count=f, category=c
+            )
+            histogram.append(hist_item)
+    else:
+        raise ValueError("run must have either scores or labels")
+    
     return SummaryItem(
         id=run.id, name=run.name, avg_score=avg_score, histogram=histogram
     )
@@ -376,8 +389,13 @@ class LocalBenchClient(BenchClient):
         run_files = glob.glob(f"{self.root_dir}/{test_suite_name}/*/run.json")
         for f in run_files:
             run_obj = PaginatedRun.parse_file(f)
-            avg_score = np.mean([o.score for o in run_obj.test_cases])
-            run_resp = TestRunMetadata(**run_obj.dict(), avg_score=float(avg_score))
+            scores = [o.score for o in run_obj.test_cases]
+            labels = [o.label for o in run_obj.test_cases]
+            if None not in scores:
+                avg_score = np.mean(scores)  # type: ignore
+                run_resp = TestRunMetadata(**run_obj.dict(), avg_score=float(avg_score))  # type: ignore
+            elif None not in labels:
+                run_resp = TestRunMetadata(**run_obj.dict(), avg_score=None)
             runs.append(run_resp)
 
         if sort is None:

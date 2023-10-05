@@ -272,8 +272,9 @@ class HistogramItem(BaseModel):
     """
 
     count: int
-    low: float
-    high: float
+    low: Optional[float] = None
+    high: Optional[float] = None
+    category: Optional[str] = None
 
 
 class SummaryItem(BaseModel):
@@ -283,8 +284,34 @@ class SummaryItem(BaseModel):
 
     id: UUID
     name: str
-    avg_score: float
+    avg_score: Optional[float]
     histogram: List[HistogramItem]
+
+    @validator("histogram")
+    def either_lowhigh_or_category(cls, v):
+        """
+        Validate that the items in the histogram list are all
+        containing low/high floats or are all containing a category
+        """
+        lowhigh_flag = False
+        category_flag = False
+        for hist_item in v:
+            if not (hist_item.low or hist_item.high or hist_item.category):
+                raise ValueError(
+                    "Histogram item has neither low/high floats nor category"
+                    " which is invalid. Histogram item needs either a pair"
+                    " of low/high floats or a category."
+                )
+            if hist_item.low and hist_item.high:
+                lowhigh_flag = True
+            if hist_item.category:
+                category_flag = True
+            if lowhigh_flag and category_flag:
+                raise ValueError(
+                    "Histogram has both float and categorical values,"
+                    " which is invalid. Histogram should have either"
+                    " all float values or all categories."
+                )
 
 
 class TestSuiteSummary(BaseModel):
