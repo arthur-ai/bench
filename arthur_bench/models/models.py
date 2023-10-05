@@ -312,6 +312,7 @@ class SummaryItem(BaseModel):
                     " which is invalid. Histogram should have either"
                     " all float values or all categories."
                 )
+        return v
 
 
 class TestSuiteSummary(BaseModel):

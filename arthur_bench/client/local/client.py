@@ -89,7 +89,11 @@ def _summarize_run(run: PaginatedRun) -> SummaryItem:
     histogram = []
     if None not in scores:
         avg_score = np.mean(scores).item()  # type: ignore
-        hist, bin_edges = np.histogram(scores, bins=20, range=(0, max(1, np.max(scores))))  # type: ignore
+        hist, bin_edges = np.histogram(  # type: ignore
+            scores,
+            bins=20,
+            range=(0, max(1, np.max(scores)))
+        )
         for i in range(len(hist)):
             hist_item = HistogramItem(
                 count=hist[i], low=bin_edges[i], high=bin_edges[i + 1]
@@ -99,13 +103,11 @@ def _summarize_run(run: PaginatedRun) -> SummaryItem:
         avg_score = None
         categories, frequencies = np.unique(labels)  # type: ignore
         for i, (c, f) in enumerate(zip(categories, frequencies)):
-            hist_item = HistogramItem(
-                count=f, category=c
-            )
+            hist_item = HistogramItem(count=f, category=c)
             histogram.append(hist_item)
     else:
         raise ValueError("run must have either scores or labels")
-    
+
     return SummaryItem(
         id=run.id, name=run.name, avg_score=avg_score, histogram=histogram
     )
@@ -188,7 +190,10 @@ class LocalBenchClient(BenchClient):
             return None
         return run_index[id]
 
-    def _create_test_case_with_id(self, test_case: TestCaseRequest) -> TestCaseResponse:
+    def _create_test_case_with_id(
+        self,
+        test_case: TestCaseRequest,
+    ) -> TestCaseResponse:
         return TestCaseResponse(
             id=uuid.uuid4(),
             input=test_case.input,
@@ -394,7 +399,7 @@ class LocalBenchClient(BenchClient):
             if None not in scores:
                 avg_score = np.mean(scores)  # type: ignore
                 run_resp = TestRunMetadata(
-                    **run_obj.dict(), 
+                    **run_obj.dict(),
                     avg_score=float(avg_score),  # type: ignore
                 )
             elif None not in labels:

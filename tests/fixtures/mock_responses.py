@@ -394,7 +394,7 @@ MOCK_SUMMARY_RESPONSE_JSON = {
     "summary": [
         {
             "avg_score": 0.8,
-            "histogram": [{"count": 2, "high": 0.8, "low": 0.0}],
+            "histogram": [{"count": 2, "high": 0.8, "low": 0.0, "category" : None}],
             "id": "af8466a8-6425-4ea5-85cb-ed952b26fa6c",
             "name": "my_test_run",
         }
