@@ -393,7 +393,10 @@ class LocalBenchClient(BenchClient):
             labels = [o.label for o in run_obj.test_cases]
             if None not in scores:
                 avg_score = np.mean(scores)  # type: ignore
-                run_resp = TestRunMetadata(**run_obj.dict(), avg_score=float(avg_score))  # type: ignore
+                run_resp = TestRunMetadata(
+                    **run_obj.dict(), 
+                    avg_score=float(avg_score),  # type: ignore
+                )
             elif None not in labels:
                 run_resp = TestRunMetadata(**run_obj.dict(), avg_score=None)
             runs.append(run_resp)
