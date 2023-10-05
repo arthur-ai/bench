@@ -37,7 +37,7 @@ class Readability(Scorer):
 
         return [
             Feedback(
-                score=max(flesch_reading_ease(i), 0) / max_flesch_reading_ease_value
+                score=max(flesch_reading_ease(i), 0) / max_flesch_reading_ease_value,
             )
             for i in candidate_batch
         ]

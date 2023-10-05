@@ -38,7 +38,7 @@ class QAQualityCorrectness(Scorer):
         return False
 
     def to_dict(self, warn=False):
-        return {"categories" : ["0", "1", "NA"]}
+        return {"categories": ["0", "1", "NA"]}
 
     def run_batch(
         self,

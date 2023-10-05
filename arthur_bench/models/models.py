@@ -308,7 +308,9 @@ class CreateRunResponse(BaseModel):
 class RunResult(BaseModel):
     id: UUID
     output: str
-    score: float
+    score: Optional[float] = None
+    label: Optional[str] = None
+    reason: Optional[str] = None
     input: Optional[str] = None
     reference_output: Optional[str] = None
 

@@ -63,7 +63,7 @@ class PythonUnitTesting(Scorer):
         return False
 
     def to_dict(self, warn=False):
-        return {"unit_tests": self.unit_tests, "categories" : ["pass", "fail"]}
+        return {"unit_tests": self.unit_tests, "categories": ["pass", "fail"]}
 
     def run(
         self,

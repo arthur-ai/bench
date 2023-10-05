@@ -47,7 +47,7 @@ class Hallucination(Scorer):
             res.append(
                 Feedback(
                     label=str(response.hallucination),
-                    reason=response.reason
+                    reason=response.reason,
                 )
             )
         return res

@@ -18,7 +18,7 @@ class ExactMatch(Scorer):
         return "exact_match"
 
     def to_dict(self, warn=False):
-        return {"categories" : ["True", "False"]}
+        return {"categories": ["True", "False"]}
 
     def run_batch(
         self,

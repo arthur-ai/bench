@@ -28,9 +28,7 @@ class ScoringMethodName(str, Enum):
     PythonUnitTesting = "python_unit_testing"
 
 
-SCORING_METHOD_CLASS_MAP: Dict[
-    str, type[Scorer]
-] = {
+SCORING_METHOD_CLASS_MAP: Dict[str, type[Scorer]] = {
     ScoringMethodName.BERTScore: BERTScore,
     ScoringMethodName.QACorrectness: QAQualityCorrectness,
     ScoringMethodName.SummaryQuality: SummaryQuality,

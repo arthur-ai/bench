@@ -90,7 +90,7 @@ class SummaryQuality(Scorer):
         return "summary_quality"
 
     def to_dict(self, warn=False):
-        return {"categories" : ["-1", "0", "1", "2"]}
+        return {"categories": ["-1", "0", "1", "2"]}
 
     def run(
         self,
@@ -182,22 +182,22 @@ class SummaryQuality(Scorer):
                     if candidate_choice in self.to_dict()["categories"]:
                         feedback = Feedback(
                             label=candidate_choice,
-                            reason=f"Candidate {candidate_choice} is preferred"
+                            reason=f"Candidate {candidate_choice} is preferred",
                         )
                     else:
                         feedback = Feedback(
                             label="-1",
-                            reason="an error occured in the scoring"
+                            reason="an error occured in the scoring",
                         )
                 except ValueError:
                     feedback = Feedback(
                         label="-1",
-                        reason="an error occured in the scoring"
+                        reason="an error occured in the scoring",
                     )
             else:
                 feedback = Feedback(
                     label="-1",
-                    reason="an error occured in the scoring"
+                    reason="an error occured in the scoring",
                 )
             res.append(feedback)
         return res

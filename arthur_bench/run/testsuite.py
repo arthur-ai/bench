@@ -240,7 +240,7 @@ class TestSuite:
                 output=output,
                 score=result.score,
                 label=result.label,
-                reason=result.reason
+                reason=result.reason,
             )
             for id_, output, result in zip(ids, candidate_output_list, all_results)
         ]
