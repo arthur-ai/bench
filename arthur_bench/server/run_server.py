@@ -6,10 +6,11 @@ from pathlib import Path
 import uuid
 from typing import Optional, Annotated, List, Union
 
+from .spa_static_files import SPAStaticFiles
+
 try:
     import uvicorn
     from fastapi import FastAPI, Request, HTTPException, Query
-    from fastapi.staticfiles import StaticFiles
     from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -169,7 +170,7 @@ def test_run_results(
 
 if os.path.exists(FRONT_END_DIRECTORY):
     app.mount(
-        "/", StaticFiles(directory=FRONT_END_DIRECTORY, html=True), name="frontend"
+        "/", SPAStaticFiles(directory=FRONT_END_DIRECTORY, html=True), name="frontend"
     )
 else:
     logger.warning(

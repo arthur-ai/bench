@@ -30,3 +30,7 @@ include/
 arthur_bench/server/js/dist/*
 arthur_bench/server/js/node_modules/*
 arthur_bench/server/js/packages/*/node_modules/
+
+bench_runs
+*package-lock.json
+
