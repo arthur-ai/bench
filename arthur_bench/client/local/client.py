@@ -90,9 +90,7 @@ def _summarize_run(run: PaginatedRun) -> SummaryItem:
     if None not in scores:
         avg_score = np.mean(scores).item()  # type: ignore
         hist, bin_edges = np.histogram(  # type: ignore
-            scores,
-            bins=20,
-            range=(0, max(1, np.max(scores)))
+            scores, bins=20, range=(0, max(1, np.max(scores)))
         )
         for i in range(len(hist)):
             hist_item = HistogramItem(
