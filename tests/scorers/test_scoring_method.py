@@ -1,7 +1,10 @@
 import pytest
 from typing import List, Optional
-from unittest.mock import Mock
+import sys
+from unittest.mock import Mock, patch, MagicMock
 from arthur_bench.scoring.scorer import Scorer, Feedback
+from arthur_bench.models.models import ScoringMethodType
+
 
 
 class MockScorer(Scorer):
@@ -63,3 +66,39 @@ def test_scorer_from_dict():
     scorer = MockScorer.from_dict({})
     assert scorer.param_1 == "default_1"
     assert scorer.param_2 == None
+
+
+@pytest.mark.parametrize(
+    "module_path,platform,expected_type",
+    [
+        (
+            "/Users/bench_user/arthur_bench/scoring/exact_match.py",
+            "darwin",
+            ScoringMethodType.BuiltIn,
+        ),
+        (
+            "/Users/bench_user/custom_dir/custom_scorer.py",
+            "darwin",
+            ScoringMethodType.Custom,
+        ),
+        (
+            "C:\\Program Files\\Python311\\Lib\\site-packages\\arthur_bench\\scoring\\exact_match.py",
+            "win32",
+            ScoringMethodType.BuiltIn,
+        ),
+        (
+            "C:\\Users\\bench_user\\custom_bench\\scoring\\exact_match.py",
+            "win32",
+            ScoringMethodType.Custom,
+        ),
+    ],
+)
+def test_scorer_type(module_path, platform, expected_type):
+    if platform != sys.platform:
+        return
+    with patch(
+        "arthur_bench.scoring.scorer.sys.modules", MagicMock()
+    ) as module_mock:
+        module_mock[MockScorer.__module__].__file__ = module_path
+        scorer = MockScorer()
+        assert scorer.type() == expected_type
