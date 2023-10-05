@@ -38,7 +38,7 @@ class QAQualityCorrectness(Scorer):
         return False
 
     def to_dict(self, warn=False):
-        return {"possible_values" : ["0", "1", "NA"]}
+        return {"categories" : ["0", "1", "NA"]}
 
     def run_batch(
         self,
@@ -72,7 +72,7 @@ class QAQualityCorrectness(Scorer):
                     "answer": candidate_batch[i],
                 }
             )["text"]
-            if llmchoice not in self.to_dict()["possible_values"]:
+            if llmchoice not in self.to_dict()["categories"]:
                 llmchoice = "-1"
             llmchoice = llmchoice
             res.append(Feedback(label=llmchoice))
