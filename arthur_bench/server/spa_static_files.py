@@ -22,7 +22,6 @@ class SPAStaticFiles(StaticFiles):
         try:
             return await super().get_response(path, scope)
         except starlette.middleware.exceptions.HTTPException as ex:
-            print(path)
             if ex.status_code == 404 and "bench" in path:
                 return await super().get_response("index.html", scope)
             else:
