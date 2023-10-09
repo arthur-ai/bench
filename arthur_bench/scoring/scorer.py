@@ -3,6 +3,7 @@ import sys
 import json
 import logging
 from pathlib import Path
+from pydantic import BaseModel, Field, validator
 from typing import List, Optional, TypeVar, get_origin, get_args, Union
 from inspect import signature, Parameter
 
@@ -27,15 +28,10 @@ def _can_omit(parameter: Parameter):
     return is_optional or is_kwargs
 
 
-class Feedback:
-    score: Optional[float]
-    label: Optional[str]
-    reason: Optional[str]
-
-    def __init__(self, score=None, label=None, reason=None):
-        self.score = score
-        self.label = label
-        self.reason = reason
+class Feedback(BaseModel):
+    score: Optional[float] = None
+    label: Optional[str] = None
+    reason: Optional[str] = None
 
 
 class Scorer(ABC):
@@ -66,7 +62,7 @@ class Scorer(ABC):
         reference_batch: Optional[List[str]] = None,
         input_text_batch: Optional[List[str]] = None,
         context_batch: Optional[List[str]] = None,
-    ) -> List[Feedback]:
+    ) -> Union[List[float], List[Feedback]]:
         """
         Score a batch of candidate generations with numerical float scores
 
@@ -74,6 +70,9 @@ class Scorer(ABC):
         :param reference_batch: reference strings representing target outputs
         :param input_text_batch: optional corresponding inputs
         :param context_batch: optional corresponding contexts, if needed by scorer
+        :return: 
+            - List[Feedback]
+            - List[float] (deprecated)
         """
         raise NotImplementedError
 
@@ -84,7 +83,7 @@ class Scorer(ABC):
         inputs: Optional[List[str]] = None,
         contexts: Optional[List[str]] = None,
         batch_size: int = SINGLE_ITEM_BATCH_DEFAULT,
-    ) -> List[Feedback]:
+    ) -> Union[List[float], List[Feedback]]:
         """
         Score a set of test cases. This method doesn't need to be implemented in most
         cases, but can be overriden to add additional functionality such as
@@ -95,7 +94,9 @@ class Scorer(ABC):
         :param inputs: input strings being tested
         :param contexts: optional corresponding contexts, if needed by scorer
         :param batch_size: size of batches
-        :return: array of scores for batch
+        :return: 
+            - List[Feedback]
+            - List[float] (deprecated)
         """
         all_scores = []
         with tqdm(total=len(candidate_outputs)) as pbar:
@@ -187,3 +188,9 @@ class Scorer(ABC):
             return ScoringMethodType.Custom
         except AttributeError:
             return ScoringMethodType.Custom
+
+class CategoricalScorer(Scorer):
+
+    def to_dict(self, warn=False):
+        parent_dict = super().to_dict(warn)
+        return parent_dict

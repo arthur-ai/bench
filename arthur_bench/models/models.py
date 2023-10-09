@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, validator, root_validator
 
 
 # COMMON
@@ -151,6 +151,13 @@ class TestCaseOutput(BaseModel):
     Reason behind the score / label assigned to the output
     """
 
+    @root_validator()
+    def either_score_or_label(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+         score, label = values.get("score"), values.get("label")
+         if not score and not label:
+              raise ValueError("Score or a label required for a test case output")
+         return values
+
 
 class CreateRunRequest(BaseModel):
     name: str
@@ -293,25 +300,29 @@ class SummaryItem(BaseModel):
         Validate that the items in the histogram list are all
         containing low/high floats or are all containing a category
         """
-        lowhigh_flag = False
-        category_flag = False
-        for hist_item in v:
-            if not (hist_item.low or hist_item.high or hist_item.category):
-                raise ValueError(
-                    "Histogram item has neither low/high floats nor category"
-                    " which is invalid. Histogram item needs either a pair"
-                    " of low/high floats or a category."
-                )
-            if hist_item.low and hist_item.high:
-                lowhigh_flag = True
-            if hist_item.category:
-                category_flag = True
-            if lowhigh_flag and category_flag:
-                raise ValueError(
-                    "Histogram has both float and categorical values,"
-                    " which is invalid. Histogram should have either"
-                    " all float values or all categories."
-                )
+        numerical_histogram = False
+        categorical_histogram = False
+        both_error = (
+            "Histogram has both low/high floats and category "
+            "values, which is invalid."
+        )
+        neither_error = (
+            "Histogram item has neither low/high floats nor category "
+            "value, which is invalid."
+        )
+        for h in v:
+            if h.low and h.high:
+                numerical_histogram = True
+                if h.category:
+                    raise ValueError(both_error)
+            elif h.category:
+                categorical_histogram = True
+                if h.low or h.high:
+                    raise ValueError(both_error)
+            else:
+                raise ValueError(neither_error)
+        if numerical_histogram and categorical_histogram:
+            raise ValueError(both_error)
         return v
 
 
