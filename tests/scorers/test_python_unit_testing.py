@@ -23,7 +23,7 @@ def mock_code_eval_success_and_failure():
     return mock_eval
 
 
-def test_run_batch(mock_code_eval_success_and_failure):
+def test_run(mock_code_eval_success_and_failure):
     with patch(
         "arthur_bench.scoring.python_unit_testing.load",
         return_value=mock_code_eval_success_and_failure,

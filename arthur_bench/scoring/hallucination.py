@@ -1,11 +1,11 @@
 from typing import List, Optional
-from arthur_bench.scoring import Scorer, Feedback
+from arthur_bench.scoring import CategoricalScorer, Feedback
 from arthur_bench.client.rest.client import ArthurClient
 from arthur_bench.exceptions import ArthurUserError
 from arthur_bench.models.scoring import HallucinationScoreRequest
 
 
-class Hallucination(Scorer):
+class Hallucination(CategoricalScorer):
     """
     Score each output against a context using Arthur's hosted
     hallucination checker. A score of False means the scorer
@@ -25,8 +25,9 @@ class Hallucination(Scorer):
     def requires_reference() -> bool:
         return False
 
-    def to_dict(self, warn=False):
-        return {"categories": ["True", "False"]}
+    @staticmethod
+    def categories() -> List[str]:
+        return ["True", "False"]
 
     def run_batch(
         self,

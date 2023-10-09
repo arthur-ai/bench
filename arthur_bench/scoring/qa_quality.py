@@ -6,13 +6,13 @@ from langchain.chat_models import ChatOpenAI
 from langchain.chat_models.base import BaseChatModel
 
 from arthur_bench.exceptions import UserValueError
-from arthur_bench.scoring import Scorer, Feedback
+from arthur_bench.scoring import CategoricalScorer, Feedback
 from arthur_bench.scoring.prompts.qa_correctness import DECIDE
 
 logger = logging.getLogger(__name__)
 
 
-class QAQualityCorrectness(Scorer):
+class QAQualityCorrectness(CategoricalScorer):
     """
     Given an input question, context string, and model generation, determine if the
     generation produced a correct answer.
@@ -37,8 +37,9 @@ class QAQualityCorrectness(Scorer):
     def requires_reference() -> bool:
         return False
 
-    def to_dict(self, warn=False):
-        return {"categories": ["0", "1", "NA"]}
+    @staticmethod
+    def categories() -> List[str]:
+        return ["0", "1", "NA"]
 
     def run_batch(
         self,

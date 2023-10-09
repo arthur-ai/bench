@@ -394,7 +394,7 @@ MOCK_SUMMARY_RESPONSE_JSON = {
     "summary": [
         {
             "avg_score": 0.8,
-            "histogram": [{"count": 2, "high": 0.8, "low": 0.0, "category" : None}],
+            "histogram": [{"count": 2, "high": 0.8, "low": 0.0, "category": None}],
             "id": "af8466a8-6425-4ea5-85cb-ed952b26fa6c",
             "name": "my_test_run",
         }
@@ -416,8 +416,8 @@ MOCK_RUN_RESPONSE_JSON = {
             "output": "this is a good test run output",
             "reference_output": "this is a test response",
             "score": 0.7,
-            "label" : None,
-            "reason" : None,
+            "label": None,
+            "reason": None,
         },
         {
             "id": "62d2d1b3-d7df-4999-b01c-52e93d34f576",
@@ -425,8 +425,8 @@ MOCK_RUN_RESPONSE_JSON = {
             "output": "this is a test run output",
             "reference_output": "this is test output from a language model",
             "score": 0.9,
-            "label" : None,
-            "reason" : None,
+            "label": None,
+            "reason": None,
         },
     ],
     "test_suite_id": "8b7ba080-8d14-42d2-9250-ec0edb96abd7",

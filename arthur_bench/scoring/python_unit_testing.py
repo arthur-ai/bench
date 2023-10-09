@@ -5,17 +5,17 @@ import os
 os.environ[
     "HF_ALLOW_CODE_EVAL"
 ] = "1"  # required for executing code using the HuggingFace code_eval metric
-from typing import List, Optional, Union
+from typing import List, Optional
 from tqdm import tqdm
 
 from arthur_bench.exceptions import UserValueError
-from arthur_bench.scoring import Scorer, Feedback
+from arthur_bench.scoring import CategoricalScorer, Feedback
 from arthur_bench.scoring.scorer import SINGLE_ITEM_BATCH_DEFAULT
 
 pass_fail_map = {0.0: "fail", 1.0: "pass"}
 
 
-class PythonUnitTesting(Scorer):
+class PythonUnitTesting(CategoricalScorer):
     """
     Wrapping the HuggingFace code_eval metric
 
@@ -62,8 +62,14 @@ class PythonUnitTesting(Scorer):
     def requires_reference() -> bool:
         return False
 
+    @staticmethod
+    def categories() -> List[str]:
+        return ["pass", "fail"]
+
     def to_dict(self, warn=False):
-        return {"unit_tests": self.unit_tests, "categories": ["pass", "fail"]}
+        d = super().to_dict(warn)
+        d["unit_tests"] = self.unit_tests
+        return d
 
     def run(
         self,

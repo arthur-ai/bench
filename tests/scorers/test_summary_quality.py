@@ -68,4 +68,3 @@ def test_run_batch_with_different_llm_returns(llm_return, expected, mock_llm_cha
         mock_llm_chain.assert_called_once_with(
             {"text": "input", "summary_A": "reference", "summary_B": "candidate"}
         )
-        

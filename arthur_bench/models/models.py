@@ -138,25 +138,25 @@ class TestCaseOutput(BaseModel):
     """
     Generated output for test case
     """
-    score: Optional[float]
+    score: Optional[float] = None
     """
     Score assigned to output
     """
-    label: Optional[str]
+    label: Optional[str] = None
     """
     Label assigned to output
     """
-    reason: Optional[str]
+    reason: Optional[str] = None
     """
     Reason behind the score / label assigned to the output
     """
 
     @root_validator()
     def either_score_or_label(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-         score, label = values.get("score"), values.get("label")
-         if not score and not label:
-              raise ValueError("Score or a label required for a test case output")
-         return values
+        score, label = values.get("score"), values.get("label")
+        if not score and not label:
+            raise ValueError("Score or a label required for a test case output")
+        return values
 
 
 class CreateRunRequest(BaseModel):
@@ -311,7 +311,7 @@ class SummaryItem(BaseModel):
             "value, which is invalid."
         )
         for h in v:
-            if h.low and h.high:
+            if h.low is not None and h.high is not None:
                 numerical_histogram = True
                 if h.category:
                     raise ValueError(both_error)

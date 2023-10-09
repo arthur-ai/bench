@@ -8,7 +8,7 @@ from langchain.chat_models.base import BaseChatModel
 
 from arthur_bench.exceptions import UserValueError, UserTypeError
 
-from arthur_bench.scoring import Scorer, Feedback
+from arthur_bench.scoring import CategoricalScorer, Feedback
 from arthur_bench.scoring.scorer import SINGLE_ITEM_BATCH_DEFAULT
 from arthur_bench.scoring.prompts.summary_quality import COMPARE
 
@@ -59,7 +59,7 @@ def truncate_input_text(
     return input_text, truncated
 
 
-class SummaryQuality(Scorer):
+class SummaryQuality(CategoricalScorer):
     """
     Comprehensive measure of summarization quality compared to a reference summary.
     """
@@ -89,8 +89,9 @@ class SummaryQuality(Scorer):
     def name() -> str:
         return "summary_quality"
 
-    def to_dict(self, warn=False):
-        return {"categories": ["-1", "0", "1", "2"]}
+    @staticmethod
+    def categories() -> List[str]:
+        return ["-1", "0", "1", "2"]
 
     def run(
         self,
@@ -131,9 +132,15 @@ class SummaryQuality(Scorer):
                 f"to {self.context_window} characters"
             )
 
-        return super().run(
+        # return list of Feedback objects
+        # (cast float scores to Feedback objects if necessary)
+        scorer_result = super().run(
             candidate_outputs, reference_outputs, truncated_inputs, contexts, batch_size
         )
+        feedback_result: List[Feedback] = [
+            Feedback(score=r) if isinstance(r, float) else r for r in scorer_result
+        ]
+        return feedback_result
 
     def run_batch(
         self,

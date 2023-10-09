@@ -1,7 +1,7 @@
 import logging
 import pandas as pd
 from typing import List, Optional, Union
-from arthur_bench.scoring import Scorer
+from arthur_bench.scoring import Scorer, Feedback
 from arthur_bench.models.models import (
     TestSuiteRequest,
     PaginatedTestSuite,
@@ -234,16 +234,26 @@ class TestSuite:
             logger.error(f"failed to create run: {e}")
             raise ArthurInternalError(f"failed to create run {run_name}") from e
 
-        test_case_outputs = [
-            TestCaseOutput(
-                id=id_,
-                output=output,
-                score=result.score,
-                label=result.label,
-                reason=result.reason,
-            )
-            for id_, output, result in zip(ids, candidate_output_list, all_results)
-        ]
+        test_case_outputs = []
+        for id_, output, result in zip(ids, candidate_output_list, all_results):
+            if isinstance(result, float):
+                test_case_outputs.append(
+                    TestCaseOutput(
+                        id=id_,
+                        output=output,
+                        score=result,
+                    )
+                )
+            elif isinstance(result, Feedback):
+                test_case_outputs.append(
+                    TestCaseOutput(
+                        id=id_,
+                        output=output,
+                        score=result.score,
+                        label=result.label,
+                        reason=result.reason,
+                    )
+                )
 
         run = TestRun(
             name=run_name,

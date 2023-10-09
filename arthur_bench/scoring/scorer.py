@@ -62,7 +62,7 @@ class Scorer(ABC):
         reference_batch: Optional[List[str]] = None,
         input_text_batch: Optional[List[str]] = None,
         context_batch: Optional[List[str]] = None,
-    ) -> Union[List[float], List[Feedback]]:
+    ) -> Union[List[Feedback], List[float]]:
         """
         Score a batch of candidate generations with numerical float scores
 
@@ -70,7 +70,7 @@ class Scorer(ABC):
         :param reference_batch: reference strings representing target outputs
         :param input_text_batch: optional corresponding inputs
         :param context_batch: optional corresponding contexts, if needed by scorer
-        :return: 
+        :return:
             - List[Feedback]
             - List[float] (deprecated)
         """
@@ -83,7 +83,7 @@ class Scorer(ABC):
         inputs: Optional[List[str]] = None,
         contexts: Optional[List[str]] = None,
         batch_size: int = SINGLE_ITEM_BATCH_DEFAULT,
-    ) -> Union[List[float], List[Feedback]]:
+    ) -> Union[List[Feedback], List[float]]:
         """
         Score a set of test cases. This method doesn't need to be implemented in most
         cases, but can be overriden to add additional functionality such as
@@ -94,11 +94,11 @@ class Scorer(ABC):
         :param inputs: input strings being tested
         :param contexts: optional corresponding contexts, if needed by scorer
         :param batch_size: size of batches
-        :return: 
+        :return:
             - List[Feedback]
             - List[float] (deprecated)
         """
-        all_scores = []
+        all_scores = []  # type: ignore
         with tqdm(total=len(candidate_outputs)) as pbar:
             for i in range(0, len(candidate_outputs), batch_size):
                 input_batch = (
@@ -189,8 +189,22 @@ class Scorer(ABC):
         except AttributeError:
             return ScoringMethodType.Custom
 
+
 class CategoricalScorer(Scorer):
+    """
+    Class for scorers that return categorical labels instead of numerical values
+    """
+
+    @staticmethod
+    @abstractmethod
+    def categories() -> List[str]:
+        """
+        Get the categories of this Scorer
+        :return: the list of categories this Scorer could return
+        """
+        raise NotImplementedError
 
     def to_dict(self, warn=False):
-        parent_dict = super().to_dict(warn)
-        return parent_dict
+        d = super().to_dict(warn)
+        d["categories"] = self.categories()
+        return d
