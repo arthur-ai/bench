@@ -3,8 +3,8 @@ import sys
 import json
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field, validator
-from typing import List, Optional, TypeVar, get_origin, get_args, Union
+from pydantic import BaseModel, root_validator
+from typing import Any, List, Dict, Optional, TypeVar, get_origin, get_args, Union
 from inspect import signature, Parameter
 
 from tqdm import tqdm
@@ -32,6 +32,13 @@ class Feedback(BaseModel):
     score: Optional[float] = None
     label: Optional[str] = None
     reason: Optional[str] = None
+
+    @root_validator()
+    def either_score_or_label(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+        score, label = values.get("score"), values.get("label")
+        if not score and not label:
+            raise ValueError("Score or a label required for Feedback")
+        return values
 
 
 class Scorer(ABC):
