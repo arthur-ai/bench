@@ -38,6 +38,7 @@ const RunDistributions = ({ summaries, total }: Props) => {
             yAxisTitle={'% of Tests'}
             xAxisTitle={'Avg Test Scores'}
             hasDefaultTooltip={true}
+            smoothData={true}
         />
     );
 };
