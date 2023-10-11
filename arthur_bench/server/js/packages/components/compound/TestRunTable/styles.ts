@@ -1,6 +1,6 @@
 import primary from "resources/colors/Arthur/primary"
 import secondary from "resources/colors/Arthur/secondary"
-import { GRAPHIK_LIGHT, MONO_MEDIUM} from "resources/fonts"
+import {GRAPHIK_LIGHT, MONO} from "resources/fonts"
 
 const styles = {
     table: {
@@ -51,7 +51,7 @@ export const cellStyles = (width?: string) => ({
 
 export const headerCell = (color?: string) => ({
     backgroundColor: color ?? primary.white,
-    fontFamily: MONO_MEDIUM,
+    fontFamily: MONO,
     border: `1px solid ${primary.ashGrey}`,
     textAlign: 'left',
     fontSize: '16px'

@@ -15,10 +15,11 @@ const styles = {
     },
     date: {
         textAlign: 'right',
+        opacity: '0.7'
     },
     name: {
         color: secondary.blue,
-        fontFamily: GRAPHIK_LIGHT,
+        fontFamily: GRAPHIK,
         fontSize: '18px',
         ':hover': {
             cursor: 'pointer',
