@@ -6,7 +6,7 @@ Install Bench to your python environment with optional dependencies for serving 
 
 `pip install 'arthur-bench[server]'`
 
-Alternatively, install Bench to your python environment with minimum dependencies:
+Alternatively, install Bench to your python environment with minimal dependencies:
 
 `pip install arthur-bench`
 
@@ -20,11 +20,11 @@ Bench has two options for tracking datasets and results:
 
 ## Local
 
-Bench spins up a local UI (like [tensorboard](https://www.tensorflow.org/tensorboard)) to provide a visual interface for your test data. 
+Bench spins up a local UI (like [tensorboard](https://www.tensorflow.org/tensorboard)) to provide a visual interface for your test data.
 
 ### View Examples
 
-Running these commands will view launch the bench UI locally ot view the example test suites from the Arthur Bench github rep.
+Running these commands will view launch the bench UI locally to view the example test suites from the Arthur Bench GitHub repo.
 
 ```
 # clone the bench repo
