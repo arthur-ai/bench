@@ -14,7 +14,7 @@ For bug fixes and feature requests, please file a Github issue.
 
 ## Package installation
 
-Install Bench to your python environment with optional dependencies for serving results locally (recommended):  
+Install Bench to your python environment with optional dependencies for serving results locally (recommended):
 `pip install 'arthur-bench[server]'`
 
 Alternatively, install Bench to your python environment with minimum dependencies:
@@ -31,9 +31,9 @@ To make sure you can run test suites in bench, you can run the following code sn
 ```python
 from arthur_bench.run.testsuite import TestSuite
 suite = TestSuite(
-    "bench_quickstart", 
+    "bench_quickstart",
     "exact_match",
-    input_text_list=["What year was FDR elected?", "What is the opposite of down?"], 
+    input_text_list=["What year was FDR elected?", "What is the opposite of down?"],
     reference_output_list=["1932", "up"]
 )
 suite.run("quickstart_run", candidate_output_list=["1932", "up is the opposite of down"])
@@ -55,3 +55,20 @@ bench
 Viewing examples in the bench UI will look something like this:
 <p align="center">
 <img src="docs/source/_static/img/Bench_UI_Screenshot.png" alt="Examples UI" width="1100"/>
+
+## Running Bench from source
+
+To launch Bench from source:
+
+1. Install the dependencies
+    * `pip install -e '.[server]'`
+2. Build the Front End
+    * `cd arthur_bench/server/js`
+    * `npm i`
+    * `npm run build`
+3. Launch the server
+    * `bench`
+
+Because the server was installed with `pip -e`, local changes will be picked up. However, the server will need to be restarted between
+changes in order for those changes to be picked up.
+
