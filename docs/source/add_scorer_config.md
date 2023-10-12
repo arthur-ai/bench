@@ -1,6 +1,8 @@
 # Add Scorer Configurations
 
-In the quickstart, we showed how to use the `exact_match` scorer. By default, the `exact_match` scorer is case sensitive. This means, the scorer returns the value of `1.0` only when the candidate output matches the content and the capitalization of the reference output. 
+Many scorers included in the Bench package have optional parameters that provide flexibility for users to match scorers with their use case. Please visit our [SDK documentation](https://bench.readthedocs.io/en/latest/sdk/arthur_bench.scoring.html) to view the optional configurations avaiable for each scorer.
+
+As an example, in the quickstart, we showed how to use the `exact_match` scorer. By default, the `exact_match` scorer is case sensitive. This means, the scorer returns the value of `1.0` only when the candidate output matches the content and the capitalization of the reference output. 
 
 If we want to ignore capitalization differences, we can add a configuration to the `exact_match` scorer.
 
@@ -36,3 +38,6 @@ print(run.test_cases)
 We have now logged the results for both test cases as `1.0` even though the capitalization doesn't match the reference. This is non-default behavior for which we needed to configure the scorer while creating the test suite.
 
 
+## Additional resources
+
+We also support creating custom scorers that provide even more flexibility. Please view the [guide here](./custom_scoring.md) to learn how custom scorers can be created.
