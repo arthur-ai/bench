@@ -46,6 +46,7 @@ const styles = {
         padding: '2px 4px',
         borderRadius: '2px',
         background: secondary.variant.grey.active,
+        cursor: 'pointer',
     },
 }
 

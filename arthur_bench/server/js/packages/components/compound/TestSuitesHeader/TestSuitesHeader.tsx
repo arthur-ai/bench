@@ -34,7 +34,7 @@ const TestSuitesHeader = (props: Props) => {
     const { setFilters, filters, setSortColumn } = props;
     return (
         <div className={css(styles.container)}>
-            <h1>Test Suites</h1>
+            <div className={css(styles.title)}>Test Suites</div>
             <div className={css(styles.toolbar)}>
                 <MetricDropdownSelection
                     data={metrics}

@@ -4,7 +4,7 @@ import styles, {cellStyles} from './styles';
 import {useFela} from 'react-fela';
 import {Run} from 'arthur-redux/slices/testSuites/types';
 import {parseAndFormatDate} from '../InsightHeadline/InsightHeadline';
-import {Button} from '../../core/Button';
+import {Button, EButtonSize} from '../../core/Button';
 import {EIconType} from "../../core/Icon";
 import {useNavigate} from "react-router-dom";
 
@@ -39,6 +39,7 @@ const TestRunRow = ({ testRun, testSuiteId }: TRowProps) => {
                             <Button
                                 isLink={true}
                                 text={'VIEW'}
+                                size={EButtonSize.SMALL}
                                 iconStart={EIconType.EXTERNAL_LINK}
                                 clickHandler={() =>
                                     navigate(
