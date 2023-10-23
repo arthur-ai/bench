@@ -105,7 +105,8 @@ export type TTestSuitesState = {
 
 export type TScoringMethod = {
     name: EMethodType;
-    type: string
+    type: string;
+    config: Record<string, string>;
 }
 
 export enum EMethodType {

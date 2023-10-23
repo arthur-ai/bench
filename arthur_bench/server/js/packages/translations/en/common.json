@@ -720,9 +720,12 @@
         "details": "DETAILS",
         "testRuns": "TEST RUNS",
         "inputsOutputs": "INPUTS & REF OUTPUTS",
-        "home": "Home"
-
-
+        "home": "Home",
+        "scoringInformation": "SCORING INFORMATION",
+        "scoringMethodBreakdown": "SCORING METHOD BREAKDOWN",
+        "type": "Type",
+        "configurations": "User-Defined Scoring Configurations",
+        "calculation": "Score Calculation"
     },
     "benchResources": {
         "python": "Python Quickstart",
