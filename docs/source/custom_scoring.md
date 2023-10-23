@@ -11,7 +11,7 @@ In this guide, we will walk through the process of evaluating LLM performance us
 
 To create a custom scorer that satisfies the Scorer interface (defined in the section below), implement the scoring logic in the `run_batch` method. Additionally, provide your scorer a name in the `name()` method. 
 
-This example custom scorer is called `TrigramRepetition`, which scores responses with False if they contain repeated trigrams above a thresholded number of times. For our scorer, we override the `requires_reference()` method to return `False` instead of `True`, since this custom scorer evaluates the candidate outputs without the need for a reference.
+This example custom scorer is called `TrigramRepetition`, which labels responses as "Repetitive" if they contain repeated trigrams above a thresholded number of times. For our scorer, we override the `requires_reference()` method to return `False` instead of `True`, since this custom scorer evaluates the candidate outputs without the need for a reference.
 
 Make sure `nltk` is installed as a package to your environment, which our custom scorer uses.
 
@@ -26,7 +26,7 @@ pip install nltk
 ```
 
 ```python
-from arthur_bench.scoring import CategoricalScorer
+from arthur_bench.scoring import CategoricalScorer, Feedback
 import nltk
 # make sure corpus is downloaded
 nltk.download('punkt')
@@ -44,15 +44,20 @@ class TrigramRepetition(CategoricalScorer):
         return "trigram_repetition"
 
     @staticmethod
-    def possible_values() -> List[bool]:
-        return [True, False]
+    def categories() -> List[str]:
+        return ["Repetitive", "Nonrepetitive"]
 
     @staticmethod
     def requires_reference() -> bool:
         return False
     
-    def run_batch(self, candidate_batch: List[str], reference_batch: Optional[List[str]] = None,
-                  input_text_batch: Optional[List[str]] = None, context_batch: Optional[List[str]] = None) -> List[float]:
+    def run_batch(
+        self, 
+        candidate_batch: List[str], 
+        reference_batch: Optional[List[str]] = None,
+        input_text_batch: Optional[List[str]] = None, 
+        context_batch: Optional[List[str]] = None
+    ) -> List[Feedback]:
         repeat_scores = []
         for text in candidate_batch:
             tokens = [t.lower() for t in nltk.word_tokenize(text)]
@@ -64,7 +69,11 @@ class TrigramRepetition(CategoricalScorer):
                 else:
                     counts[tri] = 1
             max_repeat = max(counts.values())
-            repeat_scores.append(max_repeat < self.threshold)
+            if max_repeat < self.threshold:
+                label = "Nonrepetitive"
+            else:
+                label = "Repetitive"
+            repeat_scores.append(Feedback(label=label))
         return repeat_scores
 ```
 
@@ -102,7 +111,7 @@ print(run.scores)
 ```
 
 ```python
->>> [True, False]
+>>> [Feedback(score=None, label='Nonrepetitive', reason=None), Feedback(score=None, label='Repetitive', reason=None)]
 ```
 
 ## Scorer Validation
@@ -124,7 +133,8 @@ By default, bench will save the json serializable attributes of your scorer as t
 
 ## `Scorer` interface
 
-All scorers in bench inherit from either the {class}`NumericalScorer <arthur_bench.scoring.scorer.numerical_scorer>` or {class}`CategoricalScorer <arthur_bench.scoring.scorer.categorical_scorer>` classes, both of which implement the {class}`scorer <arthur_bench.scoring.scorer.scorer>` interface. Let's take a look at that interface:
+All scorers in bench inherit from either the {class}`Scorer <arthur_bench.scoring.scorer.scorer>` or {class}`CategoricalScorer <arthur_bench.scoring.scorer.categorical_scorer>` classes. 
+Let's take a look at the Scorer interface:
 ```python
 class Scorer(ABC):
     """
@@ -157,7 +167,9 @@ class Scorer(ABC):
         """
         raise NotImplementedError
 ```
-To create a custom scorer, you need to implement the `name` and `run_batch` methods, implement the `possible_values()` method if your scorer is categorical, and optionally override the `requires_reference` method if your scorer doesn't require reference or target data.
+To create a custom scorer, you need to implement the `name` and `run_batch` methods, and optionally override the `requires_reference` method if your scorer doesn't require reference or target data.
+
+If your scorer is categorical, you must also implement the `categories` method, which specifies the possible categories your scorer can return.
 
 ## Contributing
 
