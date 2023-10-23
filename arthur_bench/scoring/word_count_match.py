@@ -28,7 +28,7 @@ class WordCountMatch(Scorer):
         reference_batch: Optional[List[str]] = None,
         input_text_batch: Optional[List[str]] = None,
         context_batch: Optional[List[str]] = None,
-    ) -> List[Feedback]:
+    ) -> List[float]:
         if reference_batch is None:
             raise UserTypeError(
                 "Reference Outputs must be provided for Word Count Match scorer. "
@@ -40,8 +40,8 @@ class WordCountMatch(Scorer):
             len_cand = lexicon_count(candidate_batch[i], removepunct=True)
             delta = abs(len_ref - len_cand)
             if delta > len_ref:
-                word_count_match.append(Feedback(score=0.0))
+                word_count_match.append(0.0)
             else:
-                word_count_match.append(Feedback(score=(len_ref - delta) / len_ref))
+                word_count_match.append((len_ref - delta) / len_ref)
 
         return word_count_match

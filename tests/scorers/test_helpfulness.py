@@ -43,7 +43,7 @@ def test_run_readability():
     for i, result in enumerate(readability_run_result):
         normalized_expected_result = expected[i] / max_flesch_reading_ease_value
         assert torch.isclose(
-            torch.tensor(result.score),
+            torch.tensor(result),
             torch.tensor(normalized_expected_result),
             atol=1e-5,
         )
@@ -59,9 +59,7 @@ def test_run_wcm():
     # assert return correct values
     expected = [0.8888888, 0.7857142, 1.0, 0.583333]
     for i, result in enumerate(wcm_run_result):
-        assert torch.isclose(
-            torch.tensor(result.score), torch.tensor(expected[i]), atol=1e-5
-        )
+        assert torch.isclose(torch.tensor(result), torch.tensor(expected[i]), atol=1e-5)
 
 
 def test_specificity_mocks(
@@ -95,7 +93,7 @@ def test_specificity_mocks(
                 expected = [0.198, 0.198, 0.198, 0.198]
                 for i, result in enumerate(spec_run_result):
                     assert torch.isclose(
-                        torch.tensor(result.score), torch.tensor(expected[i]), atol=1e-4
+                        torch.tensor(result), torch.tensor(expected[i]), atol=1e-4
                     )
 
 
@@ -109,6 +107,4 @@ def test_specificity():
     # assert return correct values
     expected = [0.825000, 0.5829599, 0.5714, 0.895714]
     for i, result in enumerate(spec_run_result):
-        assert torch.isclose(
-            torch.tensor(result.score), torch.tensor(expected[i]), atol=1e-4
-        )
+        assert torch.isclose(torch.tensor(result), torch.tensor(expected[i]), atol=1e-4)

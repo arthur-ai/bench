@@ -44,5 +44,4 @@ def test_run_batch(mock_client):
 
         # assert correct return values for mock responses
         for i, r in enumerate(result):
-            assert r.label == "False"
-            assert r.reason == "this is the reason"
+            assert r == 0.0

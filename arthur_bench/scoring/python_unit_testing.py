@@ -5,14 +5,12 @@ import os
 os.environ[
     "HF_ALLOW_CODE_EVAL"
 ] = "1"  # required for executing code using the HuggingFace code_eval metric
-from typing import List, Optional
+from typing import Dict, List, Optional
 from tqdm import tqdm
 
 from arthur_bench.exceptions import UserValueError
-from arthur_bench.scoring import CategoricalScorer, Feedback
+from arthur_bench.scoring import CategoricalScorer
 from arthur_bench.scoring.scorer import SINGLE_ITEM_BATCH_DEFAULT
-
-pass_fail_map = {0.0: "fail", 1.0: "pass"}
 
 
 class PythonUnitTesting(CategoricalScorer):
@@ -63,8 +61,8 @@ class PythonUnitTesting(CategoricalScorer):
         return False
 
     @staticmethod
-    def categories() -> List[str]:
-        return ["pass", "fail"]
+    def categories() -> Dict[float, str]:
+        return {0.0: "fail", 1.0: "pass"}
 
     def to_dict(self, warn=False):
         d = super().to_dict(warn)
@@ -78,13 +76,13 @@ class PythonUnitTesting(CategoricalScorer):
         inputs: Optional[List[str]] = None,
         contexts: Optional[List[str]] = None,
         batch_size: int = SINGLE_ITEM_BATCH_DEFAULT,
-    ) -> List[Feedback]:
+    ) -> List[float]:
         res = []
         for i in tqdm(range(len(candidate_outputs))):
             pass_at_k, _ = self.evaluator.compute(
                 references=[self.unit_tests[i]], predictions=[[candidate_outputs[i]]]
             )
-            res.append(Feedback(label=pass_fail_map[pass_at_k["pass@1"]]))
+            res.append(pass_at_k["pass@1"])
         return res
 
     def run_batch(
@@ -93,7 +91,7 @@ class PythonUnitTesting(CategoricalScorer):
         reference_batch: Optional[List[str]] = None,
         input_text_batch: Optional[List[str]] = None,
         context_batch: Optional[List[str]] = None,
-    ) -> List[Feedback]:
+    ) -> List[float]:
         raise NotImplementedError(
             "run_batch is not implemented for this scorer. "
             "Use PythonUnitTesting.run(candidates) instead."

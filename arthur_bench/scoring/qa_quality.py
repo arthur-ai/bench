@@ -1,5 +1,5 @@
 import logging
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
@@ -38,8 +38,8 @@ class QAQualityCorrectness(CategoricalScorer):
         return False
 
     @staticmethod
-    def categories() -> List[str]:
-        return ["0", "1", "NA"]
+    def categories() -> Dict[float, str]:
+        return {0.0: "0", 1.0: "1", -1.0: "NA"}
 
     def run_batch(
         self,
@@ -47,7 +47,7 @@ class QAQualityCorrectness(CategoricalScorer):
         reference_batch: Optional[List[str]] = None,
         input_text_batch: Optional[List[str]] = None,
         context_batch: Optional[List[str]] = None,
-    ) -> List[Feedback]:
+    ) -> List[float]:
         """
         Reference batch is not used for this scoring method, QA correctness requires an
         input_text_batch and context_batch
@@ -73,8 +73,11 @@ class QAQualityCorrectness(CategoricalScorer):
                     "answer": candidate_batch[i],
                 }
             )["text"]
+            try:
+                llmchoice = float(llmchoice)
+            except ValueError:
+                llmchoice = -1.0
             if llmchoice not in self.to_dict()["categories"]:
-                llmchoice = "-1"
-            llmchoice = llmchoice
-            res.append(Feedback(label=llmchoice))
+                llmchoice = -1.0
+            res.append(llmchoice)
         return res

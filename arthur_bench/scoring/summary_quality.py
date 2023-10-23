@@ -1,7 +1,7 @@
 import logging
 import tiktoken
 from tiktoken.core import Encoding
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 from langchain.chat_models.base import BaseChatModel
@@ -90,8 +90,8 @@ class SummaryQuality(CategoricalScorer):
         return "summary_quality"
 
     @staticmethod
-    def categories() -> List[str]:
-        return ["-1", "0", "1", "2"]
+    def categories() -> Dict[float, str]:
+        return {-1.0: "error", 0.0: "A", 1.0: "B", 2.0: "neither"}
 
     def run(
         self,
@@ -148,7 +148,7 @@ class SummaryQuality(CategoricalScorer):
         reference_batch: Optional[List[str]] = None,
         input_text_batch: Optional[List[str]] = None,
         context_batch: Optional[List[str]] = None,
-    ) -> List[Feedback]:
+    ) -> List[float]:
         """
         Summary quality requires input_text_batch.
         """
@@ -185,26 +185,14 @@ class SummaryQuality(CategoricalScorer):
             # return -1 if the LLMChain returns an invalid result
             if "text" in choice:
                 try:
-                    candidate_choice = choice["text"][:3]
+                    candidate_choice = float(choice["text"][:3])
                     if candidate_choice in self.to_dict()["categories"]:
-                        feedback = Feedback(
-                            label=candidate_choice,
-                            reason=f"Candidate {candidate_choice} is preferred",
-                        )
+                        feedback = candidate_choice
                     else:
-                        feedback = Feedback(
-                            label="-1",
-                            reason="an error occured in the scoring",
-                        )
+                        feedback = -1.0
                 except ValueError:
-                    feedback = Feedback(
-                        label="-1",
-                        reason="an error occured in the scoring",
-                    )
+                    feedback = -1.0
             else:
-                feedback = Feedback(
-                    label="-1",
-                    reason="an error occured in the scoring",
-                )
+                feedback = -1.0
             res.append(feedback)
         return res

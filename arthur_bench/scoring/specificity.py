@@ -1,6 +1,6 @@
 from textstat import lexicon_count
 from typing import List, Optional
-from arthur_bench.scoring import Scorer, Feedback
+from arthur_bench.scoring import Scorer
 from wordfreq import word_frequency
 from collections import Counter
 import nltk
@@ -122,7 +122,7 @@ class Specificity(Scorer):
         reference_batch: Optional[List[str]] = None,
         input_text_batch: Optional[List[str]] = None,
         context_batch: Optional[List[str]] = None,
-    ) -> List[Feedback]:
+    ) -> List[float]:
         res = []
         for i in range(len(candidate_batch)):
             c = candidate_batch[i]
@@ -132,6 +132,6 @@ class Specificity(Scorer):
             pn_prop = self.get_pn_and_num(c)
 
             s = (0.33 * vague_prop) + (0.33 * adj_freq) + (0.33 * pn_prop)  # aggregate
-            res.append(Feedback(score=s))
+            res.append(s)
 
         return res

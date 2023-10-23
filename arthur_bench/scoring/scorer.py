@@ -204,7 +204,7 @@ class CategoricalScorer(Scorer):
 
     @staticmethod
     @abstractmethod
-    def categories() -> List[str]:
+    def categories() -> Union[List[str], Dict[float, str]]:
         """
         Get the categories of this Scorer
         :return: the list of categories this Scorer could return

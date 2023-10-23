@@ -37,5 +37,5 @@ def test_run_bertscore(mock_scorer):
         expected = [0.11, 0.31, 0.51, 0.71]
         for i, result in enumerate(bertscore_run_result):
             assert torch.isclose(
-                torch.tensor(result.score), torch.tensor(expected[i]), atol=1e-5
+                torch.tensor(result), torch.tensor(expected[i]), atol=1e-5
             )

@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from arthur_bench.exceptions import UserTypeError
 from arthur_bench.scoring import CategoricalScorer, Feedback
@@ -18,8 +18,8 @@ class ExactMatch(CategoricalScorer):
         return "exact_match"
 
     @staticmethod
-    def categories() -> List[str]:
-        return ["True", "False"]
+    def categories() -> Dict[float, str]:
+        return {1.0: "True", 0.0: "False"}
 
     def run_batch(
         self,
