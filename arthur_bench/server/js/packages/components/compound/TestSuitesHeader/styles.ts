@@ -11,7 +11,10 @@ const styles = {
         display: 'flex',
         gap: '20px',
         alignItems: 'center',
-        marginTop: '30px',
+        marginTop: "15px",
+    },
+    title: {
+        fontSize: "24px",
     },
 };
 

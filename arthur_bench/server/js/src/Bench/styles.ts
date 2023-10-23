@@ -3,7 +3,7 @@ import { GRAPHIK_LIGHT } from "resources/fonts"
 
 const styles = {
     container: {
-        padding: '0px 50px',
+        padding: "0px 50px 40px 50px",
         color: primary.black,
     },
     banner: {
@@ -58,9 +58,6 @@ const styles = {
         flexDirection: 'column',
         gap: '15px',
         transitionDuration: '0.5s',
-        ':hover': {
-            cursor: 'pointer'
-        }
     },
     tableContainer: {
         backgroundColor: primary.white,
