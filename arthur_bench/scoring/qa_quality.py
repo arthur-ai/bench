@@ -6,7 +6,7 @@ from langchain.chat_models import ChatOpenAI
 from langchain.chat_models.base import BaseChatModel
 
 from arthur_bench.exceptions import UserValueError
-from arthur_bench.scoring import CategoricalScorer, Feedback
+from arthur_bench.scoring import CategoricalScorer
 from arthur_bench.scoring.prompts.qa_correctness import DECIDE
 
 logger = logging.getLogger(__name__)

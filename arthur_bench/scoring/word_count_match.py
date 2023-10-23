@@ -2,7 +2,7 @@ from textstat import lexicon_count
 from typing import List, Optional
 
 from arthur_bench.exceptions import UserTypeError
-from arthur_bench.scoring import Scorer, Feedback
+from arthur_bench.scoring import Scorer
 
 
 class WordCountMatch(Scorer):
