@@ -12,6 +12,7 @@ Here is a list of all the scorers available by default in Arthur Bench (listed a
 |-----------------------------------|-----|-----|-----|
 | BERT Score (`bertscore`)          | any |  Embedding-Based | Reference Output, Candidate Output|
 | Exact Match (`exact_match`)       | any | Lexicon-Based | Reference Output, Candidate Output|
+| Hallucination (`hallucination`)       | any | Prompt-Based | Candidate Output, Context|
 | Hedging Language (`hedging_language`)   | any | Embedding-Based | Candidate Output |
 | Python Unit Testing (`python_unit_testing`)   | Python Generation | Code Evaluator| Candidate Output, Unit Tests (see the [code eval guide](code_evaluation.md)) |
 | QA Correctness (`qa_correctness`) | Question-Answering| Prompt-Based | Input, Candidate Output, Context|
@@ -32,6 +33,10 @@ The QA correctness scorer evaluates the correctness of an answer, given a questi
 ### `summary_quality`
 
 The Summary Quality scorer evaluates a summary against its source text and a reference summary for comparison. It evaluates summaries on dimensions including relevance and syntax. Each row of the test run will receive a binary 0, indicating that the reference output was scored higher than the candidate output, or 1, indicating that the candidate output was scored higher than the reference output.
+
+### `hallucination`
+
+The Hallucination scorer takes a response and a context (e.g. in a RAG setting where context is used to ground an LLM’s responses) and identifies when information in the response is not substantiated by the context . The scorer breaks down the response into a list of claims and checks the claims against the context for support. This binary score is 0 if all claims are supported, and 1 otherwise.
 
 ## Embedding-Based Scorers
 
