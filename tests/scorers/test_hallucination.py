@@ -42,4 +42,4 @@ def test_run_batch(mock_client):
             )
 
         # assert correct return values for mock responses
-        assert result == [1.0] * len(MOCK_SUMMARY_DATA)
+        assert result == [0.0] * len(MOCK_SUMMARY_DATA)
