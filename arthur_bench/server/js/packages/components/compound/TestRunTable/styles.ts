@@ -43,7 +43,7 @@ const styles = {
 export const cellStyles = (width?: string) => ({
     width: width ?? 'auto',
     border: `1px solid ${primary.ashGrey}`,
-    fontSize: '12px',
+    fontSize: '14px',
     FontFamily: GRAPHIK_LIGHT,
     textAlign: 'left',
     padding: '16px',
