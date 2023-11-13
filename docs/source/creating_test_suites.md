@@ -22,7 +22,7 @@ You can provide data for your `TestSuite` via the following options, each of whi
 3. CSV file
 4. HuggingFace Dataset
 
-To see the exact specifications for the `TestSuite` class, visit our [SDK docs](https://bench.readthedocs.io/en/latest/testsuite.html#arthur_bench.run.testsuite.TestSuite).
+To see the exact specifications for the `TestSuite` class, visit our [SDK docs](https://bench.readthedocs.io/en/latest/sdk/arthur_bench.run.html#arthur_bench.run.testsuite.TestSuite).
 
 ### `List[str]` -> `TestSuite`
 
