@@ -21,7 +21,7 @@ class HedgingLanguage(Scorer):
 
     def __init__(self, model_type=DEFAULT_MODEL, hedging_language=DEFAULT_HEDGE):
         """
-        Hedging Language score implementation. 
+        Hedging Language score implementation.
 
         :param model_type: the underlying language model to extract embeddings from
         :param hedging_language: reference hedging language used by an llm
