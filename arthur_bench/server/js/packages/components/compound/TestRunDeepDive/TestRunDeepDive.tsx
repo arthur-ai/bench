@@ -1,4 +1,4 @@
-import { TestRunCase } from 'arthur-redux/slices/testSuites/types';
+import { TestRunCase } from "../../../arthur-redux/slices/testSuites/types";
 import React, {useCallback, useEffect, useState} from 'react';
 import { Table, TableCell, TableRow } from '../../core/Table';
 import Header from './Header';
@@ -35,11 +35,13 @@ const Row = ({ runCase }: RowProps) => {
                 limit={300}
                 tableCellProps={{ style: cellStyle }}
             />
-            <ExpandableTableCell
+            {
+                runCase.reference_output &&
+                <ExpandableTableCell
                 text={runCase.reference_output}
                 limit={300}
-                tableCellProps={{ style: cellStyle }}
-            />
+                tableCellProps={{style: cellStyle}}
+            />}
             <ExpandableTableCell
                 text={runCase.output}
                 limit={300}
