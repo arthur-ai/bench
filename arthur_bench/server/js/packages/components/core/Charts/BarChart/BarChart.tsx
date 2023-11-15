@@ -1,8 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import merge from 'lodash.merge';
-import { EChartsOption, EChartsType } from 'echarts';
-import EChartsReact from 'echarts-for-react';
-import primary from 'resources/colors/Arthur/primary';
+import React, { useEffect, useMemo, useState } from "react";
+import merge from "lodash.merge";
+import { EChartsOption, EChartsType } from "echarts";
+import EChartsReact from "echarts-for-react";
+import primary from "resources/colors/Arthur/primary";
 
 import {
     xAxisDefaults,
@@ -15,13 +15,13 @@ import {
     rootStyles,
     secondaryTitle,
     legendTopContainer,
-} from '../constants';
-import graphs, { chartColorsArray } from 'resources/colors/Arthur/graphs';
-import Legend, { ELegendItemShape, LegendItems } from '../Legend/Legend';
-import { MarkLine1DDataItemOption } from 'echarts/types/src/component/marker/MarkLineModel';
-import { CallbackDataParams } from 'echarts/types/dist/shared';
-import { useTranslation } from 'react-i18next';
-import { useFela } from 'react-fela';
+} from "../constants";
+import graphs, { chartColorsArray } from "resources/colors/Arthur/graphs";
+import Legend, { ELegendItemShape, LegendItems } from "../Legend/Legend";
+import { MarkLine1DDataItemOption } from "echarts/types/src/component/marker/MarkLineModel";
+import { CallbackDataParams } from "echarts/types/dist/shared";
+import { useTranslation } from "react-i18next";
+import { useFela } from "react-fela";
 
 export type TBarChartData = Record<string, number | string>;
 
@@ -29,6 +29,7 @@ export type TBarChartDataItem = {
     name: string;
     data: TBarChartData;
     color?: string;
+    border?: { color: string; type: string; width: number };
     subtitle?: string;
     opacity?: number;
 };
@@ -67,7 +68,7 @@ type TBarChartProps = {
     splitLegendOnChar?: string;
     hasToolbox?: boolean;
     openChartSelections?: () => void | null;
-    additionalToolboxItems?: Record<string, Record<string, any>>
+    additionalToolboxItems?: Record<string, Record<string, any>>;
 };
 
 const BarChart = (props: TBarChartProps) => {
@@ -77,9 +78,9 @@ const BarChart = (props: TBarChartProps) => {
         id,
         dataTestId,
         isLoading,
-        height = '400px',
+        height = "400px",
         options,
-        barWidth = '15%',
+        barWidth = "15%",
         barGap,
         markArea,
         markLine,
@@ -101,34 +102,23 @@ const BarChart = (props: TBarChartProps) => {
         stacked = false,
         groupByName = false,
         hasToolbox = false,
-        additionalToolboxItems = {}
+        additionalToolboxItems = {},
     } = props;
 
     const [stateLegendItems, setLegendItems] = useState<LegendItems>(legendItems);
 
     useEffect(() => {
         handleAddLegendItems();
-    }, [graphData, markLine])
+    }, [graphData, markLine]);
 
     const renderEmptyMessage = () => {
         if (graphData) {
             const emptyGraphData = !graphData.length;
-            const emptyDataPoint = graphData.every(
-                (d) => !Object.keys(d.data).length
-            );
-            const zeroesData = graphData.every((d) =>
-                Object.values(d.data).every((val) => !val)
-            );
+            const emptyDataPoint = graphData.every((d) => !Object.keys(d.data).length);
+            const zeroesData = graphData.every((d) => Object.values(d.data).every((val) => !val));
 
-            if (
-                (emptyGraphData || emptyDataPoint || zeroesData) &&
-                !isLoading
-            ) {
-                return (
-                    <div className={css(emptyMessageStyles)}>
-                        {emptyMessage || t('charts.emptyMessage')}
-                    </div>
-                );
+            if ((emptyGraphData || emptyDataPoint || zeroesData) && !isLoading) {
+                return <div className={css(emptyMessageStyles)}>{emptyMessage || t("charts.emptyMessage")}</div>;
             }
         }
 
@@ -142,8 +132,8 @@ const BarChart = (props: TBarChartProps) => {
 
         const allGraphDataKeys: string[] = [];
         graphData.forEach((dataItem: TBarChartDataItem) => {
-            allGraphDataKeys.push(...Object.keys(dataItem.data))
-        })
+            allGraphDataKeys.push(...Object.keys(dataItem.data));
+        });
         const uniqueDataKeys = Array.from(new Set(allGraphDataKeys));
         const moreLegendItems: LegendItems = [];
         uniqueDataKeys.map((name: string, index: number) => {
@@ -152,7 +142,7 @@ const BarChart = (props: TBarChartProps) => {
                 name,
                 shape: ELegendItemShape.SQUARE,
             });
-        })
+        });
 
         if (addMarkLineLegendItems) {
             markLine?.map((dp: any) => {
@@ -167,17 +157,12 @@ const BarChart = (props: TBarChartProps) => {
         setLegendItems([...moreLegendItems, ...legendItems]);
     };
 
-    const tooltipFormatter = (
-        event: { value: number; axisValueLabel: string }[]
-    ) => {
+    const tooltipFormatter = (event: { value: number; axisValueLabel: string }[]) => {
         return `<span style='color: rgba(0, 0, 0, 0.6)'>${event[0].axisValueLabel}</span>
                 <span style="color: #000000">${event[0].value}</span> `;
     };
 
-    const handleChartClick = (
-        event: CallbackDataParams,
-        chart: EChartsType
-    ) => {
+    const handleChartClick = (event: CallbackDataParams, chart: EChartsType) => {
         if (onChartClick) {
             onChartClick(event, chart);
         }
@@ -196,10 +181,10 @@ const BarChart = (props: TBarChartProps) => {
     };
 
     const defaultSeriesOptions = (rw: any, index: number) => ({
-        ...(stacked && { stack: 'stackbar' }),
+        ...(stacked && { stack: "stackbar" }),
         barMinHeight: 1,
         silent: !onChartClick,
-        barCategoryGap: '10px',
+        barCategoryGap: "10px",
         barWidth,
         barGap,
         barMaxWidth: 120,
@@ -210,21 +195,26 @@ const BarChart = (props: TBarChartProps) => {
             color: rw.color,
             barBorderRadius: [2, 2, 0, 0],
             opacity: rw.opacity,
+            ...(rw.border && {
+                borderType: rw.border.type,
+                borderColor: rw.border.color,
+                borderWidth: rw.border.width,
+            }),
         },
         emphasis: {
             itemStyle: {
                 borderWidth: 2,
-                shadowColor: 'rgba(0, 0, 0, 0.5)',
+                shadowColor: "rgba(0, 0, 0, 0.5)",
                 shadowBlur: 2,
             },
-            focus: 'series',
+            focus: "series",
         },
         showSymbol: false,
         ...(!index && {
             ...(markLine && {
                 markLine: {
                     silent: true,
-                    symbol: 'none',
+                    symbol: "none",
                     lineStyle: { color: primary.raisin, width: 2 },
                     label: { show: false },
                     data: markLine,
@@ -237,42 +227,38 @@ const BarChart = (props: TBarChartProps) => {
                         color: graphs.backgrounds.ashGrey,
                         opacity: 0.5,
                     },
-                    data: [
-                        [
-                            { [markArea.axis]: markArea.data[0] },
-                            { [markArea.axis]: markArea.data[1] },
-                        ],
-                    ],
+                    data: [[{ [markArea.axis]: markArea.data[0] }, { [markArea.axis]: markArea.data[1] }]],
                 },
             }),
         }),
     });
     const defaultOptions = useMemo(
         () => ({
-            ...(hasToolbox ? {
-                toolbox: {
-                right: 10,
-                feature: {
-                  dataZoom: {
-                    yAxisIndex: 'none'
-                  },
-                  ...additionalToolboxItems,
+            ...(hasToolbox
+                ? {
+                    toolbox: {
+                        right: 10,
+                        feature: {
+                            dataZoom: {
+                                yAxisIndex: "none",
+                            },
+                            ...additionalToolboxItems,
+                        },
+                    },
                 }
-              }
-            } : {}),
+                : {}),
             color: chartColorsArray,
             legend: { show: false },
             tooltip: {
-                trigger: 'axis',
+                trigger: "axis",
                 formatter: tooltip || tooltipFormatter,
-                extraCssText:
-                    'font-family: "Mono-Regular"; border-radius: 6px; padding: 4px 12px;',
-                borderColor: 'transparent',
+                extraCssText: 'font-family: "Mono-Regular"; border-radius: 6px; padding: 4px 12px;',
+                borderColor: "transparent",
             },
             xAxis: {
                 name: props.xAxisTitle,
                 ...xAxisDefaults(xAxisLabelFormatter),
-                type: 'category',
+                type: "category",
                 axisTick: { show: !hideVerticalLines },
                 splitLine: {
                     show: !hideVerticalLines,
@@ -282,61 +268,57 @@ const BarChart = (props: TBarChartProps) => {
             },
             ...(yAxisMax
                 ? {
-                      yAxis: {
-                          max: yAxisMax,
-                          name: props.yAxisTitle,
-                          ...yAxisDefaults(yAxisLabelFormatter),
-                          axisTick: { show: false },
-                          splitLine: {
-                              lineStyle: { color: graphs.backgrounds.ashGrey },
-                          },
-                      },
-                  }
+                    yAxis: {
+                        max: yAxisMax,
+                        name: props.yAxisTitle,
+                        ...yAxisDefaults(yAxisLabelFormatter),
+                        axisTick: { show: false },
+                        splitLine: {
+                            lineStyle: { color: graphs.backgrounds.ashGrey },
+                        },
+                    },
+                }
                 : {
-                      yAxis: {
-                          name: props.yAxisTitle,
-                          ...yAxisDefaults(yAxisLabelFormatter),
-                          axisTick: { show: false },
-                          splitLine: {
-                              lineStyle: { color: graphs.backgrounds.ashGrey },
-                          },
-                      },
-                  }),
+                    yAxis: {
+                        name: props.yAxisTitle,
+                        ...yAxisDefaults(yAxisLabelFormatter),
+                        axisTick: { show: false },
+                        splitLine: {
+                            lineStyle: { color: graphs.backgrounds.ashGrey },
+                        },
+                    },
+                }),
             series:
                 graphData &&
                 (groupByName
                     ? graphData.reduce((final: any, rw: any, index: number) => {
-                          Object.keys(rw.data).forEach((key) => {
-                              const mappedSeriesData = final.findIndex(
-                                  (dp: any) => dp.name === key
-                              );
-                              if (mappedSeriesData >= 0) {
-                                  final[mappedSeriesData].data = [
-                                      ...final[mappedSeriesData].data,
-                                      rw.data[key],
-                                  ];
-                              } else {
-                                  final.push({
-                                      ...defaultSeriesOptions(rw, index),
-                                      data: [rw.data[key]],
-                                      name: key,
-                                  });
-                              }
-                          });
+                        Object.keys(rw.data).forEach((key) => {
+                            const mappedSeriesData = final.findIndex((dp: any) => dp.name === key);
 
-                          return final;
-                      }, [])
+                            if (mappedSeriesData >= 0) {
+                                final[mappedSeriesData].data = [...final[mappedSeriesData].data, rw.data[key]];
+                            } else {
+                                final.push({
+                                    ...defaultSeriesOptions(rw, index),
+                                    data: [rw.data[key]],
+                                    name: key,
+                                });
+                            }
+                        });
+
+                        return final;
+                    }, [])
                     : graphData.map((rw: TBarChartDataItem, index: number) => ({
-                          ...defaultSeriesOptions(rw, index),
-                          name: rw.name,
-                          data: Object.values(rw.data),
-                      }))),
+                        ...defaultSeriesOptions(rw, index),
+                        name: rw.name,
+                        data: Object.values(rw.data),
+                    }))),
         }),
         [graphData]
     );
 
     return (
-        <div style={{ width: '100%' }} className={css(rootStyles)} id={id} data-testid={dataTestId}>
+        <div style={{ width: "100%" }} className={css(rootStyles)} id={id} data-testid={dataTestId}>
             {renderEmptyMessage()}
             {showLegendTop && !!stateLegendItems?.length && (
                 <div className={css(legendTopContainer)}>
@@ -350,15 +332,11 @@ const BarChart = (props: TBarChartProps) => {
                 option={merge(defaultOptions, options)}
                 showLoading={isLoading}
                 loadingOption={LOADING_OPTIONS}
-                style={{ height, width: '100%' }}
-                opts={{ renderer: 'svg' }}
+                style={{ height, width: "100%" }}
+                opts={{ renderer: "svg" }}
             />
-            {xSecondaryAxisTitle && (
-                <div className={css(secondaryTitle)}>{xSecondaryAxisTitle}</div>
-            )}
-            {showLegend && !!stateLegendItems?.length && (
-                <Legend items={stateLegendItems} />
-            )}
+            {xSecondaryAxisTitle && <div className={css(secondaryTitle)}>{xSecondaryAxisTitle}</div>}
+            {showLegend && !!stateLegendItems?.length && <Legend items={stateLegendItems} />}
         </div>
     );
 };

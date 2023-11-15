@@ -1,18 +1,18 @@
-import React from 'react';
-import LineChart from '../../core/Charts/LineChart';
-import {
-    TDistribution,
-    TestRunSummary,
-} from 'arthur-redux/slices/testSuites/types';
-import { TGraphDataItem } from '../../core/Charts/LineChart/';
-import { useParams } from 'react-router-dom';
+import React from "react";
+import LineChart from "../../core/Charts/LineChart";
+import { Distribution, TestRunSummary, Histogram } from "../../../arthur-redux/slices/testSuites/types";
+import { TGraphDataItem } from "../../core/Charts/LineChart/";
+import { useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const getValues = (summaries: TestRunSummary[], testRunId: string, total: number): TGraphDataItem[] => {
-    return summaries.map((summary: TestRunSummary, i: number) => {
-        const formattedData: Array<[number, number] | [number]> = summary.histogram.map((t: TDistribution) => {
-            const lower = t.low;
-            return [parseFloat(lower.toFixed(3)), t.count/total * 100];
+    return summaries.map((summary: TestRunSummary) => {
+        const formattedData: Array<[number, number] | [number]> = summary.histogram.map((t: Histogram) => {
+            const { low } = t as Distribution;
+
+            return [parseFloat(low.toFixed(3)), (t.count / total) * 100];
         });
+
         return {
             name: summary.name,
             data: formattedData,
@@ -26,6 +26,7 @@ type Props = {
     total: number;
 };
 const RunDistributions = ({ summaries, total }: Props) => {
+    const { t } = useTranslation(["common"]);
     const params = useParams();
     const values = getValues(summaries, params.testRunId as string, total);
 
@@ -34,11 +35,11 @@ const RunDistributions = ({ summaries, total }: Props) => {
             id={params.testSuiteId}
             graphData={values}
             showLegend
-            height={'300px'}
-            yAxisTitle={'% of Tests'}
-            xAxisTitle={'Avg Test Scores'}
+            height={"300px"}
+            yAxisTitle={t("visualization.distributionYAxis")}
+            xAxisTitle={t("visualization.distributionXAxis")}
+            smoothData
             hasDefaultTooltip={true}
-            smoothData={true}
         />
     );
 };
