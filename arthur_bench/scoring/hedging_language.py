@@ -19,7 +19,9 @@ class HedgingLanguage(Scorer):
     model output.
     """
 
-    def __init__(self, model_type=DEFAULT_MODEL, hedging_language=DEFAULT_HEDGE):
+    def __init__(
+        self, model_type: str = DEFAULT_MODEL, hedging_language: str = DEFAULT_HEDGE
+    ):
         """
         Hedging Language score implementation.
 
@@ -40,7 +42,10 @@ class HedgingLanguage(Scorer):
         return False
 
     def to_dict(self, warn=False):
-        return {"model_type": self.scorer.model_type}
+        return {
+            "model_type": self.scorer.model_type,
+            "hedging_language": self.hedging_language,
+        }
 
     def run_batch(
         self,
