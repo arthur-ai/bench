@@ -130,7 +130,7 @@ def test_suite_summary(
     test_suite_id: uuid.UUID,
     page: int = 1,
     page_size: int = 5,
-    run_ids: Annotated[list[uuid.UUID], Query()] = None,
+    run_ids: Annotated[Optional[list[uuid.UUID]], Query()] = None,
 ):
     client = request.app.state.client
     try:
