@@ -409,10 +409,10 @@ class LocalBenchClient(BenchClient):
         for f in run_files:
             run_obj = PaginatedRun.parse_file(f)
             runs.append(_summarize_run(run=run_obj))
-        
-        if run_ids: 
-            runs= [run for run in runs if str(run.id) in run_ids]
- 
+
+        if run_ids:
+            runs = [run for run in runs if str(run.id) in run_ids]
+
         pagination = _paginate(runs, page, page_size, sort_key="avg_score")
         paginated_summary = TestSuiteSummary(
             summary=runs,
