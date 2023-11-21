@@ -396,7 +396,7 @@ class LocalBenchClient(BenchClient):
     def get_summary_statistics(
         self,
         test_suite_id: str,
-        run_id: Optional[str] = None,
+        run_ids: Optional[list[str]] = None,
         page: int = 1,
         page_size: int = DEFAULT_PAGE_SIZE,
     ) -> TestSuiteSummary:
@@ -404,15 +404,15 @@ class LocalBenchClient(BenchClient):
         if test_suite_name is None:
             raise NotFoundError(f"no test suite with id {test_suite_id}")
 
-        runs = []
-        run_id_found = False
+        runs: list[SummaryItem] = []
         run_files = glob.glob(f"{self.root_dir}/{test_suite_name}/*/run.json")
         for f in run_files:
             run_obj = PaginatedRun.parse_file(f)
             runs.append(_summarize_run(run=run_obj))
-            if str(run_obj.id) == run_id:
-                run_id_found = True
-
+        
+        if run_ids: 
+            runs= [run for run in runs if str(run.id) in run_ids]
+ 
         pagination = _paginate(runs, page, page_size, sort_key="avg_score")
         paginated_summary = TestSuiteSummary(
             summary=runs,
@@ -423,14 +423,6 @@ class LocalBenchClient(BenchClient):
             total_count=pagination.total_count,
         )
 
-        if run_id is not None and not run_id_found:
-            run_name = self._get_run_name_from_id(test_suite_name, run_id)
-            if run_name is None:
-                raise NotFoundError()
-            additional_run = PaginatedRun.parse_file(
-                self.root_dir / test_suite_name / run_name / "run.json"
-            )
-            paginated_summary.summary.append(_summarize_run(additional_run))
         return paginated_summary
 
     def get_test_run(
