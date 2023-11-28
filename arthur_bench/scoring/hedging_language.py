@@ -5,7 +5,6 @@ from arthur_bench.scoring.utils import suppress_warnings
 
 DEFAULT_MODEL = "microsoft/deberta-v3-base"
 
-# [TODO] need to make these editable by user
 DEFAULT_HEDGE = (
     "As an AI language model, I don't have personal opinions, emotions, or beliefs."
 )
@@ -20,6 +19,20 @@ class HedgingLanguage(Scorer):
     model output.
     """
 
+    def __init__(
+        self, model_type: str = DEFAULT_MODEL, hedging_language: str = DEFAULT_HEDGE
+    ):
+        """
+        Hedging Language score implementation.
+
+        :param model_type: the underlying language model to extract embeddings from
+        :param hedging_language: reference hedging language used by an llm
+        """
+        self.hedging_language = hedging_language
+
+        with suppress_warnings("transformers"):
+            self.scorer = BERTScorer(lang="en", model_type=model_type)
+
     @staticmethod
     def name() -> str:
         return "hedging_language"
@@ -28,12 +41,11 @@ class HedgingLanguage(Scorer):
     def requires_reference() -> bool:
         return False
 
-    def __init__(self):
-        with suppress_warnings("transformers"):
-            self.scorer = BERTScorer(lang="en", model_type=DEFAULT_MODEL)
-
     def to_dict(self, warn=False):
-        return {"model_type": self.scorer.model_type}
+        return {
+            "model_type": self.scorer.model_type,
+            "hedging_language": self.hedging_language,
+        }
 
     def run_batch(
         self,
@@ -43,7 +55,7 @@ class HedgingLanguage(Scorer):
         context_batch: Optional[List[str]] = None,
     ) -> List[float]:
         # convert reference hedge to list
-        reference_batch = [DEFAULT_HEDGE] * len(candidate_batch)
+        reference_batch = [self.hedging_language] * len(candidate_batch)
 
         # get precision, recall, and F1 score from bert_score package
         p, r, f = self.scorer.score(candidate_batch, reference_batch, verbose=False)
