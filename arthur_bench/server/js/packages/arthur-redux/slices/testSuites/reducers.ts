@@ -14,7 +14,8 @@ const defaultState = {
         },
         summaries: {
             summaries: null,
-            num_test_cases: 0
+            num_test_cases: 0,
+            categorical: false
         },
         data: {
             data: null,
@@ -64,6 +65,7 @@ export const testSuitesReducer = createReducer<TTestSuitesState>(
                     if (state.currentTestSuite) {
                         state.currentTestSuite.summaries.summaries = action.payload.summaries;
                         state.currentTestSuite.summaries.num_test_cases = action.payload.num_test_cases;
+                        state.currentTestSuite.summaries.categorical = action.payload.categorical;
                     }
                 }
             )
