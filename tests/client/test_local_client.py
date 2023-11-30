@@ -189,3 +189,7 @@ def get_summary_statistics(bench_temp_dir_with_runs):
         client = LocalBenchClient(bench_temp_dir_with_runs)
         resp = client.get_summary_statistics(SUITE_EXISTS)
         assert resp == MOCK_SUMMARY_RESPONSE
+
+
+def test_summarize_run():
+    pass

@@ -25,6 +25,7 @@ from arthur_bench.models.models import (
     TestRunMetadata,
     SummaryItem,
     HistogramItem,
+    CategoricalHistogramItem,
     TestCaseRequest,
     TestCaseResponse,
     RunResult,
@@ -40,6 +41,8 @@ RUN_INDEX_FILE = "run_id_to_name.json"
 
 TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%S.%f"
 DEFAULT_PAGE_SIZE = 5
+
+NUM_BINS = 20
 
 SORT_QUERY_TO_FUNC = {
     "last_run_time": lambda x: x.last_run_time
@@ -83,18 +86,36 @@ def _load_suite_with_optional_id(
     return None
 
 
-def _summarize_run(run: PaginatedRun) -> SummaryItem:
+def _summarize_run(run: PaginatedRun, categorical: bool) -> SummaryItem:
+    """
+    Compute aggregate statistics for a run. If scorer defined categories, categorical
+    histogram will be returned, otherwise continuous values will be grouped into 20 bins.
+    """
     scores = [o.score for o in run.test_cases]
     avg_score = np.mean(scores).item()
-    hist, bin_edges = np.histogram(scores, bins=20, range=(0, max(1, np.max(scores))))
     histogram = []
-    for i in range(len(hist)):
-        hist_item = HistogramItem(
-            count=hist[i], low=bin_edges[i], high=bin_edges[i + 1]
+
+    if categorical:
+        # TODO: use categories?
+        categories, frequencies = np.unique(scores, return_counts=True)
+        for i, (c, f) in enumerate(zip(categories, frequencies)):
+            hist_item = CategoricalHistogramItem(count=f, category=c)
+            histogram.append(hist_item)
+
+    else:
+        hist, bin_edges = np.histogram(
+            scores, bins=20, range=(0, max(1, np.max(scores)))
         )
-        histogram.append(hist_item)
+        for i in range(len(hist)):
+            hist_item = HistogramItem(
+                count=hist[i], low=bin_edges[i], high=bin_edges[i + 1]
+            )
+            histogram.append(hist_item)
     return SummaryItem(
-        id=run.id, name=run.name, avg_score=avg_score, histogram=histogram
+        id=run.id,
+        name=run.name,
+        avg_score=avg_score,
+        histogram=histogram,
     )
 
 
@@ -404,12 +425,16 @@ class LocalBenchClient(BenchClient):
         if test_suite_name is None:
             raise NotFoundError(f"no test suite with id {test_suite_id}")
 
+        suite_file = self.root_dir / test_suite_name / "suite.json"
+        suite = PaginatedTestSuite.parse_file(suite_file)
+        categorical = suite.scoring_method.categorical
+
         runs = []
         run_id_found = False
         run_files = glob.glob(f"{self.root_dir}/{test_suite_name}/*/run.json")
         for f in run_files:
             run_obj = PaginatedRun.parse_file(f)
-            runs.append(_summarize_run(run=run_obj))
+            runs.append(_summarize_run(run=run_obj, categorical=categorical))
             if str(run_obj.id) == run_id:
                 run_id_found = True
 
@@ -417,6 +442,7 @@ class LocalBenchClient(BenchClient):
         paginated_summary = TestSuiteSummary(
             summary=runs,
             num_test_cases=len(run_obj.test_cases),
+            categorical=categorical,
             page_size=pagination.page_size,
             page=pagination.page,
             total_pages=pagination.total_pages,

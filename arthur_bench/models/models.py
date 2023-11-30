@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional
+from typing import List, Optional, Union
 from uuid import UUID
 
 from pydantic import BaseModel, Field, validator
@@ -37,6 +37,10 @@ class ScoringMethod(BaseModel):
     config: dict = {}
     """
     Configuration as used by the scorer to_dict and from_dict methods
+    """
+    categorical: bool = False
+    """
+    Whether the scoring method returns categorical scores
     """
 
 
@@ -268,6 +272,11 @@ class HistogramItem(BaseModel):
     high: float
 
 
+class CategoricalHistogramItem(BaseModel):
+    count: int
+    category: float
+
+
 class SummaryItem(BaseModel):
     """
     Aggregate statistics for a single run: average score and score distribution
@@ -276,7 +285,26 @@ class SummaryItem(BaseModel):
     id: UUID
     name: str
     avg_score: float
-    histogram: List[HistogramItem]
+    histogram: List[Union[HistogramItem, CategoricalHistogramItem]]
+
+    @validator("histogram")
+    def either_continuous_or_categorical(cls, v):
+        """
+        Validate that the items in the histogram list are all
+        containing low/high floats or are all containing a category
+        """
+        both_error = (
+            "Histogram has both low/high floats and category "
+            "values, which is invalid."
+        )
+        is_categorical = isinstance(v[0], CategoricalHistogramItem)
+        for h in v:
+            if isinstance(h, CategoricalHistogramItem) and not is_categorical:
+                raise ValueError(both_error)
+
+            elif isinstance(h, HistogramItem) and is_categorical:
+                raise ValueError(both_error)
+        return v
 
 
 class TestSuiteSummary(BaseModel):
@@ -291,6 +319,7 @@ class TestSuiteSummary(BaseModel):
     total_pages: int
     total_count: int
     num_test_cases: int
+    categorical: bool = False
 
 
 class CreateRunResponse(BaseModel):
