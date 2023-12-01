@@ -84,6 +84,7 @@ class TestSuite:
             method_meta = ScoringMethod(
                 name=self.scorer.name(),
                 type=self.scorer.type(),
+                categorical=self.scorer.is_categorical(),
                 config=self.scorer.to_dict(warn=True),
             )
             new_suite = TestSuiteRequest(

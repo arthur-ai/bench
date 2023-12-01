@@ -52,7 +52,7 @@ export type Distribution = {
 };
 
 export type CategoricalDistribution = {
-    category: string;
+    category: number;
     count: number;
 };
 
