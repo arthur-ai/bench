@@ -16,6 +16,10 @@ class ExactMatch(Scorer):
     def name() -> str:
         return "exact_match"
 
+    @staticmethod
+    def is_categorical() -> bool:
+        return True
+
     def run_batch(
         self,
         candidate_batch: List[str],

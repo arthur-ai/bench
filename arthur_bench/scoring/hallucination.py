@@ -25,6 +25,10 @@ class Hallucination(Scorer):
     def requires_reference() -> bool:
         return False
 
+    @staticmethod
+    def is_categorical() -> bool:
+        return True
+
     def to_dict(self, warn=False):
         return {}
 

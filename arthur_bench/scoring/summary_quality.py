@@ -90,6 +90,10 @@ class SummaryQuality(Scorer):
     def name() -> str:
         return "summary_quality"
 
+    @staticmethod
+    def is_categorical() -> bool:
+        return True
+
     def to_dict(self, warn=False):
         return {}
 
