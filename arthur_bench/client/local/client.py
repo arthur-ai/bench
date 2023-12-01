@@ -89,18 +89,19 @@ def _load_suite_with_optional_id(
 def _summarize_run(run: PaginatedRun, categorical: bool) -> SummaryItem:
     """
     Compute aggregate statistics for a run. If scorer defined categories, categorical
-    histogram will be returned, otherwise continuous values will be grouped into 20 bins.
+    histogram will be returned, otherwise continuous values will be grouped into 20
+    bins.
     """
     scores = [o.score for o in run.test_cases]
     avg_score = np.mean(scores).item()
-    histogram = []
+    histogram: List[Union[HistogramItem, CategoricalHistogramItem]] = []
 
     if categorical:
         # TODO: use categories?
         categories, frequencies = np.unique(scores, return_counts=True)
         for i, (c, f) in enumerate(zip(categories, frequencies)):
-            hist_item = CategoricalHistogramItem(count=f, category=c)
-            histogram.append(hist_item)
+            cat_hist_item = CategoricalHistogramItem(count=f, category=c)
+            histogram.append(cat_hist_item)
 
     else:
         hist, bin_edges = np.histogram(
@@ -456,7 +457,9 @@ class LocalBenchClient(BenchClient):
             additional_run = PaginatedRun.parse_file(
                 self.root_dir / test_suite_name / run_name / "run.json"
             )
-            paginated_summary.summary.append(_summarize_run(additional_run))
+            paginated_summary.summary.append(
+                _summarize_run(additional_run, categorical=categorical)
+            )
         return paginated_summary
 
     def get_test_run(
