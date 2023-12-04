@@ -29,6 +29,7 @@ from arthur_bench.models.models import (
     TestCaseRequest,
     TestCaseResponse,
     RunResult,
+    ScoringMethod,
 )
 
 from arthur_bench.utils.loaders import load_suite_from_json, get_file_extension
@@ -86,21 +87,22 @@ def _load_suite_with_optional_id(
     return None
 
 
-def _summarize_run(run: PaginatedRun, categorical: bool) -> SummaryItem:
+def _summarize_run(run: PaginatedRun, scoring_method: ScoringMethod) -> SummaryItem:
     """
     Compute aggregate statistics for a run. If scorer defined categories, categorical
     histogram will be returned, otherwise continuous values will be grouped into 20
     bins.
     """
-    scores = [o.score for o in run.test_cases]
+    scores = np.array([o.score for o in run.test_cases])
     avg_score = np.mean(scores).item()
     histogram: List[Union[HistogramItem, CategoricalHistogramItem]] = []
 
-    if categorical:
-        # TODO: use categories?
-        categories, frequencies = np.unique(scores, return_counts=True)
-        for i, (c, f) in enumerate(zip(categories, frequencies)):
-            cat_hist_item = CategoricalHistogramItem(count=f, category=c)
+    if scoring_method.categorical:
+        categories = scoring_method.categories
+        # we validate that all categorical scoring methods have non null categories
+        for cat in categories:  # type: ignore
+            frequency = (scores == cat).sum()
+            cat_hist_item = CategoricalHistogramItem(count=frequency, category=cat)
             histogram.append(cat_hist_item)
 
     else:
@@ -428,14 +430,15 @@ class LocalBenchClient(BenchClient):
 
         suite_file = self.root_dir / test_suite_name / "suite.json"
         suite = PaginatedTestSuite.parse_file(suite_file)
-        categorical = suite.scoring_method.categorical
 
         runs = []
         run_id_found = False
         run_files = glob.glob(f"{self.root_dir}/{test_suite_name}/*/run.json")
         for f in run_files:
             run_obj = PaginatedRun.parse_file(f)
-            runs.append(_summarize_run(run=run_obj, categorical=categorical))
+            runs.append(
+                _summarize_run(run=run_obj, scoring_method=suite.scoring_method)
+            )
             if str(run_obj.id) == run_id:
                 run_id_found = True
 
@@ -443,7 +446,7 @@ class LocalBenchClient(BenchClient):
         paginated_summary = TestSuiteSummary(
             summary=runs,
             num_test_cases=len(run_obj.test_cases),
-            categorical=categorical,
+            categorical=suite.scoring_method.categorical,
             page_size=pagination.page_size,
             page=pagination.page,
             total_pages=pagination.total_pages,
@@ -458,7 +461,7 @@ class LocalBenchClient(BenchClient):
                 self.root_dir / test_suite_name / run_name / "run.json"
             )
             paginated_summary.summary.append(
-                _summarize_run(additional_run, categorical=categorical)
+                _summarize_run(additional_run, scoring_method=suite.scoring_method)
             )
         return paginated_summary
 

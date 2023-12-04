@@ -51,10 +51,16 @@ class Scorer(ABC):
     @staticmethod
     def is_categorical() -> bool:
         """
-        All possible values returned by the scorer if categorical.
-        Empty list if continuous score
+        Whether the scorer is continuous or categorical
         """
         return False
+
+    @staticmethod
+    def categories() -> Optional[List[float]]:
+        """
+        All possible values returned by the scorer if categorical.
+        """
+        return None
 
     @abstractmethod
     def run_batch(

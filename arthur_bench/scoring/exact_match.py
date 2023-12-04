@@ -20,6 +20,10 @@ class ExactMatch(Scorer):
     def is_categorical() -> bool:
         return True
 
+    @staticmethod
+    def categories() -> Optional[List[float]]:
+        return [0.0, 1.0]
+
     def run_batch(
         self,
         candidate_batch: List[str],

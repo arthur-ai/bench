@@ -5,7 +5,7 @@ from enum import Enum
 from typing import List, Optional, Union
 from uuid import UUID
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, validator, root_validator
 
 
 # COMMON
@@ -42,6 +42,25 @@ class ScoringMethod(BaseModel):
     """
     Whether the scoring method returns categorical scores
     """
+    categories: Optional[List[float]] = None
+    """
+    Valid categories returned by the scorer. Only valid if categories is True.
+    """
+
+    @root_validator
+    def scoring_method_categorical_defined(cls, values):
+        categorical = values.get("categorical")
+        categories = values.get("categories")
+        if not categorical:
+            if categories is not None:
+                raise ValueError(
+                    "continuous scoring methods may not have categories defined"
+                )
+
+        else:
+            if categories is None or categories == 0:
+                raise ValueError("categorical scorers must have categories defined")
+        return values
 
 
 # REQUESTS

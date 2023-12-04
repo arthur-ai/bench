@@ -85,6 +85,7 @@ class TestSuite:
                 name=self.scorer.name(),
                 type=self.scorer.type(),
                 categorical=self.scorer.is_categorical(),
+                categories=self.scorer.categories(),
                 config=self.scorer.to_dict(warn=True),
             )
             new_suite = TestSuiteRequest(
