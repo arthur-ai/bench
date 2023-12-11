@@ -1,12 +1,11 @@
 import React from 'react';
 import {useRoutes } from 'react-router-dom';
-/* Model component and children */
-
 import TestSuites from '../Bench/TestSuites';
 import TestSuiteRoute from '../Bench/index';
 import TestRuns from '../Bench/TestRuns';
 import InputsOutputs from '../Bench/InputsOutputs';
 import TestRun from '../Bench/TestRun';
+import CompareTestRuns from "@src/Bench/CompareTestRuns";
 
 const ArthurRoutes = () => {
 
@@ -27,6 +26,10 @@ const ArthurRoutes = () => {
         {
             path: '/bench/:testSuiteId/runs/:testRunId',
             element: <TestRun />
+        },
+        {
+            path: "/bench/:testSuiteId/compare/:testRunIds",
+            element: <CompareTestRuns />
         },
         {
             path: '*',

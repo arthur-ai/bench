@@ -24,6 +24,7 @@ export enum EIconType {
     CALENDAR = 'calendar',
     CANCEL = 'cancel',
     CANCEL_FILLED = 'cancel-filled',
+    CANCEL_ROUND = "cancel-round",
     // CHART = 'chart',
     CHART_OPTION_2 = 'insights',
     CHART_VIEW_SETTINGS = 'tune',
