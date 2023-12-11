@@ -404,6 +404,8 @@ class LocalBenchClient(BenchClient):
         if test_suite_name is None:
             raise NotFoundError(f"no test suite with id {test_suite_id}")
 
+        suite = self.get_test_suite(test_suite_id)
+
         runs: list[SummaryItem] = []
         run_files = glob.glob(f"{self.root_dir}/{test_suite_name}/*/run.json")
         for f in run_files:
@@ -416,7 +418,7 @@ class LocalBenchClient(BenchClient):
         pagination = _paginate(runs, page, page_size, sort_key="avg_score")
         paginated_summary = TestSuiteSummary(
             summary=runs,
-            num_test_cases=len(run_obj.test_cases),
+            num_test_cases=len(suite.test_cases),
             page_size=pagination.page_size,
             page=pagination.page,
             total_pages=pagination.total_pages,
