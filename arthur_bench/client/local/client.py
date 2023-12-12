@@ -408,12 +408,17 @@ class LocalBenchClient(BenchClient):
 
         runs: list[SummaryItem] = []
         run_files = glob.glob(f"{self.root_dir}/{test_suite_name}/*/run.json")
+
+        if run_ids:
+            run_id_to_file_dict = {file.split("/")[-2]: file for file in run_files}
+            filtered_run_files = {
+                k: run_id_to_file_dict[k] for k in run_ids if k in run_id_to_file_dict
+            }
+            run_files = filtered_run_files.values()
+
         for f in run_files:
             run_obj = PaginatedRun.parse_file(f)
             runs.append(_summarize_run(run=run_obj))
-
-        if run_ids:
-            runs = [run for run in runs if str(run.id) in run_ids]
 
         pagination = _paginate(runs, page, page_size, sort_key="avg_score")
         paginated_summary = TestSuiteSummary(
