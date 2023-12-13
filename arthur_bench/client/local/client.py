@@ -100,7 +100,7 @@ def _summarize_run(run: PaginatedRun, scoring_method: ScoringMethod) -> SummaryI
 
     if scoring_method.categorical:
         # count values in results
-        value_counts = defaultdict(int)
+        value_counts: defaultdict[str, int] = defaultdict(int)
         for result in run.test_cases:
             value_counts[result.score_result.category.name] += 1
 

@@ -157,6 +157,7 @@ def test_reload_test_suite(params, found_model):
 
 @pytest.mark.parametrize("candidate_column", ["custom_candidate", None])
 def test_run_test_suite(candidate_column, test_suite_default):
+    print(test_suite_default.test_cases)
     if candidate_column:
         run = test_suite_default.run(
             run_name="test_run",
@@ -164,6 +165,7 @@ def test_run_test_suite(candidate_column, test_suite_default):
             candidate_column=candidate_column,
             model_name="my_very_special_gpt",
             save=False,
+            batch_size=2,
         )
     else:
         run = test_suite_default.run(
@@ -171,6 +173,7 @@ def test_run_test_suite(candidate_column, test_suite_default):
             candidate_data=pd.DataFrame({"candidate_output": MOCK_OUTPUTS}),
             model_name="my_very_special_gpt",
             save=False,
+            batch_size=2,
         )
 
     assert_test_run_equal(run, MOCK_RUN)

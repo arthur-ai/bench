@@ -217,7 +217,10 @@ class ArthurBenchClient(BenchClient):
             Dict,
             self.http_client.post(
                 f"/bench/test_suites/{test_suite_id}/runs",
-                json=json_body.json(by_alias=True),
+                json=json_body.json(
+                    by_alias=True,
+                    exclude={"test_cases": {"__all__": {"score_result"}}},
+                ),
                 validation_response_code=HTTPStatus.CREATED,
             ),
         )

@@ -103,7 +103,7 @@ class Scorer(ABC):
         :return: scoring results for this run. Float scores are deprecated,
             use ScoreResult instead
         """
-        all_scores = []
+        all_scores: Union[List[float], List[ScoreResult]] = []
         with tqdm(total=len(candidate_outputs)) as pbar:
             for i in range(0, len(candidate_outputs), batch_size):
                 input_batch = (

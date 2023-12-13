@@ -421,6 +421,7 @@ MOCK_RUN_RESPONSE_JSON = {
             "output": "this is a good test run output",
             "reference_output": "this is a test response",
             "score": 0.7,
+            "score_result": {"score": 0.7, "category": None},
         },
         {
             "id": "62d2d1b3-d7df-4999-b01c-52e93d34f576",
@@ -428,6 +429,7 @@ MOCK_RUN_RESPONSE_JSON = {
             "output": "this is a test run output",
             "reference_output": "this is test output from a language model",
             "score": 0.9,
+            "score_result": {"score": 0.9, "category": None},
         },
     ],
     "test_suite_id": "8b7ba080-8d14-42d2-9250-ec0edb96abd7",
