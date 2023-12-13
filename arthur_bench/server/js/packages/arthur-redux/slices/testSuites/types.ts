@@ -123,6 +123,7 @@ export type TScoringMethod = {
     config: Record<string, string>;
 };
 
+
 export enum EMethodType {
     BERT = "bertscore",
     SUMMARY = "summary_quality",
