@@ -7,7 +7,7 @@ from typing import List, Optional, TypeVar, get_origin, get_args, Union
 from inspect import signature, Parameter
 
 from tqdm import tqdm
-from arthur_bench.models.models import ScoringMethodType
+from arthur_bench.models.models import ScoringMethodType, ScoreResult, Category
 
 
 logger = logging.getLogger(__name__)
@@ -56,7 +56,7 @@ class Scorer(ABC):
         return False
 
     @staticmethod
-    def categories() -> Optional[List[float]]:
+    def categories() -> Optional[List[Category]]:
         """
         All possible values returned by the scorer if categorical.
         """
@@ -69,7 +69,7 @@ class Scorer(ABC):
         reference_batch: Optional[List[str]] = None,
         input_text_batch: Optional[List[str]] = None,
         context_batch: Optional[List[str]] = None,
-    ) -> List[float]:
+    ) -> Union[List[float], List[ScoreResult]]:
         """
         Score a batch of candidate generations.
 
@@ -77,6 +77,8 @@ class Scorer(ABC):
         :param reference_batch: reference strings representing target outputs
         :param input_text_batch: optional corresponding inputs
         :param context_batch: optional corresponding contexts, if needed by scorer
+        :return: scoring results for this batch. Float scores are deprecated,
+            use ScoreResult instead
         """
         raise NotImplementedError
 
@@ -87,7 +89,7 @@ class Scorer(ABC):
         inputs: Optional[List[str]] = None,
         contexts: Optional[List[str]] = None,
         batch_size: int = SINGLE_ITEM_BATCH_DEFAULT,
-    ) -> List[float]:
+    ) -> Union[List[float], List[ScoreResult]]:
         """
         Score a set of test cases. This method doesn't need to be implemented in most
         cases, but can be overriden to add additional functionality such as
@@ -98,7 +100,8 @@ class Scorer(ABC):
         :param inputs: input strings being tested
         :param contexts: optional corresponding contexts, if needed by scorer
         :param batch_size: size of batches
-        :return: array of scores for batch
+        :return: scoring results for this run. Float scores are deprecated,
+            use ScoreResult instead
         """
         all_scores = []
         with tqdm(total=len(candidate_outputs)) as pbar:

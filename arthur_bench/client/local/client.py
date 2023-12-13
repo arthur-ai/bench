@@ -10,6 +10,7 @@ from typing import Optional, Union, List, Dict, Any
 from dataclasses import dataclass
 import uuid
 from pathlib import Path
+from collections import defaultdict
 from arthur_bench.client.bench_client import BenchClient
 from arthur_bench.exceptions import NotFoundError, ArthurError, UserValueError
 from arthur_bench.models.models import (
@@ -93,17 +94,24 @@ def _summarize_run(run: PaginatedRun, scoring_method: ScoringMethod) -> SummaryI
     histogram will be returned, otherwise continuous values will be grouped into 20
     bins.
     """
-    scores = np.array([o.score for o in run.test_cases])
+    scores = np.array([o.score_result.score for o in run.test_cases])
     avg_score = np.mean(scores).item()
     histogram: List[Union[HistogramItem, CategoricalHistogramItem]] = []
 
     if scoring_method.categorical:
+        # count values in results
+        value_counts = defaultdict(int)
+        for result in run.test_cases:
+            value_counts[result.score_result.category.name] += 1
+
         categories = scoring_method.categories
         # we validate that all categorical scoring methods have non null categories
         for cat in categories:  # type: ignore
-            frequency = (scores == cat).sum()
-            cat_hist_item = CategoricalHistogramItem(count=frequency, category=cat)
-            histogram.append(cat_hist_item)
+            if cat.name in value_counts:
+                cat_hist_item = CategoricalHistogramItem(
+                    count=value_counts[cat.name], category=cat
+                )
+                histogram.append(cat_hist_item)
 
     else:
         hist, bin_edges = np.histogram(

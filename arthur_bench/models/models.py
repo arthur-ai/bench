@@ -21,6 +21,11 @@ class ScoringMethodType(str, Enum):
     Custom = "custom"
 
 
+class Category(BaseModel):
+    name: str
+    description: Optional[str] = None
+
+
 class ScoringMethod(BaseModel):
     """
     Scoring method configuration
@@ -42,7 +47,7 @@ class ScoringMethod(BaseModel):
     """
     Whether the scoring method returns categorical scores
     """
-    categories: Optional[List[float]] = None
+    categories: Optional[List[Category]] = None
     """
     Valid categories returned by the scorer. Only valid if categories is True.
     """
@@ -58,7 +63,7 @@ class ScoringMethod(BaseModel):
                 )
 
         else:
-            if categories is None or categories == 0:
+            if categories is None or len(categories) == 0:
                 raise ValueError("categorical scorers must have categories defined")
         return values
 
@@ -148,6 +153,17 @@ class TestSuiteRequest(BaseModel):
         return v
 
 
+class ScoreResult(BaseModel):
+    score: Optional[float] = None
+    category: Optional[Category] = None
+
+    @root_validator
+    def contains_score(cls, values):
+        if values.get("score") is None and values.get("category") is None:
+            raise ValueError("at least one of score or category must be defined")
+        return values
+
+
 class TestCaseOutput(BaseModel):
     """
     A generated output, score pair
@@ -163,8 +179,18 @@ class TestCaseOutput(BaseModel):
     """
     score: float
     """
-    Score assigned to output
+    Score assigned to output. This field is decprecated, used score_result instead
     """
+    score_result: ScoreResult
+    """
+    Score information about output. Contains float score and / or category description
+    """
+
+    @root_validator(pre=True)
+    def score_result_backwards_compatible(cls, values):
+        if values.get("score_result") is None:
+            values["score_result"] = ScoreResult(score=values.get("score"))
+        return values
 
 
 class CreateRunRequest(BaseModel):
@@ -293,7 +319,7 @@ class HistogramItem(BaseModel):
 
 class CategoricalHistogramItem(BaseModel):
     count: int
-    category: float
+    category: Category
 
 
 class SummaryItem(BaseModel):
@@ -348,9 +374,16 @@ class CreateRunResponse(BaseModel):
 class RunResult(BaseModel):
     id: UUID
     output: str
-    score: float
+    score: float  # deprecated
     input: Optional[str] = None
     reference_output: Optional[str] = None
+    score_result: ScoreResult
+
+    @root_validator(pre=True)
+    def score_result_backwards_compatible(cls, values):
+        if values.get("score_result") is None:
+            values["score_result"] = ScoreResult(score=values.get("score"))
+        return values
 
 
 class PaginatedRun(BaseModel):

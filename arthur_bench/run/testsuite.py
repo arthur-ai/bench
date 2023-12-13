@@ -9,6 +9,7 @@ from arthur_bench.models.models import (
     ScoringMethod,
     ScoringMethodType,
     TestCaseResponse,
+    ScoreResult,
 )
 from arthur_bench.exceptions import (
     UserValueError,
@@ -236,10 +237,17 @@ class TestSuite:
             logger.error(f"failed to create run: {e}")
             raise ArthurInternalError(f"failed to create run {run_name}") from e
 
-        test_case_outputs = [
-            TestCaseOutput(id=id_, output=output, score=score)
-            for id_, output, score in zip(ids, candidate_output_list, all_scores)
-        ]
+        test_case_outputs = []
+        for i, result in enumerate(all_scores):
+            test_case_outputs.append(
+                TestCaseOutput(
+                    id=ids[i],
+                    output=candidate_output_list[i],
+                    # temporary hack until score field is fully deprecated
+                    score=result if isinstance(result, float) else result.score,
+                    score_result=result if isinstance(result, ScoreResult) else None,
+                )
+            )
 
         run = TestRun(
             name=run_name,
