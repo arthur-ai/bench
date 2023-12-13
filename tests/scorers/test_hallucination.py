@@ -4,6 +4,7 @@ from unittest.mock import Mock, patch
 from tests.helpers import get_mock_client
 from arthur_bench.scoring.hallucination import Hallucination
 from arthur_bench.models.scoring import HallucinationScoreResponse
+from arthur_bench.models.models import ScoreResult, Category
 from tests.fixtures.mock_data import MOCK_SUMMARY_DATA
 
 
@@ -42,4 +43,12 @@ def test_run_batch(mock_client):
             )
 
         # assert correct return values for mock responses
-        assert result == [1.0] * len(MOCK_SUMMARY_DATA)
+        assert result == [
+            ScoreResult(
+                score=1.0,
+                category=Category(
+                    name="no hallucination",
+                    description="model output supported by context",
+                ),
+            )
+        ] * len(MOCK_SUMMARY_DATA)

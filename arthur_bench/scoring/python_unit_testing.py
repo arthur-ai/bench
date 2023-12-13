@@ -11,6 +11,7 @@ from tqdm import tqdm
 from arthur_bench.exceptions import UserValueError
 from arthur_bench.scoring import Scorer
 from arthur_bench.scoring.scorer import SINGLE_ITEM_BATCH_DEFAULT
+from arthur_bench.models.models import Category, ScoreResult
 
 
 class PythonUnitTesting(Scorer):
@@ -65,8 +66,14 @@ class PythonUnitTesting(Scorer):
         return True
 
     @staticmethod
-    def categories() -> Optional[List[float]]:
-        return [0.0, 1.0]
+    def categories() -> List[Category]:
+        return [
+            Category(
+                name="fail",
+                description="unit tests failed",
+            ),
+            Category(name="pass", description="unit tests passed"),
+        ]
 
     def to_dict(self, warn=False):
         return {"unit_tests": self.unit_tests}
@@ -78,13 +85,18 @@ class PythonUnitTesting(Scorer):
         inputs: Optional[List[str]] = None,
         contexts: Optional[List[str]] = None,
         batch_size: int = SINGLE_ITEM_BATCH_DEFAULT,
-    ) -> List[float]:
+    ) -> List[ScoreResult]:
         res = []
         for i in tqdm(range(len(candidate_outputs))):
             pass_at_k, _ = self.evaluator.compute(
                 references=[self.unit_tests[i]], predictions=[[candidate_outputs[i]]]
             )
-            res.append(pass_at_k["pass@1"])
+            res.append(
+                ScoreResult(
+                    score=pass_at_k["pass@1"],
+                    category=self.categories()[int(pass_at_k["pass@1"])],
+                )
+            )
         return res
 
     def run_batch(
@@ -93,7 +105,7 @@ class PythonUnitTesting(Scorer):
         reference_batch: Optional[List[str]] = None,
         input_text_batch: Optional[List[str]] = None,
         context_batch: Optional[List[str]] = None,
-    ) -> List[float]:
+    ) -> List[ScoreResult]:
         raise NotImplementedError(
             "run_batch is not implemented for this scorer. "
             "Use PythonUnitTesting.run(candidates) instead."

@@ -2,6 +2,7 @@ from bert_score import BERTScorer
 from typing import List, Optional
 from arthur_bench.scoring import Scorer
 from arthur_bench.scoring.utils import suppress_warnings
+from arthur_bench.models.models import ScoreResult
 
 DEFAULT_MODEL = "microsoft/deberta-v3-base"
 
@@ -41,7 +42,7 @@ class HedgingLanguage(Scorer):
         reference_batch: Optional[List[str]] = None,
         input_text_batch: Optional[List[str]] = None,
         context_batch: Optional[List[str]] = None,
-    ) -> List[float]:
+    ) -> List[ScoreResult]:
         # convert reference hedge to list
         reference_batch = [DEFAULT_HEDGE] * len(candidate_batch)
 
@@ -51,4 +52,4 @@ class HedgingLanguage(Scorer):
         # return a BERTScore using F1
         list_bertscore = f.tolist()
 
-        return list_bertscore
+        return [ScoreResult(score=score) for score in list_bertscore]

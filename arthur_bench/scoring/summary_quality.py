@@ -1,7 +1,7 @@
 import logging
 import tiktoken
 from tiktoken.core import Encoding
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Union
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 from langchain.chat_models.base import BaseChatModel
@@ -11,6 +11,7 @@ from arthur_bench.exceptions import UserValueError, UserTypeError
 from arthur_bench.scoring import Scorer
 from arthur_bench.scoring.scorer import SINGLE_ITEM_BATCH_DEFAULT
 from arthur_bench.scoring.prompts.summary_quality import COMPARE
+from arthur_bench.models.models import Category, ScoreResult
 
 
 CONTEXT_WINDOW_MAP = {
@@ -22,7 +23,19 @@ CONTEXT_WINDOW_MAP = {
 EVALUATOR_MODEL = "gpt-3.5-turbo"
 TIKTOKEN_ENCODER = tiktoken.get_encoding("cl100k_base")
 TIKTOKEN_ERROR_PADDING = 150
-LLM_CHOICE_OPTIONS = {"0": 0.0, "1": 1.0, "tie": 0.5}
+LLM_CHOICE_TO_FLOAT = {"0": 0.0, "1": 1.0, "tie": 0.5}
+LLM_CHOICE_TO_CATEGORIES = {
+    "0": Category(
+        name="reference",
+        description="reference summary preferred",
+    ),
+    "1": Category(
+        name="candidate",
+        description="candidate summary preferered",
+    ),
+    "tie": Category(name="equal", description="summaries are equally preferred"),
+    "default": Category(name="invalid", description="invalid response from llm grader"),
+}
 
 logger = logging.getLogger(__name__)
 
@@ -95,8 +108,8 @@ class SummaryQuality(Scorer):
         return True
 
     @staticmethod
-    def categories() -> Optional[List[float]]:
-        return [0.0, 1.0, -1.0]
+    def categories() -> List[Category]:
+        return list(LLM_CHOICE_TO_CATEGORIES.values())
 
     def to_dict(self, warn=False):
         return {}
@@ -108,7 +121,7 @@ class SummaryQuality(Scorer):
         inputs: Optional[List[str]] = None,
         contexts: Optional[List[str]] = None,
         batch_size: int = SINGLE_ITEM_BATCH_DEFAULT,
-    ) -> list:
+    ) -> Union[List[ScoreResult], List[float]]:
         if inputs is None:
             raise TypeError(
                 "Inputs must be provided for Summary Quality scorer, got None"
@@ -150,7 +163,7 @@ class SummaryQuality(Scorer):
         reference_batch: Optional[List[str]] = None,
         input_text_batch: Optional[List[str]] = None,
         context_batch: Optional[List[str]] = None,
-    ) -> List[float]:
+    ) -> List[ScoreResult]:
         """
         Summary quality requires input_text_batch.
         """
@@ -185,8 +198,23 @@ class SummaryQuality(Scorer):
             )
 
             # return -1.0 if the LLMChain returns an invalid result
+            score = None
             if "text" in choice:
-                res.append(LLM_CHOICE_OPTIONS.get(choice["text"][:3], -1.0))
-            else:
-                res.append(-1.0)
+                llmchoice = choice["text"][:3]
+                score = LLM_CHOICE_TO_FLOAT.get(llmchoice)
+                if score is not None:
+                    res.append(
+                        ScoreResult(
+                            score=score,
+                            category=LLM_CHOICE_TO_CATEGORIES.get(
+                                llmchoice, LLM_CHOICE_TO_CATEGORIES["default"]
+                            ),
+                        )
+                    )
+            if score is None:
+                res.append(
+                    ScoreResult(
+                        score=-1.0, category=LLM_CHOICE_TO_CATEGORIES["default"]
+                    )
+                )
         return res

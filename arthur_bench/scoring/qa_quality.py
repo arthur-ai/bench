@@ -8,6 +8,8 @@ from langchain.chat_models.base import BaseChatModel
 from arthur_bench.exceptions import UserValueError
 from arthur_bench.scoring import Scorer
 from arthur_bench.scoring.prompts.qa_correctness import DECIDE
+from arthur_bench.models.models import Category, ScoreResult
+
 
 logger = logging.getLogger(__name__)
 
@@ -42,8 +44,17 @@ class QAQualityCorrectness(Scorer):
         return True
 
     @staticmethod
-    def categories() -> Optional[List[float]]:
-        return [0.0, 1.0, -1.0]
+    def categories() -> List[Category]:
+        return [
+            Category(
+                name="incorrect",
+                description="model output is incorrect given the context",
+            ),
+            Category(
+                name="correct", description="model output is correct given the context"
+            ),
+            Category(name="invalid", description="grader returned an invalid response"),
+        ]
 
     def to_dict(self, warn=False):
         return {}
@@ -54,7 +65,7 @@ class QAQualityCorrectness(Scorer):
         reference_batch: Optional[List[str]] = None,
         input_text_batch: Optional[List[str]] = None,
         context_batch: Optional[List[str]] = None,
-    ) -> List[float]:
+    ) -> List[ScoreResult]:
         """
         Reference batch is not used for this scoring method, QA correctness requires an
         input_text_batch and context_batch
@@ -83,5 +94,7 @@ class QAQualityCorrectness(Scorer):
             if llmchoice not in ["0", "1", "NA"]:
                 llmchoice = "-1"
             llmchoice = {"0": 0.0, "1": 1.0, "NA": -1.0, "-1": -1.0}[llmchoice]
-            res.append(llmchoice)
+            res.append(
+                ScoreResult(score=llmchoice, category=self.categories()[int(llmchoice)])
+            )
         return res

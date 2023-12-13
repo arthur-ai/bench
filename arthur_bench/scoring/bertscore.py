@@ -2,6 +2,7 @@ from bert_score import BERTScorer
 from typing import List, Optional
 from arthur_bench.scoring import Scorer
 from arthur_bench.scoring.utils import suppress_warnings
+from arthur_bench.models.models import ScoreResult
 
 DEFAULT_MODEL = "microsoft/deberta-v3-base"
 
@@ -49,10 +50,13 @@ class BERTScore(Scorer):
         reference_batch: Optional[List[str]] = None,
         input_text_batch: Optional[List[str]] = None,
         context_batch: Optional[List[str]] = None,
-    ) -> List[float]:
+    ) -> List[ScoreResult]:
         # get precision, recall, and F1 score from bert_score package
         p, r, _ = self.model.score(candidate_batch, reference_batch, verbose=False)
 
         # return a BERTScore using our weighting of precision and recall (instead of F1
         # which weights them equally)
-        return (self.precision_weight * p + self.recall_weight * r).tolist()
+        return [
+            ScoreResult(score=score)
+            for score in (self.precision_weight * p + self.recall_weight * r).tolist()
+        ]

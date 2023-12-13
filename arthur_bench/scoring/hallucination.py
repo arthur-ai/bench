@@ -4,6 +4,8 @@ from arthur_bench.client.rest.client import ArthurClient
 from arthur_bench.exceptions import ArthurUserError
 from arthur_bench.models.scoring import HallucinationScoreRequest
 
+from arthur_bench.models.models import Category, ScoreResult
+
 
 class Hallucination(Scorer):
     """
@@ -30,8 +32,16 @@ class Hallucination(Scorer):
         return True
 
     @staticmethod
-    def categories() -> Optional[List[float]]:
-        return [0.0, 1.0]
+    def categories() -> List[Category]:
+        return [
+            Category(
+                name="hallucination",
+                description="model output not supported by context",
+            ),
+            Category(
+                name="no hallucination", description="model output supported by context"
+            ),
+        ]
 
     def to_dict(self, warn=False):
         return {}
@@ -42,7 +52,7 @@ class Hallucination(Scorer):
         reference_batch: Optional[List[str]] = None,
         input_text_batch: Optional[List[str]] = None,
         context_batch: Optional[List[str]] = None,
-    ) -> List[float]:
+    ) -> List[ScoreResult]:
         if context_batch is None:
             raise ArthurUserError("context is required for hallucination scoring")
 
@@ -54,5 +64,5 @@ class Hallucination(Scorer):
             response = self.client.bench.score_hallucination(request)
             # score 0 if there is a hallucination, 1 if no hallucination found
             score = float(not response.hallucination)
-            res.append(score)
+            res.append(ScoreResult(score=score, category=self.categories()[int(score)]))
         return res
