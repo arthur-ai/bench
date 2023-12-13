@@ -7,7 +7,13 @@ from typing import List, Optional, TypeVar, get_origin, get_args, Union
 from inspect import signature, Parameter
 
 from tqdm import tqdm
-from arthur_bench.models.models import ScoringMethodType, ScoreResult, Category
+from arthur_bench.models.models import (
+    ScoringMethodType,
+    ScoreResult,
+    Category,
+    ScoringMethod,
+    ScorerOutputType,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -51,14 +57,15 @@ class Scorer(ABC):
     @staticmethod
     def is_categorical() -> bool:
         """
-        Whether the scorer is continuous or categorical
+        Whether the scorer is continuous or categorical.
+        categories() should be implemented if True
         """
         return False
 
     @staticmethod
     def categories() -> Optional[List[Category]]:
         """
-        All possible values returned by the scorer if categorical.
+        All possible values returned by the scorer if output type is categorical.
         """
         return None
 
@@ -193,3 +200,14 @@ class Scorer(ABC):
             return ScoringMethodType.Custom
         except AttributeError:
             return ScoringMethodType.Custom
+
+    def to_metadata(self) -> ScoringMethod:
+        return ScoringMethod(
+            name=self.name(),
+            type=self.type(),
+            output_type=ScorerOutputType.Categorical
+            if self.is_categorical()
+            else ScorerOutputType.Continuous,
+            categories=self.categories(),
+            config=self.to_dict(warn=True),
+        )

@@ -31,6 +31,7 @@ from arthur_bench.models.models import (
     TestCaseResponse,
     RunResult,
     ScoringMethod,
+    ScorerOutputType,
 )
 
 from arthur_bench.utils.loaders import load_suite_from_json, get_file_extension
@@ -98,7 +99,7 @@ def _summarize_run(run: PaginatedRun, scoring_method: ScoringMethod) -> SummaryI
     avg_score = np.mean(scores).item()
     histogram: List[Union[HistogramItem, CategoricalHistogramItem]] = []
 
-    if scoring_method.categorical:
+    if scoring_method.output_type == ScorerOutputType.Categorical:
         # count values in results
         value_counts: defaultdict[str, int] = defaultdict(int)
         for result in run.test_cases:
@@ -454,7 +455,8 @@ class LocalBenchClient(BenchClient):
         paginated_summary = TestSuiteSummary(
             summary=runs,
             num_test_cases=len(run_obj.test_cases),
-            categorical=suite.scoring_method.categorical,
+            categorical=suite.scoring_method.output_type
+            == ScorerOutputType.Categorical,
             page_size=pagination.page_size,
             page=pagination.page,
             total_pages=pagination.total_pages,

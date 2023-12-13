@@ -10,6 +10,7 @@ from arthur_bench.models.models import (
     ScoringMethodType,
     TestCaseResponse,
     ScoreResult,
+    ScorerOutputType,
 )
 from arthur_bench.exceptions import (
     UserValueError,
@@ -82,13 +83,7 @@ class TestSuite:
                 reference_output_list=reference_output_list,
                 requires_reference=self.scorer.requires_reference(),
             )
-            method_meta = ScoringMethod(
-                name=self.scorer.name(),
-                type=self.scorer.type(),
-                categorical=self.scorer.is_categorical(),
-                categories=self.scorer.categories(),
-                config=self.scorer.to_dict(warn=True),
-            )
+            method_meta = self.scorer.to_metadata()
             new_suite = TestSuiteRequest(
                 name=name,
                 scoring_method=method_meta,

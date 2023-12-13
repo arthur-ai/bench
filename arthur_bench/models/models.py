@@ -21,6 +21,15 @@ class ScoringMethodType(str, Enum):
     Custom = "custom"
 
 
+class ScorerOutputType(str, Enum):
+    """
+    Indicates the output type of the scorer
+    """
+
+    Continuous = "continuous"
+    Categorical = "categorical"
+
+
 class Category(BaseModel):
     name: str
     description: Optional[str] = None
@@ -43,7 +52,7 @@ class ScoringMethod(BaseModel):
     """
     Configuration as used by the scorer to_dict and from_dict methods
     """
-    categorical: bool = False
+    output_type: ScorerOutputType = ScorerOutputType.Continuous
     """
     Whether the scoring method returns categorical scores
     """
@@ -54,9 +63,9 @@ class ScoringMethod(BaseModel):
 
     @root_validator
     def scoring_method_categorical_defined(cls, values):
-        categorical = values.get("categorical")
+        output_type = values.get("output_type")
         categories = values.get("categories")
-        if not categorical:
+        if output_type == ScorerOutputType.Continuous:
             if categories is not None:
                 raise ValueError(
                     "continuous scoring methods may not have categories defined"

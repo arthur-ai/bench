@@ -63,7 +63,7 @@ MOCK_RUN = CreateRunRequest(
 MOCK_SUITE_JSON = """{\
 "name": "test_suite", \
 "description": null, \
-"scoring_method": {"name": "bertscore", "type": "built_in", "categorical": false, "categories": null}, \
+"scoring_method": {"name": "bertscore", "type": "built_in"}, \
 "test_cases": [\
 {\
 "input": "this is test input to a language model", \

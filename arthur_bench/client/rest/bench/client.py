@@ -99,7 +99,11 @@ class ArthurBenchClient(BenchClient):
                         "created_by": True,
                         "bench_version": True,
                         # TODO: add REST data store support for scoring method config
-                        "scoring_method": {"config"},
+                        "scoring_method": {
+                            "config": True,
+                            "output_type": True,
+                            "categories": True,
+                        },
                     }
                 ),
                 validation_response_code=HTTPStatus.CREATED,
