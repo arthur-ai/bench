@@ -51,8 +51,13 @@ export type Distribution = {
     high: number;
 };
 
+export type Category = {
+    name: string;
+    description: string | null
+};
+
 export type CategoricalDistribution = {
-    category: number;
+    category: Category;
     count: number;
 };
 

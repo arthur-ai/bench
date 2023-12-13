@@ -45,7 +45,7 @@ const formatGraphData = (inputData: TestRunSummary[], testRunId: string, total: 
 
         item.histogram.map((histogramEntry) => {
             const { category, count } = histogramEntry as CategoricalDistribution;
-            entry.data[category] = ((count / total) * 100).toFixed();
+            entry.data[category.name] = ((count / total) * 100).toFixed();
         });
 
         transformedData.push(entry);
