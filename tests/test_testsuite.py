@@ -157,7 +157,6 @@ def test_reload_test_suite(params, found_model):
 
 @pytest.mark.parametrize("candidate_column", ["custom_candidate", None])
 def test_run_test_suite(candidate_column, test_suite_default):
-    print(test_suite_default.test_cases)
     if candidate_column:
         run = test_suite_default.run(
             run_name="test_run",
