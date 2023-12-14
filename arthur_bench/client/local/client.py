@@ -419,7 +419,7 @@ class LocalBenchClient(BenchClient):
                 for k in run_names
                 if k in run_name_to_file_dict
             }
-            run_files = filtered_run_files.values()
+            run_files = list(filtered_run_files.values())
 
         for f in run_files:
             run_obj = PaginatedRun.parse_file(f)
