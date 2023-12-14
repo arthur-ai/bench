@@ -31,7 +31,7 @@ SUITE_EXISTS = "8b7ba080-8d14-42d2-9250-ec0edb96abd7"
 RUN_EXISTS = "af8466a8-6425-4ea5-85cb-ed952b26fa6c"
 
 
-def mock_summarize(run):
+def mock_summarize(run, scoring_method):
     return MOCK_SUMMARY
 
 

@@ -22,7 +22,7 @@ class TestRun(CreateRunRequest):
         # we validate that all or None contain categories
         if self.test_cases[0].score_result.category is None:
             return [None for _ in range(len(self.test_cases))]
-        return [case.score_result.category.name for case in self.test_cases]  # type: ignore
+        return [case.score_result.category.name for case in self.test_cases]  # type: ignore # noqa
 
     @property
     def output(self) -> List[str]:

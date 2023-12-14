@@ -112,11 +112,10 @@ def _summarize_run(
         categories = scoring_method.categories
         # we validate that all categorical scoring methods have non null categories
         for cat in categories:  # type: ignore
-            if cat.name in value_counts:
-                cat_hist_item = CategoricalHistogramItem(
-                    count=value_counts[cat.name], category=cat
-                )
-                histogram.append(cat_hist_item)
+            cat_hist_item = CategoricalHistogramItem(
+                count=value_counts[cat.name], category=cat
+            )
+            histogram.append(cat_hist_item)
 
     else:
         hist, bin_edges = np.histogram(
@@ -460,7 +459,9 @@ class LocalBenchClient(BenchClient):
 
         for f in run_files:
             run_obj = PaginatedRun.parse_file(f)
-            runs.append(_summarize_run(run=run_obj, scoring_method=suite.scoring_method))
+            runs.append(
+                _summarize_run(run=run_obj, scoring_method=suite.scoring_method)
+            )
 
         pagination = _paginate(runs, page, page_size, sort_key="avg_score")
         paginated_summary = TestSuiteSummary(

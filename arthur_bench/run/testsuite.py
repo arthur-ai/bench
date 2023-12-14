@@ -231,14 +231,16 @@ class TestSuite:
             raise ArthurInternalError(f"failed to create run {run_name}") from e
 
         test_case_outputs = []
-        for i, result in enumerate[float | ScoreResult](all_scores):
+        for i, result in enumerate(all_scores):
             # temporary hack until score field is fully deprecated
             score: Optional[float] = (
-                result if isinstance(result, float) else result.score
+                result if isinstance(result, float) else result.score  # type: ignore
             )
+            # we can't properly type this in python3.9. In 3.10 we can switch to
+            # https://github.com/python/mypy/issues/11934#issuecomment-1008295539
             score_result: ScoreResult = (
-                ScoreResult(score=result) if isinstance(result, float) else result
-            )
+                ScoreResult(score=result) if isinstance(result, float) else result  # type: ignore # noqa
+            )  # type: ignore
             test_case_outputs.append(
                 TestCaseOutput(
                     id=ids[i],
