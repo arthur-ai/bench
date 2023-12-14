@@ -186,7 +186,7 @@ class TestCaseOutput(BaseModel):
     """
     Generated output for test case
     """
-    score: float
+    score: Optional[float] = None
     """
     Score assigned to output. This field is decprecated, used score_result instead
     """
@@ -235,6 +235,23 @@ class CreateRunRequest(BaseModel):
 
     class Config:
         allow_population_by_field_name = True
+
+    @validator("test_cases")
+    def consistent_categories(cls, v):
+        last_score_result_categorical = None
+        for tc in v:
+            if (
+                tc.score_result.category is not None
+                and last_score_result_categorical is False
+            ) or (tc.score_result.category is None and last_score_result_categorical):
+                raise ValueError(
+                    "all score results must provide categories if any one does"
+                )
+            elif tc.score_result.category is None:
+                last_score_result_categorical = False
+            elif tc.score_result.category is not None:
+                last_score_result_categorical = True
+        return v
 
 
 # RESPONSES

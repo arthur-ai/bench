@@ -6,11 +6,9 @@ from arthur_bench.models.models import (
     TestSuiteRequest,
     PaginatedTestSuite,
     TestCaseOutput,
-    ScoringMethod,
     ScoringMethodType,
     TestCaseResponse,
     ScoreResult,
-    ScorerOutputType,
 )
 from arthur_bench.exceptions import (
     UserValueError,
@@ -233,16 +231,20 @@ class TestSuite:
             raise ArthurInternalError(f"failed to create run {run_name}") from e
 
         test_case_outputs = []
-        print(all_scores)
-        for i, result in enumerate(all_scores):
-            print(i)
+        for i, result in enumerate[float | ScoreResult](all_scores):
+            # temporary hack until score field is fully deprecated
+            score: Optional[float] = (
+                result if isinstance(result, float) else result.score
+            )
+            score_result: ScoreResult = (
+                ScoreResult(score=result) if isinstance(result, float) else result
+            )
             test_case_outputs.append(
                 TestCaseOutput(
                     id=ids[i],
                     output=candidate_output_list[i],
-                    # temporary hack until score field is fully deprecated
-                    score=result.score if isinstance(result, ScoreResult) else result,
-                    score_result=result if isinstance(result, ScoreResult) else None,
+                    score=score,
+                    score_result=score_result,
                 )
             )
 

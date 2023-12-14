@@ -89,7 +89,9 @@ def _load_suite_with_optional_id(
     return None
 
 
-def _summarize_run(run: PaginatedRun, scoring_method: ScoringMethod) -> SummaryItem:
+def _summarize_run(
+    run: PaginatedRun, scoring_method: ScoringMethod, num_bins=NUM_BINS
+) -> SummaryItem:
     """
     Compute aggregate statistics for a run. If scorer defined categories, categorical
     histogram will be returned, otherwise continuous values will be grouped into 20
@@ -103,7 +105,9 @@ def _summarize_run(run: PaginatedRun, scoring_method: ScoringMethod) -> SummaryI
         # count values in results
         value_counts: defaultdict[str, int] = defaultdict(int)
         for result in run.test_cases:
-            value_counts[result.score_result.category.name] += 1
+            # we validate at score time that categorical scorers specify non-null
+            # categories
+            value_counts[result.score_result.category.name] += 1  # type: ignore
 
         categories = scoring_method.categories
         # we validate that all categorical scoring methods have non null categories
@@ -116,7 +120,7 @@ def _summarize_run(run: PaginatedRun, scoring_method: ScoringMethod) -> SummaryI
 
     else:
         hist, bin_edges = np.histogram(
-            scores, bins=20, range=(0, max(1, np.max(scores)))
+            scores, bins=num_bins, range=(0, max(1, np.max(scores)))
         )
         for i in range(len(hist)):
             hist_item = HistogramItem(

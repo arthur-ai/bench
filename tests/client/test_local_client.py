@@ -3,6 +3,7 @@ import shutil
 from unittest import mock
 from pathlib import Path
 from arthur_bench.client.local import LocalBenchClient
+from arthur_bench.client.local.client import _summarize_run
 from arthur_bench.exceptions import UserValueError, NotFoundError
 from arthur_bench.models.models import PaginatedTestSuite
 
@@ -18,6 +19,9 @@ from tests.fixtures.mock_responses import (
     MOCK_RUNS_RESPONSE,
     MOCK_SUMMARY,
     MOCK_SUMMARY_RESPONSE,
+    MOCK_CATEGORICAL_RUN_RESPONSE,
+    MOCK_CATEGORICAL_SUITE_RESPONSE,
+    MOCK_CATEGORICAL_SUMMARY,
 )
 from tests.fixtures.mock_requests import MOCK_SUITE, MOCK_SUITE_CUSTOM, MOCK_RUN
 from tests.helpers import assert_test_suite_equal
@@ -191,5 +195,17 @@ def get_summary_statistics(bench_temp_dir_with_runs):
         assert resp == MOCK_SUMMARY_RESPONSE
 
 
-def test_summarize_run():
-    pass
+@pytest.mark.parametrize(
+    "run,scoring_config,expected",
+    [
+        (MOCK_RUN_RESPONSE, MOCK_SUITE_RESPONSE.scoring_method, MOCK_SUMMARY),
+        (
+            MOCK_CATEGORICAL_RUN_RESPONSE,
+            MOCK_CATEGORICAL_SUITE_RESPONSE.scoring_method,
+            MOCK_CATEGORICAL_SUMMARY,
+        ),
+    ],
+)
+def test_summarize_run(run, scoring_config, expected):
+    summary = _summarize_run(run, scoring_config, num_bins=1)
+    assert summary == expected

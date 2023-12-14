@@ -132,7 +132,15 @@ class Scorer(ABC):
                     context_batch,
                 )
 
-                all_scores.extend(scores)
+                # validate run_batch results
+                if self.is_categorical():
+                    for score in scores:
+                        if isinstance(score, float) or score.category is None:
+                            raise ValueError(
+                                "categorical scorer must return categorical results"
+                            )
+
+                all_scores.extend(scores)  # type: ignore
                 pbar.update(len(candidate_outputs))
 
         return all_scores
