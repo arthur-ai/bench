@@ -10,6 +10,7 @@ from typing import Optional, Union, List, Dict, Any
 from dataclasses import dataclass
 import uuid
 from pathlib import Path
+from collections import defaultdict
 from arthur_bench.client.bench_client import BenchClient
 from arthur_bench.exceptions import NotFoundError, ArthurError, UserValueError
 from arthur_bench.models.models import (
@@ -25,9 +26,12 @@ from arthur_bench.models.models import (
     TestRunMetadata,
     SummaryItem,
     HistogramItem,
+    CategoricalHistogramItem,
     TestCaseRequest,
     TestCaseResponse,
     RunResult,
+    ScoringMethod,
+    ScorerOutputType,
 )
 
 from arthur_bench.utils.loaders import load_suite_from_json, get_file_extension
@@ -40,6 +44,8 @@ RUN_INDEX_FILE = "run_id_to_name.json"
 
 TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%S.%f"
 DEFAULT_PAGE_SIZE = 5
+
+NUM_BINS = 20
 
 SORT_QUERY_TO_FUNC = {
     "last_run_time": lambda x: x.last_run_time
@@ -83,18 +89,48 @@ def _load_suite_with_optional_id(
     return None
 
 
-def _summarize_run(run: PaginatedRun) -> SummaryItem:
-    scores = [o.score for o in run.test_cases]
+def _summarize_run(
+    run: PaginatedRun, scoring_method: ScoringMethod, num_bins=NUM_BINS
+) -> SummaryItem:
+    """
+    Compute aggregate statistics for a run. If scorer defined categories, categorical
+    histogram will be returned, otherwise continuous values will be grouped into 20
+    bins.
+    """
+    scores = np.array([o.score_result.score for o in run.test_cases])
     avg_score = np.mean(scores).item()
-    hist, bin_edges = np.histogram(scores, bins=20, range=(0, max(1, np.max(scores))))
-    histogram = []
-    for i in range(len(hist)):
-        hist_item = HistogramItem(
-            count=hist[i], low=bin_edges[i], high=bin_edges[i + 1]
+    histogram: List[Union[HistogramItem, CategoricalHistogramItem]] = []
+
+    if scoring_method.output_type == ScorerOutputType.Categorical:
+        # count values in results
+        value_counts: defaultdict[str, int] = defaultdict(int)
+        for result in run.test_cases:
+            # we validate at score time that categorical scorers specify non-null
+            # categories
+            value_counts[result.score_result.category.name] += 1  # type: ignore
+
+        categories = scoring_method.categories
+        # we validate that all categorical scoring methods have non null categories
+        for cat in categories:  # type: ignore
+            cat_hist_item = CategoricalHistogramItem(
+                count=value_counts[cat.name], category=cat
+            )
+            histogram.append(cat_hist_item)
+
+    else:
+        hist, bin_edges = np.histogram(
+            scores, bins=num_bins, range=(0, max(1, np.max(scores)))
         )
-        histogram.append(hist_item)
+        for i in range(len(hist)):
+            hist_item = HistogramItem(
+                count=hist[i], low=bin_edges[i], high=bin_edges[i + 1]
+            )
+            histogram.append(hist_item)
     return SummaryItem(
-        id=run.id, name=run.name, avg_score=avg_score, histogram=histogram
+        id=run.id,
+        name=run.name,
+        avg_score=avg_score,
+        histogram=histogram,
     )
 
 
@@ -423,11 +459,15 @@ class LocalBenchClient(BenchClient):
 
         for f in run_files:
             run_obj = PaginatedRun.parse_file(f)
-            runs.append(_summarize_run(run=run_obj))
+            runs.append(
+                _summarize_run(run=run_obj, scoring_method=suite.scoring_method)
+            )
 
         pagination = _paginate(runs, page, page_size, sort_key="avg_score")
         paginated_summary = TestSuiteSummary(
             summary=runs,
+            categorical=suite.scoring_method.output_type
+            == ScorerOutputType.Categorical,
             num_test_cases=len(suite.test_cases),
             page_size=pagination.page_size,
             page=pagination.page,

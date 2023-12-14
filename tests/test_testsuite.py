@@ -164,6 +164,7 @@ def test_run_test_suite(candidate_column, test_suite_default):
             candidate_column=candidate_column,
             model_name="my_very_special_gpt",
             save=False,
+            batch_size=2,
         )
     else:
         run = test_suite_default.run(
@@ -171,6 +172,7 @@ def test_run_test_suite(candidate_column, test_suite_default):
             candidate_data=pd.DataFrame({"candidate_output": MOCK_OUTPUTS}),
             model_name="my_very_special_gpt",
             save=False,
+            batch_size=2,
         )
 
     assert_test_run_equal(run, MOCK_RUN)

@@ -98,6 +98,7 @@ export const useTestSuites = () => {
                     actions.fetchTestRunSummaryReceive({
                         summaries: r.data.summary,
                         num_test_cases: r.data.num_test_cases,
+                        categorical: r.data.categorical
                     })
                 );
             });

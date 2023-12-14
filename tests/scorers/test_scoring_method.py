@@ -95,9 +95,7 @@ def test_scorer_from_dict():
 def test_scorer_type(module_path, platform, expected_type):
     if platform != sys.platform:
         return
-    with patch(
-        "arthur_bench.scoring.scorer.sys.modules", MagicMock()
-    ) as module_mock:
+    with patch("arthur_bench.scoring.scorer.sys.modules", MagicMock()) as module_mock:
         module_mock[MockScorer.__module__].__file__ = module_path
         scorer = MockScorer()
         assert scorer.type() == expected_type

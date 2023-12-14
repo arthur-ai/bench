@@ -129,7 +129,13 @@
         "ne": "Not equal",
         "like": "Like",
         "in": "In",
-        "NotNull": "Not Null"
+        "NotNull": "Not Null",
+        "item_gte_k": "Greater than or equal to",
+        "item_gt_k": "Greater than",
+        "item_lt_k": "Less than",
+        "item_lte_k": "Less than or equal to",
+        "item_eq_k": "Equal",
+        "time_range_happens_in": "happens"
     },
     "attributeSelector": {
         "add": "Add attribute filter",
@@ -289,7 +295,20 @@
         "subtitle": "See how your model is performing across a number of evaluation metrics",
         "metricSelection": "Metric Selection",
         "segmentation": "SEGMENTATION",
-        "showReferenceData": "Show Reference Data"
+        "showReferenceData": "Show Reference Data",
+        "showAsBarChart": "Show As a Bar Chart",
+        "showAsBartChartTooltip": "Toggling to bar chart is only supported when segmentation is turned off and cleared"
+    },
+    "scoringMethodExplanations": {
+        "qa_correctness": "QA Correctness scorer evaluates the correctness of an answer, given a question and context. This scorer does not require a reference output, but does require context. Each row of the Test Run will receive a binary 0, indicating an incorrect output, or 1, indicating a correct output.",
+        "summary_quality": "Summary Quality scorer evaluates a summary against its source text and a reference summary for comparison. It evaluates summaries on dimensions including relevance and syntax. Each row of the Test Run will receive a binary 0, indicating that the reference output was scored higher than the candidate output, or 1, indicating that the candidate output was scored higher than the reference output.",
+        "bertscore": "BERTScore is a quantitative metric to compare the similarity of two pieces of text. Each row of the Test Run will calculate the BERTScore between the reference output and the candidate output, with higher values indicating more similarity.",
+        "hedging_language": "Hedging Language scorer evaluates whether a candidate response is similar to generic hedging language used by an LLM (“As an AI language model, I don’t have personal opinions, emotions, or beliefs”). Each row of the Test Run will receive a score between 0 and 1 indicating the extent to which hedging language is detected in the response.",
+        "exact_match": "Exact Match scorer evaluates whether the candidate output exactly matches the reference output. This is case sensitive. Each row of the Test Run will receive a binary 0, indicating a non-match, or 1, indicating an exact match.",
+        "readability": "Readability scorer evaluates the reading ease of the candidate output according to the Flesch Reading Ease Score. The higher the score, the easier the candidate output is to read. Scores of 90-100 correspond to a 5th grade reading level, while scores less than 10 are classified as being “extremely difficult to read, and best understood by university graduates.”",
+        "specificity": "Specificity scorer outputs a score within a range of 0 to 1, where smaller values correspond to candidate outputs with more vague language while higher values correspond to candidate outputs with more precise language. Specificity is calculated through 3 heuristic approaches: identifying the presence of predefined words that indicate vagueness, determining how rare the words used are according to word frequencies calculated by popular NLP corpora, and detecting the use of proper nouns and numbers.",
+        "word_count_match": "Word Count Match scorer outputs a score within a range of 0 to 1 for scenarios where there is a preferred output word count. Specifically, this scorer calculates how similar the count of words in the candidate output is to the count of words in the reference output, where a score of 1 indicates that there are the same count of words in the candidate output as in the reference output. Scores are calculated as ((len_reference-delta)/len_reference), where delta is the absolute difference in word counts between the candidate and reference outputs. All negative computed values are truncated to 0.",
+        "python_unit_testing": "Python Unit Testing scorer evaluates candidate solutions to coding tasks against unit tests. This scorer wraps the code_eval evaluator interface from HuggingFace. Note that this function supports solution code that uses only standard Python libraries."
     },
     "defaultMetrics": {
         "inferenceCount": "Inference Count",
@@ -525,7 +544,11 @@
         "tryArthur": "Try Arthur by uploading a simple example model",
         "uploadEffort": "{{minutes}} min upload effort",
         "uploadOwnModel": "Upload your own model",
-        "welcomeTo": "Welcome to <1></1>"
+        "welcomeTo": "Welcome to <1></1>",
+        "directAccess": "Direct access to Arthur’s observability platform is coming soon.",
+        "tryBench": "Meanwhile, we invite you to try out Bench, our solution to help teams evaluate the different LLM options in a quick, easy and consistent way.",
+        "ready": "Ready to use Bench?",
+        "tryBenchButton": "Try Bench"
     },
     "customAlerts": {
         "notificationChannels": "Notification channels",
@@ -707,8 +730,13 @@
     "testSuite": {
         "generalInformation": "GENERAL INFORMATION",
         "testRunInformation": "TEST RUN INFORMATION",
+        "scoringInformation": "SCORING INFORMATION",
+        "scoringMethodBreakdown": "SCORING METHOD BREAKDOWN",
         "testSuiteId": "Test Suite ID",
         "description": "Test Suite Description",
+        "type": "Type",
+        "configurations": "User-Defined Scoring Configurations",
+        "calculation": "Score Calculation",
         "scoringMethod": "Scoring Method",
         "lastRun": "Last Run",
         "number": "Number of Test Runs",
@@ -721,18 +749,46 @@
         "testRuns": "TEST RUNS",
         "inputsOutputs": "INPUTS & REF OUTPUTS",
         "home": "Home",
-        "scoringInformation": "SCORING INFORMATION",
-        "scoringMethodBreakdown": "SCORING METHOD BREAKDOWN",
-        "type": "Type",
-        "configurations": "User-Defined Scoring Configurations",
-        "calculation": "Score Calculation"
+        "scoringMethodLabel": "SCORING METHODS",
+        "testSuites": "Test Suites",
+        "inputPrompts": "INPUT PROMPTS",
+        "referenceOutputs": "REFERENCE OUTPUTS",
+        "modelOutputs": "MODEL OUTPUTS",
+        "score": "SCORE",
+        "noData": "There is no data available for this test suite"
     },
     "benchResources": {
-        "python": "Python Quickstart",
-        "pythonText": "View our Github source package which includes ReadMe & QuickStart guides",
-        "api": "API Documentation",
-        "apiText": "Explore how to integrate with Arthur’s API endpoints and get most out of your models",
+        "repository": "Repository",
+        "pythonText": "View the Bench package repository on GitHub which includes README and Quickstart guides",
+        "docs": "Documentation",
+        "docsText": "Explore how to use Bench for comparing and validating LLMs",
         "support": "Support",
         "supportText": "Email us your questions and we will contact you"
+    },
+    "bench": {
+        "welcome": "Welcome to Bench, {{name}}!",
+        "noResults": "No results found",
+        "summaryVisualizations": "Summary Visualizations",
+        "testRuns": "Test Runs"
+    },
+    "visualization": {
+        "noData": "No test run data available",
+        "distributionTitle": "Distributions of Top 5 Test Runs",
+        "distributionDescription": "Distribution of scores for the top 5 runs with the highest average score",
+        "averageTitle": "Top 5 Test Runs by Average {{scoring_method}}",
+        "averageDescription": "The average {{scoring_method}} scores for the top 5 runs in this suite",
+        "distributionXAxis": "Avg Test Scores",
+        "distributionYAxis": "% of Tests"
+    },
+    "benchCharts": {
+        "distribution": "Distribution of Test Runs",
+        "distributionSubtitle": "Distribution of scores for all test runs in this suite",
+        "categoricalYAxis": "% of Cases",
+        "categoricalXAxis": "Category"
+    },
+    "toastNotifications": {
+        "errors": {
+            "403": "You do not have permissions to perform this action. Please contact your administrator to update user permissions."
+        }
     }
 }

@@ -15,13 +15,13 @@ export type TestSuiteCase = {
 
 export type TRunData = {
     runs: Run[] | null;
-    pagination: TPagination
-}
+    pagination: TPagination;
+};
 
 export type TTestSuiteData = {
     data: DetailedTestSuite | null;
     pagination: TPagination;
-}
+};
 
 export type Run = {
     id: string;
@@ -32,7 +32,7 @@ export type Run = {
     foundation_model: string;
     prompt_template: string;
     avg_score: number;
-    updated_at: string
+    updated_at: string;
 };
 
 export type DetailedTestSuite = {
@@ -45,55 +45,69 @@ export type DetailedTestSuite = {
     test_cases: TestSuiteCase[];
 };
 
-export type TDistribution = {
+export type Distribution = {
     count: number;
     low: number;
     high: number;
-}
+};
+
+export type Category = {
+    name: string;
+    description: string | null
+};
+
+export type CategoricalDistribution = {
+    category: Category;
+    count: number;
+};
+
+export type Histogram = Distribution | CategoricalDistribution;
 
 export type TestRunSummary = {
-    avg_score: number;
+    avg_score?: number;
     name: string;
-    histogram: TDistribution[];
-    id: string
-}
-export type TSummary = {
+    histogram: Histogram[];
+    id: string;
+};
+
+export type Summary = {
     summaries: TestRunSummary[] | null;
     num_test_cases: number;
-}
+    categorical?: boolean;
+};
 
 export type TPagination = {
     page: number;
     page_size: number;
     total_count: number;
     total_pages: number;
-}
+};
 
 export type TestSuiteData = {
     data: TTestSuiteData | null;
     runs: TRunData | null;
-    summaries: TSummary;
+    summaries: Summary;
 };
 
 export type TestRunCase = {
     id: string;
     input: string;
     output: string;
-    reference_output: string;
+    reference_output?: string;
     score: number;
 };
 
 export type TTestRun = {
     data: TTestRunData | null;
     pagination: TPagination;
-}
+};
 
 export type TTestRunData = {
     test_suite_id: string;
     test_case_runs: TestRunCase[];
     name: string;
-    created_at: string,
-    id: string
+    created_at: string;
+    id: string;
 };
 
 export type TTestSuitesState = {
@@ -107,17 +121,18 @@ export type TScoringMethod = {
     name: EMethodType;
     type: string;
     config: Record<string, string>;
-}
+};
+
 
 export enum EMethodType {
-    BERT = 'bertscore',
-    SUMMARY = 'summary_quality',
-    QA = 'qa_correctness',
-    EXACT_MATCH = 'exact_match',
-    HALLUCINATION = 'hallucination',
-    READABILITY = 'readability',
-    WC_MATCH = 'word_count_match',
-    SPECIFICITY = 'specificity',
-    HEDGING = 'hedging_language',
-    PYTHON_UNIT_TESTING = 'python_unit_testing',
+    BERT = "bertscore",
+    SUMMARY = "summary_quality",
+    QA = "qa_correctness",
+    EXACT_MATCH = "exact_match",
+    HALLUCINATION = "hallucination",
+    READABILITY = "readability",
+    WC_MATCH = "word_count_match",
+    SPECIFICITY = "specificity",
+    HEDGING = "hedging_language",
+    PYTHON_UNIT_TESTING = "python_unit_testing",
 }

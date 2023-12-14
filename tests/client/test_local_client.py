@@ -3,6 +3,7 @@ import shutil
 from unittest import mock
 from pathlib import Path
 from arthur_bench.client.local import LocalBenchClient
+from arthur_bench.client.local.client import _summarize_run
 from arthur_bench.exceptions import UserValueError, NotFoundError
 from arthur_bench.models.models import PaginatedTestSuite
 
@@ -18,6 +19,9 @@ from tests.fixtures.mock_responses import (
     MOCK_RUNS_RESPONSE,
     MOCK_SUMMARY,
     MOCK_SUMMARY_RESPONSE,
+    MOCK_CATEGORICAL_RUN_RESPONSE,
+    MOCK_CATEGORICAL_SUITE_RESPONSE,
+    MOCK_CATEGORICAL_SUMMARY,
 )
 from tests.fixtures.mock_requests import MOCK_SUITE, MOCK_SUITE_CUSTOM, MOCK_RUN
 from tests.helpers import assert_test_suite_equal
@@ -27,7 +31,7 @@ SUITE_EXISTS = "8b7ba080-8d14-42d2-9250-ec0edb96abd7"
 RUN_EXISTS = "af8466a8-6425-4ea5-85cb-ed952b26fa6c"
 
 
-def mock_summarize(run):
+def mock_summarize(run, scoring_method):
     return MOCK_SUMMARY
 
 
@@ -191,3 +195,19 @@ def test_get_summary_statistics(bench_temp_dir_with_runs):
         assert resp == MOCK_SUMMARY_RESPONSE
         resp = client.get_summary_statistics(SUITE_EXISTS, run_ids=["does_not_exist"])
         assert len(resp.summary) == 0
+
+
+@pytest.mark.parametrize(
+    "run,scoring_config,expected",
+    [
+        (MOCK_RUN_RESPONSE, MOCK_SUITE_RESPONSE.scoring_method, MOCK_SUMMARY),
+        (
+            MOCK_CATEGORICAL_RUN_RESPONSE,
+            MOCK_CATEGORICAL_SUITE_RESPONSE.scoring_method,
+            MOCK_CATEGORICAL_SUMMARY,
+        ),
+    ],
+)
+def test_summarize_run(run, scoring_config, expected):
+    summary = _summarize_run(run, scoring_config, num_bins=1)
+    assert summary == expected
