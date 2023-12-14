@@ -130,7 +130,7 @@ def test_suite_summary(
     test_suite_id: uuid.UUID,
     page: int = 1,
     page_size: int = 5,
-    run_id: Optional[uuid.UUID] = None,
+    run_ids: Annotated[Optional[list[uuid.UUID]], Query()] = None,
 ):
     client = request.app.state.client
     try:
@@ -138,7 +138,7 @@ def test_suite_summary(
             test_suite_id=str(test_suite_id),
             page=page,
             page_size=page_size,
-            run_id=str(run_id) if run_id is not None else None,
+            run_ids=[str(run_id) for run_id in run_ids] if run_ids else None,
         )
     except NotFoundError as e:
         return HTTPException(status_code=404, detail=str(e))

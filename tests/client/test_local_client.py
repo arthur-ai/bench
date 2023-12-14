@@ -185,14 +185,16 @@ def test_check_run_exists(bench_temp_dir_with_runs):
     assert client.check_run_exists(SUITE_EXISTS, "invalid run") == False
 
 
-def get_summary_statistics(bench_temp_dir_with_runs):
+def test_get_summary_statistics(bench_temp_dir_with_runs):
     with mock.patch(
-        "arthur_bench.client.local.client.LocalBenchClient._summarize_run",
+        "arthur_bench.client.local.client._summarize_run",
         mock_summarize,
     ):
         client = LocalBenchClient(bench_temp_dir_with_runs)
         resp = client.get_summary_statistics(SUITE_EXISTS)
         assert resp == MOCK_SUMMARY_RESPONSE
+        resp = client.get_summary_statistics(SUITE_EXISTS, run_ids=["does_not_exist"])
+        assert len(resp.summary) == 0
 
 
 @pytest.mark.parametrize(

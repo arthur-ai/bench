@@ -433,7 +433,7 @@ class LocalBenchClient(BenchClient):
     def get_summary_statistics(
         self,
         test_suite_id: str,
-        run_id: Optional[str] = None,
+        run_ids: Optional[list[str]] = None,
         page: int = 1,
         page_size: int = DEFAULT_PAGE_SIZE,
     ) -> TestSuiteSummary:
@@ -441,42 +441,39 @@ class LocalBenchClient(BenchClient):
         if test_suite_name is None:
             raise NotFoundError(f"no test suite with id {test_suite_id}")
 
-        suite_file = self.root_dir / test_suite_name / "suite.json"
-        suite = PaginatedTestSuite.parse_file(suite_file)
+        suite = self.get_test_suite(test_suite_id)
 
-        runs = []
-        run_id_found = False
+        runs: list[SummaryItem] = []
         run_files = glob.glob(f"{self.root_dir}/{test_suite_name}/*/run.json")
+
+        if run_ids:
+            run_name_to_file_dict = {file.split("/")[-2]: file for file in run_files}
+            run_names = [
+                self._get_run_name_from_id(test_suite_name, id) for id in run_ids
+            ]
+            filtered_run_files = {
+                k: run_name_to_file_dict[k]
+                for k in run_names
+                if k in run_name_to_file_dict
+            }
+            run_files = list(filtered_run_files.values())
+
         for f in run_files:
             run_obj = PaginatedRun.parse_file(f)
-            runs.append(
-                _summarize_run(run=run_obj, scoring_method=suite.scoring_method)
-            )
-            if str(run_obj.id) == run_id:
-                run_id_found = True
+            runs.append(_summarize_run(run=run_obj, scoring_method=suite.scoring_method))
 
         pagination = _paginate(runs, page, page_size, sort_key="avg_score")
         paginated_summary = TestSuiteSummary(
             summary=runs,
-            num_test_cases=len(run_obj.test_cases),
             categorical=suite.scoring_method.output_type
             == ScorerOutputType.Categorical,
+            num_test_cases=len(suite.test_cases),
             page_size=pagination.page_size,
             page=pagination.page,
             total_pages=pagination.total_pages,
             total_count=pagination.total_count,
         )
 
-        if run_id is not None and not run_id_found:
-            run_name = self._get_run_name_from_id(test_suite_name, run_id)
-            if run_name is None:
-                raise NotFoundError()
-            additional_run = PaginatedRun.parse_file(
-                self.root_dir / test_suite_name / run_name / "run.json"
-            )
-            paginated_summary.summary.append(
-                _summarize_run(additional_run, scoring_method=suite.scoring_method)
-            )
         return paginated_summary
 
     def get_test_run(
