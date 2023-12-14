@@ -137,7 +137,7 @@ class ArthurBenchClient(BenchClient):
     def get_summary_statistics(
         self,
         test_suite_id: str,
-        run_id: Optional[str] = None,
+        run_ids: Optional[list[str]] = None,
         page: int = 1,
         page_size: int = 5,
     ) -> TestSuiteSummary:
@@ -153,8 +153,8 @@ class ArthurBenchClient(BenchClient):
         """
 
         params = {}
-        if run_id is not None:
-            params["run_id"] = run_id
+        if run_ids is not None:
+            params["run_ids"] = run_ids
         if page is not None:
             params["page"] = page  # type: ignore
         if page_size is not None:
