@@ -410,9 +410,14 @@ class LocalBenchClient(BenchClient):
         run_files = glob.glob(f"{self.root_dir}/{test_suite_name}/*/run.json")
 
         if run_ids:
-            run_id_to_file_dict = {file.split("/")[-2]: file for file in run_files}
+            run_name_to_file_dict = {file.split("/")[-2]: file for file in run_files}
+            run_names = [
+                self._get_run_name_from_id(test_suite_name, id) for id in run_ids
+            ]
             filtered_run_files = {
-                k: run_id_to_file_dict[k] for k in run_ids if k in run_id_to_file_dict
+                k: run_name_to_file_dict[k]
+                for k in run_names
+                if k in run_name_to_file_dict
             }
             run_files = filtered_run_files.values()
 
