@@ -1,5 +1,6 @@
 from abc import abstractmethod, ABC
 import sys
+import asyncio
 import json
 import logging
 from pathlib import Path
@@ -142,6 +143,67 @@ class Scorer(ABC):
 
                 all_scores.extend(scores)  # type: ignore
                 pbar.update(len(candidate_outputs))
+
+        return all_scores
+
+    @abstractmethod
+    async def arun_batch(
+        self,
+        candidate_batch: List[str],
+        reference_batch: Optional[List[str]] = None,
+        input_text_batch: Optional[List[str]] = None,
+        context_batch: Optional[List[str]] = None,
+    ) -> Union[List[float], List[ScoreResult]]:
+        """
+        Async version of run_batch method.
+        """
+        raise NotImplementedError
+
+    async def arun(
+        self,
+        candidate_outputs: List[str],
+        reference_outputs: Optional[List[str]] = None,
+        inputs: Optional[List[str]] = None,
+        contexts: Optional[List[str]] = None,
+        batch_size: int = SINGLE_ITEM_BATCH_DEFAULT,
+    ) -> Union[List[float], List[ScoreResult]]:
+        """
+        Async version of run method.
+        """
+        all_scores: Union[List[float], List[ScoreResult]] = []
+        tasks = []
+        for i in range(0, len(candidate_outputs), batch_size):
+            input_batch = (
+                list(inputs[i : i + batch_size]) if inputs is not None else None
+            )
+            ref_batch = (
+                list(reference_outputs[i : i + batch_size])
+                if reference_outputs is not None
+                else None
+            )
+
+            context_batch = None if contexts is None else contexts[i : i + batch_size]
+            task = asyncio.create_task(
+                self.arun_batch(
+                    candidate_outputs[i : i + batch_size],
+                    ref_batch,
+                    input_batch,
+                    context_batch,
+                )
+            )
+            tasks.append(task)
+
+        results = await asyncio.gather(*tasks)  # returns tasks in order
+
+        # validate arun_batch results and extend all_scores
+        for scores in results:
+            if self.is_categorical():
+                for score in scores:
+                    if isinstance(score, float) or score.category is None:
+                        raise ValueError(
+                            "categorical scorer must return categorical results"
+                        )
+            all_scores.extend(scores)  # type: ignore
 
         return all_scores
 
