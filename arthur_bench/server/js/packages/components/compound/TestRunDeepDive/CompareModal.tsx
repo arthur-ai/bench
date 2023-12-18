@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 import { chartColorsArray } from "resources/colors/Arthur/graphs";
 import primary from "resources/colors/Arthur/primary";
 import secondary from "resources/colors/Arthur/secondary";
-import {ComparedTestRuns, Output} from "arthur-redux/slices/testSuites/types";
+import {ComparedTestRuns, Output} from "../../../arthur-redux/slices/testSuites/types";
 
 type props = {
     testCase: ComparedTestRuns;

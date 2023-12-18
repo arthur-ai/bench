@@ -3,7 +3,7 @@ import {
     createReducer,
     PayloadAction,
 } from '@reduxjs/toolkit';
-import { TRunData, TSummary, TTestRun, TTestSuiteData, TTestSuitesState} from './types';
+import { TRunData, Summary, TTestRun, TTestSuiteData, TTestSuitesState} from './types';
 import * as actions from './actions';
 
 const defaultState: TTestSuitesState = {
@@ -61,7 +61,7 @@ export const testSuitesReducer = createReducer<TTestSuitesState>(
             )
             .addCase(
                 actions.fetchTestRunSummaryReceive,
-                (state: TTestSuitesState, action: PayloadAction<TSummary>) => {
+                (state: TTestSuitesState, action: PayloadAction<Summary>) => {
                     if (state.currentTestSuite) {
                         state.currentTestSuite.summaries.summaries = action.payload.summaries;
                         state.currentTestSuite.summaries.num_test_cases = action.payload.num_test_cases;

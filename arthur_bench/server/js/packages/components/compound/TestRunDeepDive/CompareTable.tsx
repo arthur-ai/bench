@@ -15,7 +15,7 @@ import { useSelector } from "react-redux";
 import { State } from "arthur-redux";
 import { Paginator } from "../../core/Paginator";
 import { useTestSuites } from "../../../../../js/src/Bench/useTestSuites";
-import {ComparedTestRuns, Output, TTestRunData} from "arthur-redux/slices/testSuites/types";
+import {ComparedTestRuns, Output, TTestRunData} from "../../../arthur-redux/slices/testSuites/types";
 import formatTestRunData from "../../../utils/format-test-runs/format-test-runs"
 import scrollToBottom from "../../../utils/scroll-to-bottom/scroll-to-bottom"
 

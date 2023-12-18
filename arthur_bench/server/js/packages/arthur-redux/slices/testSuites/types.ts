@@ -94,7 +94,9 @@ export type TestRunCase = {
     input: string;
     output: string;
     reference_output?: string;
-    score: number;
+    score?: number;
+    label?: string;
+    details?: Record<string, { label?: string; score?: number }>;
 };
 
 export type TTestRun = {
@@ -124,8 +126,8 @@ export type TScoringMethod = {
 };
 
 export type ComparedTestRuns = {
-    test_case_id: string;
-    reference_output?: string;
+    testCaseId: string;
+    referenceOutput?: string;
     input: string;
     outputs: Output[];
 };
