@@ -6,11 +6,11 @@ import {
 import { TRunData, Summary, TTestRun, TTestSuiteData, TTestSuitesState} from './types';
 import * as actions from './actions';
 
-const defaultState = {
+const defaultState: TTestSuitesState = {
     currentTestSuite: {
         runs: {
             runs: null,
-            pagination: { total_count: 0, page: 1, page_size: 0, total_pages: 0 }
+            pagination: { total_count: 0, page: 1, page_size: 0, total_pages: 0 },
         },
         summaries: {
             summaries: null,
@@ -19,12 +19,12 @@ const defaultState = {
         },
         data: {
             data: null,
-            pagination: { total_count: 0, page: 1, page_size: 0, total_pages: 0 }},
-
+            pagination: { total_count: 0, page: 1, page_size: 0, total_pages: 0 },
+        },
     },
     currentTestRun: {
-        data: null,
-        pagination: { total_count: 0, page: 1, page_size: 0, total_pages: 0 }
+        data: [],
+        pagination: { total_count: 0, page: 1, page_size: 0, total_pages: 0 },
     },
     data: null,
     pagination: { total_count: 0, page: 1, page_size: 0, total_pages: 0 },

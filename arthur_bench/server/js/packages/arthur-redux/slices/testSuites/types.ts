@@ -94,11 +94,13 @@ export type TestRunCase = {
     input: string;
     output: string;
     reference_output?: string;
-    score: number;
+    score?: number;
+    label?: string;
+    details?: Record<string, { label?: string; score?: number }>;
 };
 
 export type TTestRun = {
-    data: TTestRunData | null;
+    data: TTestRunData[];
     pagination: TPagination;
 };
 
@@ -123,6 +125,19 @@ export type TScoringMethod = {
     config: Record<string, string>;
 };
 
+export type ComparedTestRuns = {
+    testCaseId: string;
+    referenceOutput?: string;
+    input: string;
+    outputs: Output[];
+};
+
+export type Output = {
+    id: string;
+    output: string;
+    score?: number;
+    name: string;
+};
 
 export enum EMethodType {
     BERT = "bertscore",

@@ -27,12 +27,12 @@ const Row = ({ testCase }: RowProps) => {
     return (
         <TableRow>
             <ExpandableTableCell
-                text={testCase.input}
+                content={testCase.input}
                 limit={300}
                 tableCellProps={{ style: cellStyle }}
             />
             <ExpandableTableCell
-                text={testCase.reference_output}
+                content={testCase.reference_output}
                 limit={200}
                 tableCellProps={{ style: cellStyle }}
             />
