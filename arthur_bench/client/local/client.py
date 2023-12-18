@@ -440,7 +440,9 @@ class LocalBenchClient(BenchClient):
         if test_suite_name is None:
             raise NotFoundError(f"no test suite with id {test_suite_id}")
 
-        suite = self.get_test_suite(test_suite_id)
+        suite = self.get_suite_if_exists(test_suite_name)
+        if suite is None:
+            raise NotFoundError(f"no test suite with id {test_suite_id}")
 
         runs: list[SummaryItem] = []
         run_files = glob.glob(f"{self.root_dir}/{test_suite_name}/*/run.json")
