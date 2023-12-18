@@ -1,17 +1,12 @@
 import React from 'react';
 import BarChart from '../../core/Charts/BarChart';
 import {useFela} from 'react-fela';
-import {TestRunSummary} from 'arthur-redux/slices/testSuites/types';
-import {EChartsColorBy} from '../../core/Charts/constants';
+import {TestRunSummary} from "../../../arthur-redux/slices/testSuites/types"
 import {ZRLineType} from "echarts/types/src/util/types";
 import {useParams} from "react-router-dom";
 import {ELegendItemShape} from "../../core/Charts/Legend/Legend";
 import { chartColorsArray } from 'resources/colors/Arthur/graphs';
 import primary from 'resources/colors/Arthur/primary';
-
-const getNames = (summaries: TestRunSummary[]) => {
-    return summaries.map((summary) => summary.name);
-};
 
 const baseItemStyle = (index: number) => ({
     color: chartColorsArray[index],

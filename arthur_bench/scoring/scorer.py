@@ -7,7 +7,13 @@ from typing import List, Optional, TypeVar, get_origin, get_args, Union
 from inspect import signature, Parameter
 
 from tqdm import tqdm
-from arthur_bench.models.models import ScoringMethodType
+from arthur_bench.models.models import (
+    ScoringMethodType,
+    ScoreResult,
+    Category,
+    ScoringMethod,
+    ScorerOutputType,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -48,6 +54,21 @@ class Scorer(ABC):
         """
         return True
 
+    @staticmethod
+    def is_categorical() -> bool:
+        """
+        Whether the scorer is continuous or categorical.
+        categories() should be implemented if True
+        """
+        return False
+
+    @staticmethod
+    def categories() -> Optional[List[Category]]:
+        """
+        All possible values returned by the scorer if output type is categorical.
+        """
+        return None
+
     @abstractmethod
     def run_batch(
         self,
@@ -55,7 +76,7 @@ class Scorer(ABC):
         reference_batch: Optional[List[str]] = None,
         input_text_batch: Optional[List[str]] = None,
         context_batch: Optional[List[str]] = None,
-    ) -> List[float]:
+    ) -> Union[List[float], List[ScoreResult]]:
         """
         Score a batch of candidate generations.
 
@@ -63,6 +84,8 @@ class Scorer(ABC):
         :param reference_batch: reference strings representing target outputs
         :param input_text_batch: optional corresponding inputs
         :param context_batch: optional corresponding contexts, if needed by scorer
+        :return: scoring results for this batch. Float scores are deprecated,
+            use ScoreResult instead
         """
         raise NotImplementedError
 
@@ -73,7 +96,7 @@ class Scorer(ABC):
         inputs: Optional[List[str]] = None,
         contexts: Optional[List[str]] = None,
         batch_size: int = SINGLE_ITEM_BATCH_DEFAULT,
-    ) -> List[float]:
+    ) -> Union[List[float], List[ScoreResult]]:
         """
         Score a set of test cases. This method doesn't need to be implemented in most
         cases, but can be overriden to add additional functionality such as
@@ -84,9 +107,10 @@ class Scorer(ABC):
         :param inputs: input strings being tested
         :param contexts: optional corresponding contexts, if needed by scorer
         :param batch_size: size of batches
-        :return: array of scores for batch
+        :return: scoring results for this run. Float scores are deprecated,
+            use ScoreResult instead
         """
-        all_scores = []
+        all_scores: Union[List[float], List[ScoreResult]] = []
         with tqdm(total=len(candidate_outputs)) as pbar:
             for i in range(0, len(candidate_outputs), batch_size):
                 input_batch = (
@@ -108,7 +132,15 @@ class Scorer(ABC):
                     context_batch,
                 )
 
-                all_scores.extend(scores)
+                # validate run_batch results
+                if self.is_categorical():
+                    for score in scores:
+                        if isinstance(score, float) or score.category is None:
+                            raise ValueError(
+                                "categorical scorer must return categorical results"
+                            )
+
+                all_scores.extend(scores)  # type: ignore
                 pbar.update(len(candidate_outputs))
 
         return all_scores
@@ -176,3 +208,14 @@ class Scorer(ABC):
             return ScoringMethodType.Custom
         except AttributeError:
             return ScoringMethodType.Custom
+
+    def to_metadata(self) -> ScoringMethod:
+        return ScoringMethod(
+            name=self.name(),
+            type=self.type(),
+            output_type=ScorerOutputType.Categorical
+            if self.is_categorical()
+            else ScorerOutputType.Continuous,
+            categories=self.categories(),
+            config=self.to_dict(warn=True),
+        )

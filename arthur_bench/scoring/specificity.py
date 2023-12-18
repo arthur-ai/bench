@@ -6,6 +6,8 @@ from collections import Counter
 import nltk
 import re
 
+from arthur_bench.models.models import ScoreResult
+
 
 class Specificity(Scorer):
     """
@@ -122,7 +124,7 @@ class Specificity(Scorer):
         reference_batch: Optional[List[str]] = None,
         input_text_batch: Optional[List[str]] = None,
         context_batch: Optional[List[str]] = None,
-    ) -> List[float]:
+    ) -> List[ScoreResult]:
         res = []
         for i in range(len(candidate_batch)):
             c = candidate_batch[i]
@@ -132,6 +134,6 @@ class Specificity(Scorer):
             pn_prop = self.get_pn_and_num(c)
 
             s = (0.33 * vague_prop) + (0.33 * adj_freq) + (0.33 * pn_prop)  # aggregate
-            res.append(s)
+            res.append(ScoreResult(score=s))
 
         return res

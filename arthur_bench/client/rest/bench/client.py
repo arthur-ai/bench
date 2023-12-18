@@ -99,7 +99,11 @@ class ArthurBenchClient(BenchClient):
                         "created_by": True,
                         "bench_version": True,
                         # TODO: add REST data store support for scoring method config
-                        "scoring_method": {"config"},
+                        "scoring_method": {
+                            "config": True,
+                            "output_type": True,
+                            "categories": True,
+                        },
                     }
                 ),
                 validation_response_code=HTTPStatus.CREATED,
@@ -137,7 +141,7 @@ class ArthurBenchClient(BenchClient):
     def get_summary_statistics(
         self,
         test_suite_id: str,
-        run_id: Optional[str] = None,
+        run_ids: Optional[list[str]] = None,
         page: int = 1,
         page_size: int = 5,
     ) -> TestSuiteSummary:
@@ -153,8 +157,8 @@ class ArthurBenchClient(BenchClient):
         """
 
         params = {}
-        if run_id is not None:
-            params["run_id"] = run_id
+        if run_ids is not None:
+            params["run_ids"] = run_ids
         if page is not None:
             params["page"] = page  # type: ignore
         if page_size is not None:
@@ -217,7 +221,10 @@ class ArthurBenchClient(BenchClient):
             Dict,
             self.http_client.post(
                 f"/bench/test_suites/{test_suite_id}/runs",
-                json=json_body.json(by_alias=True),
+                json=json_body.json(
+                    by_alias=True,
+                    exclude={"test_cases": {"__all__": {"score_result"}}},
+                ),
                 validation_response_code=HTTPStatus.CREATED,
             ),
         )

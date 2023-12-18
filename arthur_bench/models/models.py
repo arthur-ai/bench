@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional
+from typing import List, Optional, Union
 from uuid import UUID
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, validator, root_validator
 
 
 # COMMON
@@ -19,6 +19,20 @@ class ScoringMethodType(str, Enum):
 
     BuiltIn = "built_in"
     Custom = "custom"
+
+
+class ScorerOutputType(str, Enum):
+    """
+    Indicates the output type of the scorer
+    """
+
+    Continuous = "continuous"
+    Categorical = "categorical"
+
+
+class Category(BaseModel):
+    name: str
+    description: Optional[str] = None
 
 
 class ScoringMethod(BaseModel):
@@ -38,6 +52,29 @@ class ScoringMethod(BaseModel):
     """
     Configuration as used by the scorer to_dict and from_dict methods
     """
+    output_type: ScorerOutputType = ScorerOutputType.Continuous
+    """
+    Whether the scoring method returns categorical scores
+    """
+    categories: Optional[List[Category]] = None
+    """
+    Valid categories returned by the scorer. Only valid if categories is True.
+    """
+
+    @root_validator
+    def scoring_method_categorical_defined(cls, values):
+        output_type = values.get("output_type")
+        categories = values.get("categories")
+        if output_type == ScorerOutputType.Continuous:
+            if categories is not None:
+                raise ValueError(
+                    "continuous scoring methods may not have categories defined"
+                )
+
+        else:
+            if categories is None or len(categories) == 0:
+                raise ValueError("categorical scorers must have categories defined")
+        return values
 
 
 # REQUESTS
@@ -125,6 +162,17 @@ class TestSuiteRequest(BaseModel):
         return v
 
 
+class ScoreResult(BaseModel):
+    score: Optional[float] = None
+    category: Optional[Category] = None
+
+    @root_validator
+    def contains_score(cls, values):
+        if values.get("score") is None and values.get("category") is None:
+            raise ValueError("at least one of score or category must be defined")
+        return values
+
+
 class TestCaseOutput(BaseModel):
     """
     A generated output, score pair
@@ -138,10 +186,20 @@ class TestCaseOutput(BaseModel):
     """
     Generated output for test case
     """
-    score: float
+    score: Optional[float] = None
     """
-    Score assigned to output
+    Score assigned to output. This field is decprecated, used score_result instead
     """
+    score_result: ScoreResult
+    """
+    Score information about output. Contains float score and / or category description
+    """
+
+    @root_validator(pre=True)
+    def score_result_backwards_compatible(cls, values):
+        if values.get("score_result") is None:
+            values["score_result"] = ScoreResult(score=values.get("score"))
+        return values
 
 
 class CreateRunRequest(BaseModel):
@@ -177,6 +235,23 @@ class CreateRunRequest(BaseModel):
 
     class Config:
         allow_population_by_field_name = True
+
+    @validator("test_cases")
+    def consistent_categories(cls, v):
+        last_score_result_categorical = None
+        for tc in v:
+            if (
+                tc.score_result.category is not None
+                and last_score_result_categorical is False
+            ) or (tc.score_result.category is None and last_score_result_categorical):
+                raise ValueError(
+                    "all score results must provide categories if any one does"
+                )
+            elif tc.score_result.category is None:
+                last_score_result_categorical = False
+            elif tc.score_result.category is not None:
+                last_score_result_categorical = True
+        return v
 
 
 # RESPONSES
@@ -268,6 +343,11 @@ class HistogramItem(BaseModel):
     high: float
 
 
+class CategoricalHistogramItem(BaseModel):
+    count: int
+    category: Category
+
+
 class SummaryItem(BaseModel):
     """
     Aggregate statistics for a single run: average score and score distribution
@@ -276,7 +356,26 @@ class SummaryItem(BaseModel):
     id: UUID
     name: str
     avg_score: float
-    histogram: List[HistogramItem]
+    histogram: List[Union[HistogramItem, CategoricalHistogramItem]]
+
+    @validator("histogram")
+    def either_continuous_or_categorical(cls, v):
+        """
+        Validate that the items in the histogram list are all
+        containing low/high floats or are all containing a category
+        """
+        both_error = (
+            "Histogram has both low/high floats and category "
+            "values, which is invalid."
+        )
+        is_categorical = isinstance(v[0], CategoricalHistogramItem)
+        for h in v:
+            if isinstance(h, CategoricalHistogramItem) and not is_categorical:
+                raise ValueError(both_error)
+
+            elif isinstance(h, HistogramItem) and is_categorical:
+                raise ValueError(both_error)
+        return v
 
 
 class TestSuiteSummary(BaseModel):
@@ -291,6 +390,7 @@ class TestSuiteSummary(BaseModel):
     total_pages: int
     total_count: int
     num_test_cases: int
+    categorical: bool = False
 
 
 class CreateRunResponse(BaseModel):
@@ -300,9 +400,16 @@ class CreateRunResponse(BaseModel):
 class RunResult(BaseModel):
     id: UUID
     output: str
-    score: float
+    score: float  # deprecated
     input: Optional[str] = None
     reference_output: Optional[str] = None
+    score_result: ScoreResult
+
+    @root_validator(pre=True)
+    def score_result_backwards_compatible(cls, values):
+        if values.get("score_result") is None:
+            values["score_result"] = ScoreResult(score=values.get("score"))
+        return values
 
 
 class PaginatedRun(BaseModel):

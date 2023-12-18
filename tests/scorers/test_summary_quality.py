@@ -4,7 +4,11 @@ from unittest import mock
 from unittest.mock import Mock, patch
 
 from tests.fixtures.mock_data import MOCK_SUMMARY_DATA
-from arthur_bench.scoring.summary_quality import SummaryQuality
+from arthur_bench.scoring.summary_quality import (
+    SummaryQuality,
+    LLM_CHOICE_TO_CATEGORIES,
+)
+from arthur_bench.models.models import ScoreResult
 
 
 @pytest.fixture
@@ -41,17 +45,31 @@ def test_run_batch(mock_llm_chain):
             )
 
         # assert correct return values for mock LLMChain outputs
-        assert result == [0.0] * len(MOCK_SUMMARY_DATA)
+        assert result == [
+            ScoreResult(score=0.0, category=LLM_CHOICE_TO_CATEGORIES["0"])
+        ] * len(MOCK_SUMMARY_DATA)
 
 
 # Test the run_batch method with different return values from LLMChain
 @pytest.mark.parametrize(
     "llm_return,expected",
     [
-        ({"text": "0"}, [0.0]),
-        ({"text": "1"}, [1.0]),
-        ({"text": "tie"}, [0.5]),
-        ({"text": "invalid"}, [-1.0]),
+        (
+            {"text": "0"},
+            [ScoreResult(score=0.0, category=LLM_CHOICE_TO_CATEGORIES["0"])],
+        ),
+        (
+            {"text": "1"},
+            [ScoreResult(score=1.0, category=LLM_CHOICE_TO_CATEGORIES["1"])],
+        ),
+        (
+            {"text": "tie"},
+            [ScoreResult(score=0.5, category=LLM_CHOICE_TO_CATEGORIES["tie"])],
+        ),
+        (
+            {"text": "invalid"},
+            [ScoreResult(score=-1.0, category=LLM_CHOICE_TO_CATEGORIES["default"])],
+        ),
     ],
 )
 @mock.patch.dict(os.environ, {"OPENAI_API_KEY": "MOCK_API_KEY"})

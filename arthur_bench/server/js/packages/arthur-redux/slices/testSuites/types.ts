@@ -51,8 +51,13 @@ export type Distribution = {
     high: number;
 };
 
+export type Category = {
+    name: string;
+    description: string | null
+};
+
 export type CategoricalDistribution = {
-    category: string;
+    category: Category;
     count: number;
 };
 
@@ -65,7 +70,7 @@ export type TestRunSummary = {
     id: string;
 };
 
-export type TSummary = {
+export type Summary = {
     summaries: TestRunSummary[] | null;
     num_test_cases: number;
     categorical?: boolean;
@@ -81,7 +86,7 @@ export type TPagination = {
 export type TestSuiteData = {
     data: TTestSuiteData | null;
     runs: TRunData | null;
-    summaries: TSummary;
+    summaries: Summary;
 };
 
 export type TestRunCase = {
@@ -89,9 +94,7 @@ export type TestRunCase = {
     input: string;
     output: string;
     reference_output?: string;
-    score?: number;
-    label?: string;
-    details?: Record<string, { label?: string; score?: number }>;
+    score: number;
 };
 
 export type TTestRun = {

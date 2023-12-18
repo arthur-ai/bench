@@ -14,8 +14,15 @@ class TestRun(CreateRunRequest):
         arbitrary_types_allowed = True
 
     @property
-    def scores(self) -> List[float]:
-        return [case.score for case in self.test_cases]
+    def scores(self) -> List[Optional[float]]:
+        return [case.score_result.score for case in self.test_cases]
+
+    @property
+    def categories(self) -> List[Optional[str]]:
+        # we validate that all or None contain categories
+        if self.test_cases[0].score_result.category is None:
+            return [None for _ in range(len(self.test_cases))]
+        return [case.score_result.category.name for case in self.test_cases]  # type: ignore # noqa
 
     @property
     def output(self) -> List[str]:

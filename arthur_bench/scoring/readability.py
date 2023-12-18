@@ -1,6 +1,7 @@
 from textstat import flesch_reading_ease
 from typing import List, Optional
 from arthur_bench.scoring import Scorer
+from arthur_bench.models.models import ScoreResult
 
 
 class Readability(Scorer):
@@ -27,5 +28,5 @@ class Readability(Scorer):
         reference_batch: Optional[List[str]] = None,
         input_text_batch: Optional[List[str]] = None,
         context_batch: Optional[List[str]] = None,
-    ) -> List[float]:
-        return [flesch_reading_ease(i) for i in candidate_batch]
+    ) -> List[ScoreResult]:
+        return [ScoreResult(score=flesch_reading_ease(i)) for i in candidate_batch]

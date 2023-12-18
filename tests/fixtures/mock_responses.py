@@ -9,7 +9,10 @@ from arthur_bench.models.models import (
     RunResult,
     SummaryItem,
     HistogramItem,
+    CategoricalHistogramItem,
     TestSuiteSummary,
+    ScoreResult,
+    Category,
 )
 
 MOCK_BERTSCORE_CONFIG = {
@@ -49,6 +52,21 @@ MOCK_SUITE_RESPONSE = PaginatedTestSuite(
         "name": "bertscore",
         "type": "built_in",
         "config": MOCK_BERTSCORE_CONFIG,
+    },
+    created_at="2023-06-22T21:56:03.346141",
+    updated_at="2023-06-22T21:56:03.346141",
+    test_cases=MOCK_SUITE_CASES,
+)
+
+MOCK_CATEGORICAL_SUITE_RESPONSE = PaginatedTestSuite(
+    id="250ae532-e748-4464-bd6d-a2612dab898e",
+    name="test_suite",
+    scoring_method={
+        "name": "bertscore",
+        "type": "built_in",
+        "config": MOCK_BERTSCORE_CONFIG,
+        "output_type": "categorical",
+        "categories": [{"name": "test_category"}, {"name": "test_category_2"}],
     },
     created_at="2023-06-22T21:56:03.346141",
     updated_at="2023-06-22T21:56:03.346141",
@@ -140,11 +158,11 @@ MOCK_SUITE_CUSTOM_RESPONSE_WITH_PAGES = PaginatedTestSuite(
     total_count=2,
 )
 
-MOCK_SUITE_JSON = '{"id": "8b7ba080-8d14-42d2-9250-ec0edb96abd7", "name": "test_suite", "scoring_method": {"name": "bertscore", "type": "built_in", "config": {"precision_weight": 0.1, "model_type": "microsoft/deberta-v3-base"}}, "test_cases": [{"id": "62d2d1b3-d7df-4999-b01c-52e93d34f576", "input": "this is test input to a language model", "reference_output": "this is test output from a language model"}, {"id": "70eb3014-2b04-4974-bb05-a2e20f2cf367", "input": "this is another test prompt", "reference_output": "this is a test response"}], "created_at": "2023-06-22T21:56:03.346141", "updated_at": "2023-06-22T21:56:03.346141", "description": null, "last_run_time": null, "num_runs": 0, "page": null, "page_size": null, "total_pages": null, "total_count": null}'
+MOCK_SUITE_JSON = '{"id": "8b7ba080-8d14-42d2-9250-ec0edb96abd7", "name": "test_suite", "scoring_method": {"name": "bertscore", "type": "built_in", "config": {"precision_weight": 0.1, "model_type": "microsoft/deberta-v3-base"}, "output_type": "continuous", "categories": null}, "test_cases": [{"id": "62d2d1b3-d7df-4999-b01c-52e93d34f576", "input": "this is test input to a language model", "reference_output": "this is test output from a language model"}, {"id": "70eb3014-2b04-4974-bb05-a2e20f2cf367", "input": "this is another test prompt", "reference_output": "this is a test response"}], "created_at": "2023-06-22T21:56:03.346141", "updated_at": "2023-06-22T21:56:03.346141", "description": null, "last_run_time": null, "num_runs": 0, "page": null, "page_size": null, "total_pages": null, "total_count": null}'
 
-MOCK_SUITE_WITH_NULL_JSON = '{"id": "8b7ba080-8d14-42d2-9250-ec0edb96abd7", "name": "test_suite", "scoring_method": {"name": "bertscore", "type": "built_in", "config": {"precision_weight": 0.1, "model_type": "microsoft/deberta-v3-base"}}, "test_cases": [{"id": "62d2d1b3-d7df-4999-b01c-52e93d34f576", "input": "this is test input to a language model", "reference_output": null}, {"id": "70eb3014-2b04-4974-bb05-a2e20f2cf367", "input": "this is another test prompt", "reference_output": null}], "created_at": "2023-06-22T21:56:03.346141", "updated_at": "2023-06-22T21:56:03.346141", "description": null, "last_run_time": null, "num_runs": 0, "page": null, "page_size": null, "total_pages": null, "total_count": null}'
+MOCK_SUITE_WITH_NULL_JSON = '{"id": "8b7ba080-8d14-42d2-9250-ec0edb96abd7", "name": "test_suite", "scoring_method": {"name": "bertscore", "type": "built_in", "config": {"precision_weight": 0.1, "model_type": "microsoft/deberta-v3-base"}, "output_type": "continuous", "categories": null}, "test_cases": [{"id": "62d2d1b3-d7df-4999-b01c-52e93d34f576", "input": "this is test input to a language model", "reference_output": null}, {"id": "70eb3014-2b04-4974-bb05-a2e20f2cf367", "input": "this is another test prompt", "reference_output": null}], "created_at": "2023-06-22T21:56:03.346141", "updated_at": "2023-06-22T21:56:03.346141", "description": null, "last_run_time": null, "num_runs": 0, "page": null, "page_size": null, "total_pages": null, "total_count": null}'
 
-MOCK_SUITE_WITH_SCORING_JSON = '{"id": "8b7ba080-8d14-42d2-9250-ec0edb96abd7", "name": "test_suite", "scoring_method": {"name": "bertscore", "type": "built_in", "config": {"scoring_param": "my_custom_param"}}, "test_cases": [{"id": "62d2d1b3-d7df-4999-b01c-52e93d34f576", "input": "this is test input to a language model", "reference_output": null}, {"id": "70eb3014-2b04-4974-bb05-a2e20f2cf367", "input": "this is another test prompt", "reference_output": null}], "created_at": "2023-06-22T21:56:03.346141", "updated_at": "2023-06-22T21:56:03.346141", "description": null, "last_run_time": null, "num_runs": 0, "page": null, "page_size": null, "total_pages": null, "total_count": null}'
+MOCK_SUITE_WITH_SCORING_JSON = '{"id": "8b7ba080-8d14-42d2-9250-ec0edb96abd7", "name": "test_suite", "scoring_method": {"name": "bertscore", "type": "built_in", "config": {"scoring_param": "my_custom_param"}, "output_type": "continuous", "categories": null}, "test_cases": [{"id": "62d2d1b3-d7df-4999-b01c-52e93d34f576", "input": "this is test input to a language model", "reference_output": null}, {"id": "70eb3014-2b04-4974-bb05-a2e20f2cf367", "input": "this is another test prompt", "reference_output": null}], "created_at": "2023-06-22T21:56:03.346141", "updated_at": "2023-06-22T21:56:03.346141", "description": null, "last_run_time": null, "num_runs": 0, "page": null, "page_size": null, "total_pages": null, "total_count": null}'
 
 MOCK_NO_SUITES = PaginatedTestSuites(
     test_suites=[], page=1, page_size=5, total_count=0, total_pages=1
@@ -256,6 +274,25 @@ MOCK_RUN_RESULTS_SORTED = [
     ),
 ]
 
+MOCK_RUN_RESULTS_CATEGORICAL = [
+    RunResult(
+        id="70eb3014-2b04-4974-bb05-a2e20f2cf367",
+        input="this is another test prompt",
+        reference_output="this is a test response",
+        output="this is a good test run output",
+        score=0.7,
+        score_result=ScoreResult(score=0.7, category=Category(name="test_category")),
+    ),
+    RunResult(
+        id="62d2d1b3-d7df-4999-b01c-52e93d34f576",
+        input="this is test input to a language model",
+        reference_output="this is test output from a language model",
+        output="this is a test run output",
+        score=0.9,
+        score_result=ScoreResult(score=0.9, category=Category(name="test_category_2")),
+    ),
+]
+
 MOCK_RUN_RESULTS_INDEXED = [
     RunResult(
         id="62d2d1b3-d7df-4999-b01c-52e93d34f576",
@@ -286,6 +323,19 @@ MOCK_RUN_RESPONSE = PaginatedRun(
     total_pages=1,
 )
 
+MOCK_CATEGORICAL_RUN_RESPONSE = PaginatedRun(
+    id="af8466a8-6425-4ea5-85cb-ed952b26fa6c",
+    test_suite_id="250ae532-e748-4464-bd6d-a2612dab898e",
+    name="test_run",
+    created_at="2023-06-22T21:56:03.346141",
+    updated_at="2023-06-22T21:56:03.346141",
+    test_cases=MOCK_RUN_RESULTS_CATEGORICAL,
+    page=1,
+    page_size=5,
+    total_count=2,
+    total_pages=1,
+)
+
 MOCK_RUN_RAW = PaginatedRun(
     id="af8466a8-6425-4ea5-85cb-ed952b26fa6c",
     test_suite_id="8b7ba080-8d14-42d2-9250-ec0edb96abd7",
@@ -301,9 +351,19 @@ MOCK_RUN_RAW = PaginatedRun(
 
 MOCK_SUMMARY = SummaryItem(
     id="af8466a8-6425-4ea5-85cb-ed952b26fa6c",
-    name="my_test_run",
+    name="test_run",
     avg_score=0.8,
-    histogram=[HistogramItem(count=2, low=0, high=0.8)],
+    histogram=[HistogramItem(count=2, low=0, high=1.0)],
+)
+
+MOCK_CATEGORICAL_SUMMARY = SummaryItem(
+    id="af8466a8-6425-4ea5-85cb-ed952b26fa6c",
+    name="test_run",
+    avg_score=0.8,
+    histogram=[
+        CategoricalHistogramItem(count=1, category=Category(name="test_category")),
+        CategoricalHistogramItem(count=1, category=Category(name="test_category_2")),
+    ],
 )
 
 MOCK_SUMMARY_RESPONSE = TestSuiteSummary(
@@ -329,6 +389,8 @@ MOCK_SUITES_JSON = {
                 "name": "bertscore",
                 "type": "built_in",
                 "config": MOCK_BERTSCORE_CONFIG,
+                "output_type": "continuous",
+                "categories": None,
             },
             "updated_at": "2023-06-22T21:56:03.346141",
         }
@@ -349,6 +411,8 @@ MOCK_SUITE_RESPONSE_JSON = {
         "name": "bertscore",
         "type": "built_in",
         "config": MOCK_BERTSCORE_CONFIG,
+        "output_type": "continuous",
+        "categories": None,
     },
     "test_cases": [
         {
@@ -389,14 +453,15 @@ MOCK_RUNS_RESPONSE_JSON = {
 
 MOCK_SUMMARY_RESPONSE_JSON = {
     "num_test_cases": 2,
+    "categorical": False,
     "page": 1,
     "page_size": 5,
     "summary": [
         {
             "avg_score": 0.8,
-            "histogram": [{"count": 2, "high": 0.8, "low": 0.0}],
+            "histogram": [{"count": 2, "high": 1.0, "low": 0.0}],
             "id": "af8466a8-6425-4ea5-85cb-ed952b26fa6c",
-            "name": "my_test_run",
+            "name": "test_run",
         }
     ],
     "total_count": 1,
@@ -416,6 +481,7 @@ MOCK_RUN_RESPONSE_JSON = {
             "output": "this is a good test run output",
             "reference_output": "this is a test response",
             "score": 0.7,
+            "score_result": {"score": 0.7, "category": None},
         },
         {
             "id": "62d2d1b3-d7df-4999-b01c-52e93d34f576",
@@ -423,6 +489,7 @@ MOCK_RUN_RESPONSE_JSON = {
             "output": "this is a test run output",
             "reference_output": "this is test output from a language model",
             "score": 0.9,
+            "score_result": {"score": 0.9, "category": None},
         },
     ],
     "test_suite_id": "8b7ba080-8d14-42d2-9250-ec0edb96abd7",

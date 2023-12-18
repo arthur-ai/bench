@@ -123,7 +123,7 @@ class BenchClient(ABC):
     def get_summary_statistics(
         self,
         test_suite_id: str,
-        run_id: Optional[str] = None,
+        run_ids: Optional[list[str]] = None,
         page: int = 1,
         page_size: int = 5,
     ) -> TestSuiteSummary:
