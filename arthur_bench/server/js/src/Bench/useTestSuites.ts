@@ -91,7 +91,7 @@ export const useTestSuites = () => {
             let url = `/api/v3/bench/test_suites/${testSuiteId}/runs/summary?`;
 
             if (testRunIds) {
-                url += testRunIds.map((testRunId) => `&run_ids=${testRunId}`).join("&");
+                url += testRunIds.map((testRunId) => `run_ids=${testRunId}`).join("&");
             }
 
             return arthurAxios.get(url).then((r) => {

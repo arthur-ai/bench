@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, {useCallback, useEffect, useMemo, useState} from "react";
 import { Table, TableCell, TableHeader } from "../../core/Table";
 import HeaderCell from "./TestRunHeader";
 import TestRunRow from "./TestRunRow";
@@ -77,8 +77,10 @@ const TestRunTable = (props: TTableProps) => {
         },
         [page]
     );
-
-    const newUrl: string = `/bench/${testSuiteId}/compare/${selectedTestRuns.map((run) => `test_run_id=${run.id}`).join("&")}`;
+    const newUrl = useMemo(
+        () => `/bench/${testSuiteId}/compare/${selectedTestRuns.map((run) => `test_run_id=${run.id}`).join("&")}`,
+        [selectedTestRuns, testSuiteId]
+    );
 
     return (
         <>

@@ -1,41 +1,41 @@
-import { TTestRunData } from "arthur-redux/slices/testSuites/types";
+import { Output, TTestRunData } from "arthur-redux/slices/testSuites/types";
 
+/**
+ * Formats test run data into a specific structure for the compare test runs table.
+ *
+ * @param {TTestRunData[]} data - The test run data to be formatted.
+ * @returns {Array} The formatted data.
+ */
 const formatTestRunData = (data: TTestRunData[]) => {
+    if (!data || !data.length) return [];
     const formattedData = [];
 
-    for (let i = 0; i < data.length; i++) {
-        const testRun = data[i];
-        const testCases = testRun.test_case_runs;
+    const firstRow = data[0];
+    const testCases = firstRow.test_case_runs;
 
-        for (let j = 0; j < testCases.length; j++) {
-            const testCase = testCases[j];
-            const test_case_id = testCase.id;
-            const reference_output = testCase.reference_output;
-            const input = testCase.input;
-            const output = testCase.output;
-            const score = testCase.score;
-            const outputs = [];
+    for (let i = 0; i < testCases.length; i++) {
+        const testCase = testCases[i];
+        const formattedRow = {
+            testCaseId: testCase.id,
+            input: testCase.input,
+            referenceOutput: testCase.reference_output,
+            outputs: [] as Output[],
+        };
 
-            for (let k = 0; k < data.length; k++) {
-                const testRun = data[k];
-                const testRunId = testRun.id;
-                const testRunName = testRun.name;
-                outputs.push({
-                    id: testRunId,
-                    name: testRunName,
-                    output,
-                    score,
-                });
-            }
-            formattedData.push({
-                test_case_id,
-                reference_output,
-                input,
-                outputs,
-            });
+        for (let j = 0; j < data.length; j++) {
+            const testRun = data[j];
+            const testCaseRun = testRun.test_case_runs[i];
+            const output = {
+                id: testRun.id,
+                name: testRun.name,
+                output: testCaseRun.output,
+                score: testCaseRun.score,
+            };
+            formattedRow.outputs.push(output);
         }
-    }
 
+        formattedData.push(formattedRow);
+    }
     return formattedData;
 };
 

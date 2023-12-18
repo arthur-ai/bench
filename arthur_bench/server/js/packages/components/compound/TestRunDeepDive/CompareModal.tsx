@@ -7,12 +7,14 @@ import { useTranslation } from "react-i18next";
 import { chartColorsArray } from "resources/colors/Arthur/graphs";
 import primary from "resources/colors/Arthur/primary";
 import secondary from "resources/colors/Arthur/secondary";
+import {ComparedTestRuns, Output} from "arthur-redux/slices/testSuites/types";
 
 type props = {
-    testCase: any;
+    testCase: ComparedTestRuns;
     showModal: boolean;
     setShowModal: (arg: boolean) => void;
 };
+
 const CompareModal = ({ testCase, showModal, setShowModal }: props) => {
     const { t } = useTranslation(["common"]);
     const { css } = useFela();
@@ -24,14 +26,14 @@ const CompareModal = ({ testCase, showModal, setShowModal }: props) => {
                 <Icon
                     icon={EIconType.CANCEL_ROUND}
                     style={{ cursor: "pointer" }}
-                    color={"black"}
+                    color={primary.black}
                     size={20}
                     clickHandler={() => setShowModal(!showModal)}
                 />
             </div>
             <div className={css(styles.header)}>
                 <div className={css(styles.headerText)}>
-                    {t("testSuite.comparison")} {testCase.outputs.map((output: any) => output.name).join(", ")}
+                    {t("testSuite.comparison")} {testCase.outputs.map((output: Output) => output.name).join(", ")}
                 </div>
             </div>
             <div className={css(styles.body)}>
@@ -45,10 +47,10 @@ const CompareModal = ({ testCase, showModal, setShowModal }: props) => {
                     <div>
                         <div className={css(styles.textBox)}>
                             <div className={css(styles.textBoxHeader(primary.ashGrey))}>{t("testSuite.referenceOutputs")}</div>
-                            <div className={css(styles.textBoxBody)}>{testCase.reference_output}</div>
+                            <div className={css(styles.textBoxBody)}>{testCase.referenceOutput}</div>
                         </div>
                     </div>
-                    {testCase.outputs.map((output: any, index: number) => (
+                    {testCase.outputs.map((output: Output, index: number) => (
                         <div key={index}>
                             <div className={css(styles.textBox)}>
                                 <div className={css(styles.textBoxHeader(chartColorsArray[index]))}>

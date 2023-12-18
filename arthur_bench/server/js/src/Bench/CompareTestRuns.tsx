@@ -6,7 +6,6 @@ import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useTestSuites } from "../Bench/useTestSuites";
 import { State } from "arthur-redux";
-import { DetailedTestSuite } from "arthur-redux/slices/testSuites/types";
 import { useFela } from "react-fela";
 import styles from "./styles";
 
@@ -24,7 +23,7 @@ const CompareTestRuns = () => {
         }
     }, []);
 
-    const data = useSelector((state: State) => state.testSuites?.currentTestSuite?.data?.data) as DetailedTestSuite;
+    const data = useSelector((state: State) => state.testSuites?.currentTestSuite?.data?.data);
 
     return (
         <div>

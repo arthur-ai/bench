@@ -15,8 +15,9 @@ import { useSelector } from "react-redux";
 import { State } from "arthur-redux";
 import { Paginator } from "../../core/Paginator";
 import { useTestSuites } from "../../../../../js/src/Bench/useTestSuites";
-import { ComparedTestRuns, TTestRunData } from "arthur-redux/slices/testSuites/types";
+import {ComparedTestRuns, Output, TTestRunData} from "arthur-redux/slices/testSuites/types";
 import formatTestRunData from "../../../utils/format-test-runs/format-test-runs"
+import scrollToBottom from "../../../utils/scroll-to-bottom/scroll-to-bottom"
 
 type RowProps = {
     testCase: ComparedTestRuns;
@@ -28,10 +29,10 @@ const Row = ({ testCase }: RowProps) => {
     return (
         <TableRow>
             <ExpandableTableCell content={<div>{testCase.input}</div>} limit={true} tableCellProps={{ style: styles.expandableTableCell }} />
-            {testCase.reference_output && (
-                <ExpandableTableCell content={testCase.reference_output} limit={300} tableCellProps={{ style: styles.expandableTableCell }} />
+            {testCase.referenceOutput && (
+                <ExpandableTableCell content={testCase.referenceOutput} limit={300} tableCellProps={{ style: styles.expandableTableCell }} />
             )}
-            {testCase.outputs.map((output: any, index: number) => (
+            {testCase.outputs.map((output: Output, index: number) => (
                 <TableCell style={styles.expandableTableCell}>
                     <ExpandableTableCell content={output.output} limit={300} tableCellProps={{ style: { boxShadow: "none", textAlign: "left" } }} />
                     <p className={css(styles.score(chartColorsArray[index]))}>{output.score}</p>
@@ -76,6 +77,7 @@ const CompareTable = () => {
                 return;
             }
             setPage(newPage);
+            scrollToBottom();
         },
         [page]
     );

@@ -11,6 +11,7 @@ import { useSelector } from "react-redux";
 import { State } from "arthur-redux";
 import { useParams } from "react-router-dom";
 import { useTestSuites } from "../../../../../js/src/Bench/useTestSuites";
+import scrollToBottom from "../../../utils/scroll-to-bottom/scroll-to-bottom"
 
 type RowProps = {
     runCase: TestRunCase;
@@ -104,6 +105,7 @@ const TestRunDeepDive = () => {
                 return;
             }
             setPage(newPage);
+            scrollToBottom();
         },
         [page]
     );

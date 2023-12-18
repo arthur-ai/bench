@@ -4,6 +4,7 @@ import { GRAPHIK_LIGHT, MONO, MONO_MEDIUM } from "resources/fonts";
 import hexToRgba from "../../../utils/hex-to-rgba/hex-to-rgba"
 import { GRAPHIK } from "resources/fonts/";
 
+
 const styles = {
     headerCell: (color: string) => ({
         backgroundColor: color,
@@ -117,3 +118,4 @@ const styles = {
 };
 
 export default styles;
+
