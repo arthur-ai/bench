@@ -157,9 +157,10 @@ def _paginate(
     objs: List, page: int, page_size: int, sort_key: Optional[PaginationSortEnum] = None
 ) -> PageInfo:
     """Paginate sorted files and return iteration indices and page info"""
-    if sort_key is not None:
+    sort_func = SORT_QUERY_TO_FUNC.get(sort_key)
+    if sort_func is not None:
         desc = sort_key[0] == "-"
-        sorted_pages = sorted(objs, key=SORT_QUERY_TO_FUNC.get(sort_key), reverse=desc)
+        sorted_pages = sorted(objs, key=sort_func, reverse=desc)
     else:
         sorted_pages = objs
     offset = (page - 1) * page_size
