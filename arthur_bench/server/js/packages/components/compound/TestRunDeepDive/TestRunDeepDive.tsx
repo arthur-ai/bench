@@ -1,4 +1,4 @@
-import { TestRunCase } from "../../../arthur-redux/slices/testSuites/types";
+import { TestRunCase } from "../../../arthur-redux/slices/testSuites/types"
 import React, { useCallback, useEffect, useState } from "react";
 import { Table, TableCell, TableRow } from "../../core/Table";
 import Header from "./Header";
@@ -79,8 +79,8 @@ const TestRunDeepDive = () => {
     }, [page]);
 
     const { hasScores, hasLabels, isComposite } = (runs || []).reduce(
-        (acc, run) => {
-            if (run.score !== undefined) {
+        (acc, run: TestRunCase) => {
+            if (run.score_result?.score !== undefined) {
                 acc.hasScores = true;
             }
 

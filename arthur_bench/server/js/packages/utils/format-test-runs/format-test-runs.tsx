@@ -1,4 +1,4 @@
-import { Output, TTestRunData } from "arthur-redux/slices/testSuites/types";
+import { Output, TTestRunData } from "../../arthur-redux/slices/testSuites/types";
 
 /**
  * Formats test run data into a specific structure for the compare test runs table.
@@ -29,7 +29,7 @@ const formatTestRunData = (data: TTestRunData[]) => {
                 id: testRun.id,
                 name: testRun.name,
                 output: testCaseRun.output,
-                score: testCaseRun.score,
+                score: testCaseRun.score_result?.score,
             };
             formattedRow.outputs.push(output);
         }
