@@ -34,7 +34,6 @@ from arthur_bench.models.models import (
     ScorerOutputType,
     PaginationSuiteSortEnum,
     PaginationRunSortEnum,
-    PaginationSortEnum,
     CommonSortEnum,
     TestCaseSortEnum,
     TestRunSortEnum,
