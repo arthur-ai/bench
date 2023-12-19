@@ -5,7 +5,7 @@ import { useFela } from "react-fela";
 import primary from "resources/colors/Arthur/primary";
 import secondary from "resources/colors/Arthur/secondary";
 import { useTranslation } from "react-i18next";
-import { TestRunCase } from "arthur-redux/slices/testSuites/types";
+import { TestRunCase } from "../../../arthur-redux/slices/testSuites/types";
 
 type Props = {
     runs: TestRunCase[];
@@ -17,7 +17,7 @@ const Header = ({ runs, isComposite }: Props) => {
     const scorers = (runs.length && runs[0].details) ?? {};
     const { hasScores, hasLabels, hasReference } = (runs || []).reduce(
         (acc, run) => {
-            if (run.score !== undefined) {
+            if (run.score_result?.score !== undefined) {
                 acc.hasScores = true;
             }
 

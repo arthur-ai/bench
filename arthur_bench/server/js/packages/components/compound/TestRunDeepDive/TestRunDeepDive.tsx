@@ -1,4 +1,4 @@
-import { TestRunCase } from "arthur-redux/slices/testSuites/types";
+import { TestRunCase } from "../../../arthur-redux/slices/testSuites/types";
 import React, { useCallback, useEffect, useState } from "react";
 import { Table, TableCell, TableRow } from "../../core/Table";
 import Header from "./Header";
@@ -38,7 +38,7 @@ const Row = ({ runCase, hasScores, hasLabels }: RowProps) => {
             <ExpandableTableCell content={runCase.output} limit={300} tableCellProps={{ style: cellStyle }} />
             {hasScores && (
                 <TableCell className={css(styles.cell())}>
-                    <div>{runCase.score !== undefined ? runCase.score.toFixed(3) : "N/A"}</div>
+                    <div>{runCase.score_result?.score !== undefined ? runCase.score_result.score.toFixed(3) : "N/A"}</div>
                 </TableCell>
             )}
             {hasLabels && (
