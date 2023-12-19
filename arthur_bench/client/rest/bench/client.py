@@ -241,7 +241,7 @@ class ArthurBenchClient(BenchClient):
         test_run_id: str,
         page: int = 1,
         page_size: int = 5,
-        sort: TestCaseSortEnum = TestCaseSortEnum.SCORE_ASC,
+        sort: Optional[TestCaseSortEnum] = TestCaseSortEnum.SCORE_ASC,
     ) -> PaginatedRun:
         """
         Get a test run with input, output, and reference data

@@ -98,7 +98,6 @@ class TestRunSortEnum(str, Enum):
 
 
 class TestCaseSortEnum(str, Enum):
-    ORDER_ASC = "order"  # order suite was created
     SCORE_ASC = "score"
     SCORE_DESC = "-score"
 
