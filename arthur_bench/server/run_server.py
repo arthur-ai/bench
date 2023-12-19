@@ -22,6 +22,13 @@ except ImportError as e:
 
 from arthur_bench.client.local.client import LocalBenchClient
 from arthur_bench.exceptions import NotFoundError
+from arthur_bench.models.models import (
+    PaginationSuiteSortEnum,
+    PaginationRunSortEnum,
+    TestCaseSortEnum,
+    CommonSortEnum,
+    TestSuiteSortEnum,
+)
 from arthur_bench.telemetry.telemetry import send_event, set_track_usage_data
 from arthur_bench.telemetry.config import get_or_persist_id, persist_usage_data
 
@@ -48,7 +55,9 @@ def test_suites(
     request: Request,
     page: int = 1,
     page_size: int = 5,
-    sort: Optional[str] = None,
+    sort: Annotated[
+        Optional[PaginationSuiteSortEnum], Query()
+    ] = TestSuiteSortEnum.LAST_RUNTIME_ASC,
     scoring_method: Annotated[Union[List[str], None], Query()] = None,
     name: Optional[str] = None,
 ):
@@ -97,7 +106,9 @@ def test_runs(
     test_suite_id: uuid.UUID,
     page: int = 1,
     page_size: int = 5,
-    sort: Optional[str] = None,
+    sort: Annotated[
+        Optional[PaginationRunSortEnum], Query()
+    ] = CommonSortEnum.CREATED_AT_ASC,
 ):
     client = request.app.state.client
     try:
@@ -152,6 +163,7 @@ def test_run_results(
     run_id: uuid.UUID,
     page: int = 1,
     page_size: int = 5,
+    sort: Annotated[Optional[TestCaseSortEnum], Query()] = TestCaseSortEnum.SCORE_ASC,
 ):
     client = request.app.state.client
 
@@ -161,6 +173,7 @@ def test_run_results(
             test_run_id=str(run_id),
             page=page,
             page_size=page_size,
+            sort=sort,
         ).json(by_alias=True)
     except NotFoundError as e:
         return HTTPException(status_code=404, detail=str(e))

@@ -14,6 +14,11 @@ from arthur_bench.models.models import (
     PaginatedTestSuite,
     TestSuiteSummary,
     CreateRunResponse,
+    TestCaseSortEnum,
+    CommonSortEnum,
+    TestSuiteSortEnum,
+    PaginationRunSortEnum,
+    PaginationSuiteSortEnum,
 )
 
 from arthur_bench.models.scoring import (
@@ -43,7 +48,7 @@ class ArthurBenchClient(BenchClient):
     def get_test_suites(
         self,
         name: Optional[str] = None,
-        sort: Optional[str] = None,
+        sort: PaginationSuiteSortEnum = TestSuiteSortEnum.LAST_RUNTIME_ASC,
         scoring_method: Optional[List[str]] = None,
         page: int = 1,
         page_size: int = 5,
@@ -177,7 +182,7 @@ class ArthurBenchClient(BenchClient):
     def get_runs_for_test_suite(
         self,
         test_suite_id: str,
-        sort: Optional[str] = None,
+        sort: PaginationRunSortEnum = CommonSortEnum.CREATED_AT_ASC,
         page: int = 1,
         page_size: int = 5,
     ) -> PaginatedRuns:
@@ -236,7 +241,7 @@ class ArthurBenchClient(BenchClient):
         test_run_id: str,
         page: int = 1,
         page_size: int = 5,
-        sort: Optional[bool] = None,
+        sort: TestCaseSortEnum = TestCaseSortEnum.SCORE_ASC,
     ) -> PaginatedRun:
         """
         Get a test run with input, output, and reference data
@@ -245,7 +250,7 @@ class ArthurBenchClient(BenchClient):
         :param test_run_id:
         :param page:
         :param page_size:
-        :param sort:
+        :param sort: sort key to sort the retrieved results
         """
 
         params = {}
@@ -254,7 +259,7 @@ class ArthurBenchClient(BenchClient):
         if page_size is not None:
             params["page_size"] = page_size  # type: ignore
         if sort is not None:
-            params["sort"] = sort
+            params["sort"] = sort  # type: ignore
 
         parsed_resp = cast(
             Dict,
