@@ -163,7 +163,7 @@ def test_run_results(
     run_id: uuid.UUID,
     page: int = 1,
     page_size: int = 5,
-    sort: Annotated[Optional[TestCaseSortEnum], Query()] = TestCaseSortEnum.SCORE_ASC,
+    sort: Annotated[Optional[TestCaseSortEnum], Query()] = TestCaseSortEnum.ORDER_ASC,
 ):
     client = request.app.state.client
 

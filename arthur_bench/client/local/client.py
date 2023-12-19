@@ -34,6 +34,7 @@ from arthur_bench.models.models import (
     ScorerOutputType,
     PaginationSuiteSortEnum,
     PaginationRunSortEnum,
+    PaginationSortEnum,
     CommonSortEnum,
     TestCaseSortEnum,
     TestRunSortEnum,
@@ -68,7 +69,7 @@ SORT_QUERY_TO_FUNC = {
     TestRunSortEnum.AVG_SCORE_DESC: lambda x: x.avg_score,
     TestCaseSortEnum.SCORE_ASC: lambda x: x.score,
     TestCaseSortEnum.SCORE_DESC: lambda x: x.score,
-    TestCaseSortEnum.ID_ASC: lambda x: x.id,
+    TestCaseSortEnum.ORDER_ASC: None,
 }
 
 
@@ -153,12 +154,12 @@ class PageInfo:
 
 
 def _paginate(
-    objs: List, page: int, page_size: int, sort_key: Optional[str] = None
+    objs: List, page: int, page_size: int, sort_key: Optional[PaginationSortEnum] = None
 ) -> PageInfo:
     """Paginate sorted files and return iteration indices and page info"""
     if sort_key is not None:
         desc = sort_key[0] == "-"
-        sorted_pages = sorted(objs, key=SORT_QUERY_TO_FUNC[sort_key], reverse=desc)
+        sorted_pages = sorted(objs, key=SORT_QUERY_TO_FUNC.get(sort_key), reverse=desc)
     else:
         sorted_pages = objs
     offset = (page - 1) * page_size
@@ -466,7 +467,9 @@ class LocalBenchClient(BenchClient):
                 _summarize_run(run=run_obj, scoring_method=suite.scoring_method)
             )
 
-        pagination = _paginate(runs, page, page_size, sort_key="avg_score")
+        pagination = _paginate(
+            runs, page, page_size, sort_key=TestRunSortEnum.AVG_SCORE_ASC
+        )
         paginated_summary = TestSuiteSummary(
             summary=runs,
             categorical=suite.scoring_method.output_type
@@ -486,7 +489,7 @@ class LocalBenchClient(BenchClient):
         test_run_id: str,
         page: int = 1,
         page_size: int = DEFAULT_PAGE_SIZE,
-        sort: TestCaseSortEnum = TestCaseSortEnum.SCORE_ASC,
+        sort: TestCaseSortEnum = TestCaseSortEnum.ORDER_ASC,
     ) -> PaginatedRun:
         test_suite_name = self._get_suite_name_from_id(test_suite_id)
         if test_suite_name is None:

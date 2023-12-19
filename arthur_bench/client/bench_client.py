@@ -112,7 +112,7 @@ class BenchClient(ABC):
         test_run_id: str,
         page: int = 1,
         page_size: int = 5,
-        sort: TestCaseSortEnum = TestCaseSortEnum.SCORE_ASC,
+        sort: TestCaseSortEnum = TestCaseSortEnum.ORDER_ASC,
     ) -> PaginatedRun:
         """
         Get a test run by id.
@@ -121,7 +121,8 @@ class BenchClient(ABC):
         :param test_run_id: uuid of the test run
         :param page: the page to fetch, pagination refers to the test cases
         :param page_size: page size to fetch, pagination refers to the test cases
-        :param sort: sort key to sort the retrieved results
+        :param sort: sort key to sort the retrieved results. defaults to the order the
+            test cases were created
         """
         raise NotImplementedError
 
