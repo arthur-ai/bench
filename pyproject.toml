@@ -24,18 +24,17 @@ dependencies = [
     'pandas~=2.0.1',
     'langchain~=0.0.170',
     'sentencepiece==0.1.99',
-    'bert_score~=0.3.13',
-    'nltk~=3.8.1',
-    'tqdm~=4.65.0',
+    'bert_score~=0.3',
+    'nltk~=3.8',
+    'tqdm~=4.65',
     'pydantic>=1.10.0,<2.0',
     'pyjwt<3,>=2.6',
     'requests~=2.0',
-    'requests_toolbelt~=1.0.0',
-    'textstat~=0.7.3',
-    'tiktoken~=0.4.0',
+    'requests_toolbelt~=1.0',
+    'textstat~=0.7',
+    'tiktoken~=0.4',
     'transformers==4.29.2',
-    'wordfreq~=3.0.3'
-
+    'wordfreq~=3.0'
 ]
 
 [project.optional-dependencies]
