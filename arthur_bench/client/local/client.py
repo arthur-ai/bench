@@ -32,6 +32,13 @@ from arthur_bench.models.models import (
     RunResult,
     ScoringMethod,
     ScorerOutputType,
+    PaginationSuiteSortEnum,
+    PaginationRunSortEnum,
+    PaginationSortEnum,
+    CommonSortEnum,
+    TestCaseSortEnum,
+    TestRunSortEnum,
+    TestSuiteSortEnum,
 )
 
 from arthur_bench.utils.loaders import load_suite_from_json, get_file_extension
@@ -48,20 +55,20 @@ DEFAULT_PAGE_SIZE = 5
 NUM_BINS = 20
 
 SORT_QUERY_TO_FUNC = {
-    "last_run_time": lambda x: x.last_run_time
+    TestSuiteSortEnum.LAST_RUNTIME_ASC: lambda x: x.last_run_time
     if x.last_run_time is not None
     else x.created_at,
-    "name": lambda x: x.name,
-    "created_at": lambda x: x.created_at,
-    "avg_score": lambda x: x.avg_score,
-    "-last_run_time": lambda x: x.last_run_time
+    CommonSortEnum.NAME_ASC: lambda x: x.name,
+    CommonSortEnum.CREATED_AT_ASC: lambda x: x.created_at,
+    TestRunSortEnum.AVG_SCORE_ASC: lambda x: x.avg_score,
+    TestSuiteSortEnum.LAST_RUNTIME_DESC: lambda x: x.last_run_time
     if x.last_run_time is not None
     else x.created_at,
-    "-name": lambda x: x.name,
-    "-created_at": lambda x: x.created_at,
-    "-avg_score": lambda x: x.avg_score,
-    "score": lambda x: x.score,
-    "id": lambda x: x.id,
+    CommonSortEnum.NAME_DESC: lambda x: x.name,
+    CommonSortEnum.CREATED_AT_DESC: lambda x: x.created_at,
+    TestRunSortEnum.AVG_SCORE_DESC: lambda x: x.avg_score,
+    TestCaseSortEnum.SCORE_ASC: lambda x: x.score,
+    TestCaseSortEnum.SCORE_DESC: lambda x: x.score,
 }
 
 
@@ -146,12 +153,12 @@ class PageInfo:
 
 
 def _paginate(
-    objs: List, page: int, page_size: int, sort_key: Optional[str] = None
+    objs: List, page: int, page_size: int, sort_key: Optional[PaginationSortEnum] = None
 ) -> PageInfo:
     """Paginate sorted files and return iteration indices and page info"""
     if sort_key is not None:
         desc = sort_key[0] == "-"
-        sorted_pages = sorted(objs, key=SORT_QUERY_TO_FUNC[sort_key], reverse=desc)
+        sorted_pages = sorted(objs, key=SORT_QUERY_TO_FUNC.get(sort_key), reverse=desc)
     else:
         sorted_pages = objs
     offset = (page - 1) * page_size
@@ -281,7 +288,7 @@ class LocalBenchClient(BenchClient):
     def get_test_suites(
         self,
         name: Optional[str] = None,
-        sort: Optional[str] = None,
+        sort: PaginationSuiteSortEnum = TestSuiteSortEnum.LAST_RUNTIME_ASC,
         scoring_method: Optional[List[str]] = None,
         page: int = 1,
         page_size: int = DEFAULT_PAGE_SIZE,
@@ -338,9 +345,6 @@ class LocalBenchClient(BenchClient):
                     )
                 )
 
-        # default sort by last run time
-        if sort is None:
-            sort = "last_run_time"
         paginate = _paginate(suites, page=page, page_size=page_size, sort_key=sort)
         return PaginatedTestSuites(
             test_suites=paginate.sorted_pages[paginate.start : paginate.end],
@@ -400,7 +404,7 @@ class LocalBenchClient(BenchClient):
     def get_runs_for_test_suite(
         self,
         test_suite_id: str,
-        sort: Optional[str] = None,
+        sort: PaginationRunSortEnum = CommonSortEnum.CREATED_AT_ASC,
         page: int = 1,
         page_size: int = DEFAULT_PAGE_SIZE,
     ) -> PaginatedRuns:
@@ -415,9 +419,6 @@ class LocalBenchClient(BenchClient):
             avg_score = np.mean([o.score for o in run_obj.test_cases])
             run_resp = TestRunMetadata(**run_obj.dict(), avg_score=float(avg_score))
             runs.append(run_resp)
-
-        if sort is None:
-            sort = "created_at"
 
         pagination = _paginate(runs, page, page_size, sort_key=sort)
 
@@ -465,7 +466,9 @@ class LocalBenchClient(BenchClient):
                 _summarize_run(run=run_obj, scoring_method=suite.scoring_method)
             )
 
-        pagination = _paginate(runs, page, page_size, sort_key="avg_score")
+        pagination = _paginate(
+            runs, page, page_size, sort_key=TestRunSortEnum.AVG_SCORE_ASC
+        )
         paginated_summary = TestSuiteSummary(
             summary=runs,
             categorical=suite.scoring_method.output_type
@@ -485,7 +488,7 @@ class LocalBenchClient(BenchClient):
         test_run_id: str,
         page: int = 1,
         page_size: int = DEFAULT_PAGE_SIZE,
-        sort: Optional[bool] = True,
+        sort: Optional[TestCaseSortEnum] = None,
     ) -> PaginatedRun:
         test_suite_name = self._get_suite_name_from_id(test_suite_id)
         if test_suite_name is None:
@@ -521,7 +524,8 @@ class LocalBenchClient(BenchClient):
             cases = []
 
         run_results = [RunResult.parse_obj(r) for r in cases]
-        pagination = _paginate(run_results, page, page_size, sort_key="score")
+
+        pagination = _paginate(run_results, page, page_size, sort_key=sort)
         return PaginatedRun(
             id=uuid.UUID(test_run_id),
             name=run_name,

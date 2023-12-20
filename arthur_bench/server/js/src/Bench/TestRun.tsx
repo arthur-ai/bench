@@ -18,6 +18,7 @@ const TestRun = () => {
     const [isExpanded, setIsExpanded] = useState(true);
     const { css } = useFela();
     const { t } = useTranslation(["common"]);
+    const sort = "score"
 
     const toggleExpanded = () => {
         setIsExpanded((prevState) => !prevState);
@@ -25,7 +26,7 @@ const TestRun = () => {
 
     useEffect(() => {
         if (testSuiteId && testRunId) {
-            fetchTestRunDetail(testSuiteId, testRunId, 1, 10);
+            fetchTestRunDetail(testSuiteId, testRunId, 1, 10, sort);
             fetchTestSuiteData(testSuiteId);
             fetchTestRunSummary(testSuiteId);
             fetchTestRunSummary(testSuiteId, [testRunId]);

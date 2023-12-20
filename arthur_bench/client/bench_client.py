@@ -10,6 +10,11 @@ from arthur_bench.models.models import (
     TestSuiteRequest,
     PaginatedTestSuite,
     TestSuiteSummary,
+    TestCaseSortEnum,
+    CommonSortEnum,
+    TestSuiteSortEnum,
+    PaginationRunSortEnum,
+    PaginationSuiteSortEnum,
 )
 
 from arthur_bench.exceptions import ArthurInternalError
@@ -26,7 +31,7 @@ class BenchClient(ABC):
     def get_test_suites(
         self,
         name: Optional[str] = None,
-        sort: Optional[str] = None,
+        sort: PaginationSuiteSortEnum = TestSuiteSortEnum.LAST_RUNTIME_ASC,
         scoring_method: Optional[List[str]] = None,
         page: int = 1,
         page_size: int = 5,
@@ -72,7 +77,7 @@ class BenchClient(ABC):
     def get_runs_for_test_suite(
         self,
         test_suite_id: str,
-        sort: Optional[str] = None,
+        sort: PaginationRunSortEnum = CommonSortEnum.CREATED_AT_ASC,
         page: int = 1,
         page_size: int = 5,
     ) -> PaginatedRuns:
@@ -107,7 +112,7 @@ class BenchClient(ABC):
         test_run_id: str,
         page: int = 1,
         page_size: int = 5,
-        sort: Optional[bool] = None,
+        sort: Optional[TestCaseSortEnum] = None,
     ) -> PaginatedRun:
         """
         Get a test run by id.
@@ -116,6 +121,7 @@ class BenchClient(ABC):
         :param test_run_id: uuid of the test run
         :param page: the page to fetch, pagination refers to the test cases
         :param page_size: page size to fetch, pagination refers to the test cases
+        :param sort: sort key to sort the retrieved results
         """
         raise NotImplementedError
 

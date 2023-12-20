@@ -108,8 +108,12 @@ export const useTestSuites = () => {
     );
 
     const fetchTestRunDetail = useCallback(
-        (testSuiteId: string, testRunId: string, page?: number, pageSize?: number) => {
-            arthurAxios.get(`/api/v3/bench/test_suites/${testSuiteId}/runs/${testRunId}?page=${page}&page_size=${pageSize}`).then((r) => {
+        (testSuiteId: string, testRunId: string, page?: number, pageSize?: number, sort?: string) => {
+            let url = `/api/v3/bench/test_suites/${testSuiteId}/runs/${testRunId}?page=${page}&page_size=${pageSize}`;
+            if (sort) {
+                url += `&sort=${sort}`;
+            }
+            arthurAxios.get(url).then((r) => {
                 const { page, page_size, total_count, total_pages, ...currentTestRun } = r.data;
 
                 const pagination: TPagination = {
@@ -131,9 +135,13 @@ export const useTestSuites = () => {
     );
 
     const fetchMultipleTestRunDetails = useCallback(
-        (testSuiteId: string, testRunIds: string[], page?: number, pageSize?: number) => {
+        (testSuiteId: string, testRunIds: string[], page?: number, pageSize?: number, sort?: string) => {
             const promises = testRunIds.map((testRunId) => {
-                return arthurAxios.get(`/api/v3/bench/test_suites/${testSuiteId}/runs/${testRunId}?page=${page}&page_size=${pageSize}`);
+                let url = `/api/v3/bench/test_suites/${testSuiteId}/runs/${testRunId}?page=${page}&page_size=${pageSize}`
+                if (sort) {
+                    url += `&sort=${sort}`;
+                }
+                return arthurAxios.get(url);
             });
 
             Promise.all(promises).then((responses) => {

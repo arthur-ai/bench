@@ -80,6 +80,37 @@ class ScoringMethod(BaseModel):
 # REQUESTS
 
 
+class CommonSortEnum(str, Enum):
+    NAME_ASC = "name"
+    NAME_DESC = "-name"
+    CREATED_AT_ASC = "created_at"
+    CREATED_AT_DESC = "-created_at"
+
+
+class TestSuiteSortEnum(str, Enum):
+    LAST_RUNTIME_ASC = "last_run_time"
+    LAST_RUNTIME_DESC = "-last_run_time"
+
+
+class TestRunSortEnum(str, Enum):
+    AVG_SCORE_ASC = "avg_score"
+    AVG_SCORE_DESC = "-avg_score"
+
+
+class TestCaseSortEnum(str, Enum):
+    SCORE_ASC = "score"
+    SCORE_DESC = "-score"
+
+
+PaginationSuiteSortEnum = Union[CommonSortEnum, TestSuiteSortEnum]
+
+PaginationRunSortEnum = Union[CommonSortEnum, TestRunSortEnum]
+
+PaginationSortEnum = Union[
+    TestCaseSortEnum, PaginationSuiteSortEnum, PaginationRunSortEnum
+]
+
+
 class TestCaseRequest(BaseModel):
     """
     An input, reference output pair.

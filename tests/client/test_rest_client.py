@@ -4,6 +4,11 @@ from http import HTTPStatus
 from unittest import mock
 from arthur_bench.client.http.requests import HTTPClient
 from arthur_bench.client.rest.bench.client import ArthurBenchClient
+from arthur_bench.models.models import (
+    TestSuiteSortEnum,
+    CommonSortEnum,
+    TestCaseSortEnum,
+)
 from tests.fixtures.mock_requests import (
     MOCK_SUITE,
     MOCK_SUITE_JSON,
@@ -28,7 +33,11 @@ def test_get_test_suites(mock_rest_client):
         _ = mock_rest_client.get_test_suites()
         mock_rest_client.http_client.get.assert_called_once_with(
             "/bench/test_suites",
-            params={"page": 1, "page_size": 5},
+            params={
+                "page": 1,
+                "page_size": 5,
+                "sort": TestSuiteSortEnum.LAST_RUNTIME_ASC,
+            },
             validation_response_code=HTTPStatus.OK,
         )
 
@@ -71,7 +80,7 @@ def test_get_runs(mock_rest_client):
         _ = mock_rest_client.get_runs_for_test_suite(test_suite_id)
         mock_rest_client.http_client.get.assert_called_once_with(
             f"/bench/test_suites/{test_suite_id}/runs",
-            params={"page": 1, "page_size": 5},
+            params={"page": 1, "page_size": 5, "sort": CommonSortEnum.CREATED_AT_ASC},
             validation_response_code=HTTPStatus.OK,
         )
 
@@ -83,7 +92,7 @@ def test_get_run_by_id(mock_rest_client):
         _ = mock_rest_client.get_test_run(test_suite_id, test_run_id)
         mock_rest_client.http_client.get.assert_called_once_with(
             f"/bench/test_suites/{test_suite_id}/runs/{test_run_id}",
-            params={"page": 1, "page_size": 5},
+            params={"page": 1, "page_size": 5, "sort": TestCaseSortEnum.SCORE_ASC},
             validation_response_code=HTTPStatus.OK,
         )
 
