@@ -1,9 +1,7 @@
 name: lint
 
-on:
-  push:
-  pull_request:
-    branches: [ "develop", "main"]
+on: [pull_request]
+
 
 permissions:
   contents: read
