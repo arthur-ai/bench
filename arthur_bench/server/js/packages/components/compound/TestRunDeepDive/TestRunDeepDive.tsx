@@ -67,15 +67,16 @@ const Row = ({ runCase, hasScores, hasLabels }: RowProps) => {
 
 const TestRunDeepDive = () => {
     const { css } = useFela();
-    const [page, setPage] = useState<number>(0);
+    const [page, setPage] = useState<number>(1);
     const { testSuiteId, testRunId } = useParams();
     const { fetchTestRunDetail } = useTestSuites();
     const { pagination, runs } = useSelector((state: State) => ({
         pagination: state.testSuites.currentTestRun?.pagination,
         runs: state.testSuites.currentTestRun?.data[0]?.test_case_runs,
     }));
+    const sort = "score"
     useEffect(() => {
-        testSuiteId && testRunId && fetchTestRunDetail(testSuiteId, testRunId, page, 10);
+        testSuiteId && testRunId && fetchTestRunDetail(testSuiteId, testRunId, page, 10, sort);
     }, [page]);
 
     const { hasScores, hasLabels, isComposite } = (runs || []).reduce(
