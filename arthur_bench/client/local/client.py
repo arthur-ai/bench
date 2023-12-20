@@ -1,5 +1,4 @@
 import os
-import duckdb
 import getpass
 import numpy as np
 import glob
@@ -49,7 +48,6 @@ DEFAULT_BENCH_FILE_DIR = Path(os.getcwd()) / "bench_runs"
 SUITE_INDEX_FILE = "suite_id_to_name.json"
 RUN_INDEX_FILE = "run_id_to_name.json"
 
-TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%S.%f"
 DEFAULT_PAGE_SIZE = 5
 
 NUM_BINS = 20
@@ -498,39 +496,30 @@ class LocalBenchClient(BenchClient):
         if run_name is None:
             raise NotFoundError(f"test run with id: {test_run_id} does not exist")
 
-        created_at = PaginatedRun.parse_file(
+        run_data = PaginatedRun.parse_file(
             self.root_dir / test_suite_name / run_name / "run.json"
-        ).created_at
-        try:
-            cases = (
-                duckdb.sql(
-                    f"SELECT * FROM ("
-                    f"SELECT test_cases.id, test_cases.input, "
-                    f"test_cases.reference_output FROM ("
-                    f"SELECT unnest(test_cases) as test_cases from "
-                    f"read_json_auto('{self.root_dir}/{test_suite_name}/suite.json', "
-                    f"timestampformat='{TIMESTAMP_FORMAT}'))) "
-                    f"POSITIONAL JOIN (SELECT test_cases.output, test_cases.score "
-                    f"FROM ("
-                    f"SELECT unnest(test_cases) as test_cases from "
-                    f"read_json_auto("
-                    f"'{self.root_dir}/{test_suite_name}/{run_name}/run.json',"
-                    f"timestampformat='{TIMESTAMP_FORMAT}')))"
-                )
-                .df()
-                .to_dict("records")
+        )
+        suite_data = PaginatedTestSuite.parse_file(
+            self.root_dir / test_suite_name / "suite.json"
+        )
+        run_results = []
+        for i, test_case in enumerate(run_data.test_cases):
+            run_result = RunResult(
+                id=test_case.id,
+                output=test_case.output,
+                score=test_case.score,
+                score_result=test_case.score_result,
+                input=suite_data.test_cases[i].input,
+                reference_output=suite_data.test_cases[i].reference_output,
             )
-        except duckdb.IOException:
-            cases = []
-
-        run_results = [RunResult.parse_obj(r) for r in cases]
+            run_results.append(run_result)
 
         pagination = _paginate(run_results, page, page_size, sort_key=sort)
         return PaginatedRun(
             id=uuid.UUID(test_run_id),
             name=run_name,
-            created_at=created_at,
-            updated_at=created_at,
+            created_at=run_data.created_at,
+            updated_at=run_data.created_at,
             test_case_runs=pagination.sorted_pages[pagination.start : pagination.end],
             test_suite_id=uuid.UUID(test_suite_id),
             page=pagination.page,
