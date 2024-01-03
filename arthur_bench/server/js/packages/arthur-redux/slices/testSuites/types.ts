@@ -94,9 +94,17 @@ export type TestRunCase = {
     input: string;
     output: string;
     reference_output?: string;
-    score?: number;
+    score_result?: ScoreResult;
     label?: string;
     details?: Record<string, { label?: string; score?: number }>;
+};
+
+export type ScoreResult = {
+    score: number,
+    category?: {
+        name: string,
+        description?: string
+    }
 };
 
 export type TTestRun = {
