@@ -1,6 +1,6 @@
 import uuid
-from typing import Optional, List
-from arthur_bench.models.models import CreateRunRequest
+from typing import Optional, List, Union
+from arthur_bench.models.models import CreateRunRequest, TestCaseOutput, ScoreResult
 from arthur_bench.client.bench_client import BenchClient
 from arthur_bench.exceptions import ArthurUserError
 
@@ -39,3 +39,48 @@ class TestRun(CreateRunRequest):
         )
         self.id = resp.id
         return self.id
+
+    @classmethod
+    def from_flattened(
+        cls,
+        run_name: str,
+        ids: List[uuid.UUID],
+        candidate_output_list: List[str],
+        scores: Union[List[float], List[ScoreResult]],
+        client: BenchClient,
+        test_suite_id: uuid.UUID,
+        model_name: Optional[str] = None,
+        model_version: Optional[str] = None,
+        foundation_model: Optional[str] = None,
+        prompt_template: Optional[str] = None,
+    ):
+        test_case_outputs = []
+        for i, result in enumerate(scores):
+            # temporary hack until score field is fully deprecated
+            score: Optional[float] = (
+                result if isinstance(result, float) else result.score  # type: ignore
+            )
+            # we can't properly type this in python3.9. In 3.10 we can switch to
+            # https://github.com/python/mypy/issues/11934#issuecomment-1008295539
+            score_result: ScoreResult = (
+                ScoreResult(score=result) if isinstance(result, float) else result  # type: ignore # noqa
+            )  # type: ignore
+            test_case_outputs.append(
+                TestCaseOutput(
+                    id=ids[i],
+                    output=candidate_output_list[i],
+                    score=score,
+                    score_result=score_result,
+                )
+            )
+
+        return cls(
+            name=run_name,
+            test_case_outputs=test_case_outputs,
+            model_name=model_name,
+            model_version=model_version,
+            foundation_model=foundation_model,
+            prompt_template=prompt_template,
+            test_suite_id=test_suite_id,
+            client=client,
+        )

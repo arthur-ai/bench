@@ -21,6 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 SINGLE_ITEM_BATCH_DEFAULT = 1
+ASYNC_BATCH_DEFAULT = 5
 
 
 TScorer = TypeVar("TScorer", bound="Scorer")
@@ -146,7 +147,6 @@ class Scorer(ABC):
 
         return all_scores
 
-    @abstractmethod
     async def arun_batch(
         self,
         candidate_batch: List[str],
@@ -165,7 +165,7 @@ class Scorer(ABC):
         reference_outputs: Optional[List[str]] = None,
         inputs: Optional[List[str]] = None,
         contexts: Optional[List[str]] = None,
-        batch_size: int = SINGLE_ITEM_BATCH_DEFAULT,
+        batch_size: int = ASYNC_BATCH_DEFAULT,
     ) -> Union[List[float], List[ScoreResult]]:
         """
         Async version of run method.
