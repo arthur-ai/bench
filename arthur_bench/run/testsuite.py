@@ -187,7 +187,6 @@ class TestSuite:
                     break
                 else:
                     ref_outputs.append(case.reference_output)
-        # TODO: make separate object?
         return candidate_output_list, inputs, ids, ref_outputs, context_list
 
     async def arun(
