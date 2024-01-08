@@ -59,6 +59,15 @@ class MockScoringMethod(Scorer):
     ) -> List[float]:
         return [0.9, 0.7]
 
+    async def arun_batch(
+        self,
+        reference_batch: List[str],
+        candidate_batch: List[str],
+        input_text_batch: Optional[List[str]] = None,
+        context_batch: Optional[List[str]] = None,
+    ) -> List[float]:
+        return [0.9, 0.7]
+
 
 class CustomScorer(Scorer):
     def __init__(self, custom_name="param_name"):
@@ -69,6 +78,15 @@ class CustomScorer(Scorer):
         return "test_custom_scorer"
 
     def run_batch(
+        self,
+        reference_batch: List[str],
+        candidate_batch: List[str],
+        input_text_batch: Optional[List[str]] = None,
+        context_batch: Optional[List[str]] = None,
+    ) -> List[float]:
+        return [0.5 for _ in range(len(reference_batch))]
+
+    async def arun_batch(
         self,
         reference_batch: List[str],
         candidate_batch: List[str],

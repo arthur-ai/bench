@@ -1,14 +1,13 @@
 import logging
 import pandas as pd
-from typing import List, Optional, Union
+import uuid
+from typing import List, Optional, Union, Tuple
 from arthur_bench.scoring import Scorer
 from arthur_bench.models.models import (
     TestSuiteRequest,
     PaginatedTestSuite,
-    TestCaseOutput,
     ScoringMethodType,
     TestCaseResponse,
-    ScoreResult,
 )
 from arthur_bench.exceptions import (
     UserValueError,
@@ -22,7 +21,7 @@ from arthur_bench.run.utils import (
     _initialize_scorer,
 )
 
-from arthur_bench.scoring.scorer import SINGLE_ITEM_BATCH_DEFAULT
+from arthur_bench.scoring.scorer import SINGLE_ITEM_BATCH_DEFAULT, ASYNC_BATCH_DEFAULT
 
 
 logger = logging.getLogger(__name__)
@@ -143,6 +142,108 @@ class TestSuite:
     def scoring_method(self) -> str:
         return self.scorer.name()
 
+    def _pre_run(
+        self,
+        run_name: str,
+        candidate_data: Optional[pd.DataFrame] = None,
+        candidate_data_path: Optional[str] = None,
+        candidate_column: str = "candidate_output",
+        candidate_output_list: Optional[List[str]] = None,
+        context_column: Optional[str] = None,
+        context_list: Optional[List[str]] = None,
+    ) -> Tuple[
+        List[str], List[str], List[uuid.UUID], Optional[List[str]], Optional[List[str]]
+    ]:
+        if self.client.check_run_exists(str(self._data.id), run_name):
+            raise UserValueError(
+                f"A test run with the name {run_name} already exists. "
+                "Give this test run a unique name and re-run."
+            )
+
+        candidate_output_list, context_list = _load_run_data_from_args(
+            candidate_data=candidate_data,
+            candidate_data_path=candidate_data_path,
+            candidate_column=candidate_column,
+            candidate_output_list=candidate_output_list,
+            context_column=context_column,
+            context_list=context_list,
+        )
+
+        if len(candidate_output_list) != len(self.test_cases):
+            raise UserValueError(
+                f"candidate data has {len(candidate_output_list)} tests but "
+                f"expected {len(self.test_cases)} tests"
+            )
+
+        inputs = self.input_texts
+        ids = [case.id for case in self.test_cases]
+        # ref outputs should be None if any items are None (we validate nullness must be
+        #  all-or-none)
+        ref_outputs: Optional[List[str]] = []
+        if ref_outputs is not None:
+            for case in self.test_cases:
+                if case.reference_output is None:
+                    ref_outputs = None
+                    break
+                else:
+                    ref_outputs.append(case.reference_output)
+        return candidate_output_list, inputs, ids, ref_outputs, context_list
+
+    async def arun(
+        self,
+        run_name: str,
+        candidate_data: Optional[pd.DataFrame] = None,
+        candidate_data_path: Optional[str] = None,
+        candidate_column: str = "candidate_output",
+        candidate_output_list: Optional[List[str]] = None,
+        context_column: Optional[str] = None,
+        context_list: Optional[List[str]] = None,
+        save: bool = True,
+        batch_size: int = ASYNC_BATCH_DEFAULT,
+        model_name: Optional[str] = None,
+        model_version: Optional[str] = None,
+        foundation_model: Optional[str] = None,
+        prompt_template: Optional[str] = None,
+    ) -> TestRun:
+        candidate_output_list, inputs, ids, ref_outputs, context_list = self._pre_run(
+            run_name=run_name,
+            candidate_data=candidate_data,
+            candidate_data_path=candidate_data_path,
+            candidate_column=candidate_column,
+            candidate_output_list=candidate_output_list,
+            context_column=context_column,
+            context_list=context_list,
+        )
+        try:
+            all_scores = await self.scorer.arun(
+                candidate_outputs=candidate_output_list,
+                reference_outputs=ref_outputs,
+                inputs=inputs,
+                contexts=context_list,
+                batch_size=batch_size,
+            )
+        except Exception as e:
+            logger.error(f"failed to create run: {e}")
+            raise ArthurInternalError(f"failed to create run {run_name}") from e
+
+        run = TestRun.from_flattened(
+            run_name=run_name,
+            ids=ids,
+            candidate_output_list=candidate_output_list,
+            scores=all_scores,
+            model_name=model_name,
+            model_version=model_version,
+            foundation_model=foundation_model,
+            prompt_template=prompt_template,
+            test_suite_id=self._data.id,
+            client=self.client,
+        )
+
+        if save:
+            run.save()
+
+        return run
+
     def run(
         self,
         run_name: str,
@@ -183,15 +284,8 @@ class TestSuite:
         :returns: TestRun object containing scored outputs
         """
 
-        # make sure no existing test run named run_name is already attached to this
-        #  suite
-        if self.client.check_run_exists(str(self._data.id), run_name):
-            raise UserValueError(
-                f"A test run with the name {run_name} already exists. "
-                "Give this test run a unique name and re-run."
-            )
-
-        candidate_output_list, context_list = _load_run_data_from_args(
+        candidate_output_list, inputs, ids, ref_outputs, context_list = self._pre_run(
+            run_name=run_name,
             candidate_data=candidate_data,
             candidate_data_path=candidate_data_path,
             candidate_column=candidate_column,
@@ -200,24 +294,6 @@ class TestSuite:
             context_list=context_list,
         )
 
-        if len(candidate_output_list) != len(self.test_cases):
-            raise UserValueError(
-                f"candidate data has {len(candidate_output_list)} tests but "
-                f"expected {len(self.test_cases)} tests"
-            )
-
-        inputs = self.input_texts
-        ids = [case.id for case in self.test_cases]
-        # ref outputs should be None if any items are None (we validate nullness must be
-        #  all-or-none)
-        ref_outputs: Optional[List[str]] = []
-        if ref_outputs is not None:
-            for case in self.test_cases:
-                if case.reference_output is None:
-                    ref_outputs = None
-                    break
-                else:
-                    ref_outputs.append(case.reference_output)
         try:
             all_scores = self.scorer.run(
                 candidate_output_list,
@@ -230,29 +306,11 @@ class TestSuite:
             logger.error(f"failed to create run: {e}")
             raise ArthurInternalError(f"failed to create run {run_name}") from e
 
-        test_case_outputs = []
-        for i, result in enumerate(all_scores):
-            # temporary hack until score field is fully deprecated
-            score: Optional[float] = (
-                result if isinstance(result, float) else result.score  # type: ignore
-            )
-            # we can't properly type this in python3.9. In 3.10 we can switch to
-            # https://github.com/python/mypy/issues/11934#issuecomment-1008295539
-            score_result: ScoreResult = (
-                ScoreResult(score=result) if isinstance(result, float) else result  # type: ignore # noqa
-            )  # type: ignore
-            test_case_outputs.append(
-                TestCaseOutput(
-                    id=ids[i],
-                    output=candidate_output_list[i],
-                    score=score,
-                    score_result=score_result,
-                )
-            )
-
-        run = TestRun(
-            name=run_name,
-            test_case_outputs=test_case_outputs,
+        run = TestRun.from_flattened(
+            run_name=run_name,
+            ids=ids,
+            candidate_output_list=candidate_output_list,
+            scores=all_scores,
             model_name=model_name,
             model_version=model_version,
             foundation_model=foundation_model,
