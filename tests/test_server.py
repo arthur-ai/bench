@@ -2,6 +2,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from arthur_bench.server.run_server import app
+from arthur_bench.models.models import TestSuiteSortEnum
 from tests.helpers import get_mock_client
 from tests.fixtures.mock_responses import (
     MOCK_SUITES_JSON,
@@ -39,7 +40,7 @@ def test_get_test_suites_with_filters(mock_client):
     mock_client.app.state.client.get_test_suites.assert_called_once_with(
         page=1,
         page_size=5,
-        sort=None,
+        sort=TestSuiteSortEnum.LAST_RUNTIME_ASC,
         scoring_method=["bertscore", "custom"],
         name=None,
     )

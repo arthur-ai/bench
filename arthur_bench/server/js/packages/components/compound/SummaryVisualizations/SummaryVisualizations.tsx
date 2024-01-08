@@ -4,7 +4,7 @@ import RunDistributions from "./RunDistributions";
 import { useFela } from "react-fela";
 import styles from "./styles";
 import { useSelector } from "react-redux";
-import { State } from "arthur-redux";
+import { State } from "../../../arthur-redux/index";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import CategoricalDistribution from "./CategoricalDistribution";

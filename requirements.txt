@@ -12,7 +12,6 @@ cycler==0.12.1
 dataclasses-json==0.6.3
 datasets==2.16.1
 dill==0.3.7
-duckdb==0.8.1
 evaluate==0.4.1
 exceptiongroup==1.2.0
 filelock==3.13.1
@@ -44,10 +43,10 @@ mypy-extensions==1.0.0
 networkx==3.2.1
 nltk==3.8.1
 numpy==1.26.3
-openai==0.27.0
 packaging==23.2
 pandas==2.0.3
 pillow==10.2.0
+openai==0.28.1
 pyarrow==14.0.2
 pyarrow-hotfix==0.6
 pydantic==1.10.13
