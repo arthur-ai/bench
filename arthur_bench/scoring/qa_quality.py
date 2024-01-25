@@ -1,5 +1,5 @@
 import logging
-from typing import List, Optional
+from typing import List, Optional, Dict, Any, Union, Tuple
 
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
@@ -59,17 +59,20 @@ class QAQualityCorrectness(Scorer):
     def to_dict(self, warn=False):
         return {}
 
-    def run_batch(
-        self,
+    def _parse_response(self, response: Dict[str, Any]) -> ScoreResult:
+        llmchoice = response["text"]
+        if llmchoice not in ["0", "1", "NA"]:
+            llmchoice = "-1"
+        llmchoice = {"0": 0.0, "1": 1.0, "NA": -1.0, "-1": -1.0}[llmchoice]
+        return ScoreResult(score=llmchoice, category=self.categories()[int(llmchoice)])
+
+    @staticmethod
+    def validate_batch(
         candidate_batch: List[str],
         reference_batch: Optional[List[str]] = None,
         input_text_batch: Optional[List[str]] = None,
         context_batch: Optional[List[str]] = None,
-    ) -> List[ScoreResult]:
-        """
-        Reference batch is not used for this scoring method, QA correctness requires an
-        input_text_batch and context_batch
-        """
+    ) -> Tuple[List[str], List[str]]:
         if input_text_batch is None:
             raise UserValueError(
                 "input text is required for this scoring method. Please provide a "
@@ -82,6 +85,47 @@ class QAQualityCorrectness(Scorer):
                 "dataframe column or a list of your context strings in the Test Suite."
             )
 
+    async def arun_batch(
+        self,
+        candidate_batch: List[str],
+        reference_batch: Optional[List[str]] = None,
+        input_text_batch: Optional[List[str]] = None,
+        context_batch: Optional[List[str]] = None,
+    ) -> Union[List[float], List[ScoreResult]]:
+        """
+        Reference batch is not used for this scoring method, QA correctness requires an
+        input_text_batch and context_batch
+        """
+        input_text_batch, context_batch = self.validate_batch(
+            candidate_batch, reference_batch, input_text_batch, context_batch
+        )
+        res = []
+        for i in range(len(input_text_batch)):
+            llmchoice = self.evaluator.acall(
+                {
+                    "question": input_text_batch[i],
+                    "context": context_batch[i],
+                    "answer": candidate_batch[i],
+                }
+            )
+            res.append(self._parse_response(llmchoice))
+        return res
+
+    def run_batch(
+        self,
+        candidate_batch: List[str],
+        reference_batch: Optional[List[str]] = None,
+        input_text_batch: Optional[List[str]] = None,
+        context_batch: Optional[List[str]] = None,
+    ) -> List[ScoreResult]:
+        """
+        Reference batch is not used for this scoring method, QA correctness requires an
+        input_text_batch and context_batch
+        """
+        input_text_batch, context_batch = self.validate_batch(
+            candidate_batch, reference_batch, input_text_batch, context_batch
+        )
+
         res = []
         for i in range(len(input_text_batch)):
             llmchoice = self.evaluator(
@@ -90,11 +134,6 @@ class QAQualityCorrectness(Scorer):
                     "context": context_batch[i],
                     "answer": candidate_batch[i],
                 }
-            )["text"]
-            if llmchoice not in ["0", "1", "NA"]:
-                llmchoice = "-1"
-            llmchoice = {"0": 0.0, "1": 1.0, "NA": -1.0, "-1": -1.0}[llmchoice]
-            res.append(
-                ScoreResult(score=llmchoice, category=self.categories()[int(llmchoice)])
             )
+            res.append(self._parse_response(llmchoice))
         return res
