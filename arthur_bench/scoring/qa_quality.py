@@ -84,6 +84,7 @@ class QAQualityCorrectness(Scorer):
                 "context is required for this scoring method. Please provide a "
                 "dataframe column or a list of your context strings in the Test Suite."
             )
+        return input_text_batch, context_batch
 
     async def arun_batch(
         self,
