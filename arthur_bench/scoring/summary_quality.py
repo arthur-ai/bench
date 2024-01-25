@@ -2,7 +2,6 @@ import logging
 import tiktoken
 from tiktoken.core import Encoding
 from typing import Any, List, Optional, Tuple, Union, Dict
-from typing_extensions import TypeGuard
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 from langchain.chat_models.base import BaseChatModel
