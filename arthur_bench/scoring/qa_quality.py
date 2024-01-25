@@ -101,7 +101,7 @@ class QAQualityCorrectness(Scorer):
         )
         res = []
         for i in range(len(input_text_batch)):
-            llmchoice = self.evaluator.acall(
+            llmchoice = await self.evaluator.acall(
                 {
                     "question": input_text_batch[i],
                     "context": context_batch[i],

@@ -186,8 +186,7 @@ class SummaryQuality(Scorer):
             candidate_outputs, reference_outputs, truncated_inputs, contexts, batch_size
         )
 
-    @staticmethod
-    def _parse_response(response: Dict[str, Any]) -> ScoreResult:
+    def _parse_response(self, response: Dict[str, Any]) -> ScoreResult:
         score = None
         if "text" in response:
             llmchoice = response["text"][:3]

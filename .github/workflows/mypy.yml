@@ -29,4 +29,4 @@ jobs:
     - name: mypy
       run: |
         mkdir .mypy_cache -p
-        mypy arthur_bench --ignore-missing-imports --install-types --non-interactive
+        mypy arthur_bench --ignore-missing-imports --install-types --non-interactive --namespace-packages
