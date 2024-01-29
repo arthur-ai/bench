@@ -275,9 +275,11 @@ class Scorer(ABC):
         return ScoringMethod(
             name=self.name(),
             type=self.type(),
-            output_type=ScorerOutputType.Categorical
-            if self.is_categorical()
-            else ScorerOutputType.Continuous,
+            output_type=(
+                ScorerOutputType.Categorical
+                if self.is_categorical()
+                else ScorerOutputType.Continuous
+            ),
             categories=self.categories(),
             config=self.to_dict(warn=True),
         )
