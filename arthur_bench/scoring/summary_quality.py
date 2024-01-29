@@ -187,24 +187,15 @@ class SummaryQuality(Scorer):
         )
 
     def _parse_response(self, response: Dict[str, Any]) -> ScoreResult:
-        score = None
-        if "text" in response:
-            llmchoice = response["text"][:3]
-            score = LLM_CHOICE_TO_FLOAT.get(llmchoice)
-            if score is not None:
-                result = ScoreResult(
-                    score=score,
-                    category=LLM_CHOICE_TO_CATEGORIES.get(
-                        llmchoice, LLM_CHOICE_TO_CATEGORIES["default"]
-                    ),
-                )
+        llmchoice = response["text"][:3] if "text" in response else None
 
-        # return -1.0 if the LLMChain returns an invalid result
-        if score is None:
-            result = ScoreResult(
-                score=-1.0, category=LLM_CHOICE_TO_CATEGORIES["default"]
+        if llmchoice in LLM_CHOICE_TO_FLOAT:
+            return ScoreResult(
+                score=LLM_CHOICE_TO_FLOAT[llmchoice],
+                category=LLM_CHOICE_TO_CATEGORIES[llmchoice],
             )
-        return result
+        else:
+            return ScoreResult(score=-1.0, category=LLM_CHOICE_TO_CATEGORIES["default"])
 
     @staticmethod
     def validate_batch(

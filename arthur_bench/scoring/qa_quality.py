@@ -84,6 +84,11 @@ class QAQualityCorrectness(Scorer):
                 "context is required for this scoring method. Please provide a "
                 "dataframe column or a list of your context strings in the Test Suite."
             )
+
+        if reference_batch is not None:
+            raise UserValueError(
+                "using reference is not currently supported for qa correctness"
+            )
         return input_text_batch, context_batch
 
     async def arun_batch(
