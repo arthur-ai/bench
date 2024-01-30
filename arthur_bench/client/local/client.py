@@ -53,15 +53,15 @@ DEFAULT_PAGE_SIZE = 5
 NUM_BINS = 20
 
 SORT_QUERY_TO_FUNC = {
-    TestSuiteSortEnum.LAST_RUNTIME_ASC: lambda x: x.last_run_time
-    if x.last_run_time is not None
-    else x.created_at,
+    TestSuiteSortEnum.LAST_RUNTIME_ASC: lambda x: (
+        x.last_run_time if x.last_run_time is not None else x.created_at
+    ),
     CommonSortEnum.NAME_ASC: lambda x: x.name,
     CommonSortEnum.CREATED_AT_ASC: lambda x: x.created_at,
     TestRunSortEnum.AVG_SCORE_ASC: lambda x: x.avg_score,
-    TestSuiteSortEnum.LAST_RUNTIME_DESC: lambda x: x.last_run_time
-    if x.last_run_time is not None
-    else x.created_at,
+    TestSuiteSortEnum.LAST_RUNTIME_DESC: lambda x: (
+        x.last_run_time if x.last_run_time is not None else x.created_at
+    ),
     CommonSortEnum.NAME_DESC: lambda x: x.name,
     CommonSortEnum.CREATED_AT_DESC: lambda x: x.created_at,
     TestRunSortEnum.AVG_SCORE_DESC: lambda x: x.avg_score,

@@ -2,9 +2,9 @@
 from evaluate import load
 import os
 
-os.environ[
-    "HF_ALLOW_CODE_EVAL"
-] = "1"  # required for executing code using the HuggingFace code_eval metric
+os.environ["HF_ALLOW_CODE_EVAL"] = (
+    "1"  # required for executing code using the HuggingFace code_eval metric
+)
 from typing import List, Optional
 from tqdm import tqdm
 

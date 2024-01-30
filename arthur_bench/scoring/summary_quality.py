@@ -1,7 +1,7 @@
 import logging
 import tiktoken
 from tiktoken.core import Encoding
-from typing import List, Optional, Tuple, Union
+from typing import Any, List, Optional, Tuple, Union, Dict
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 from langchain.chat_models.base import BaseChatModel
@@ -9,7 +9,7 @@ from langchain.chat_models.base import BaseChatModel
 from arthur_bench.exceptions import UserValueError, UserTypeError
 
 from arthur_bench.scoring import Scorer
-from arthur_bench.scoring.scorer import SINGLE_ITEM_BATCH_DEFAULT
+from arthur_bench.scoring.scorer import SINGLE_ITEM_BATCH_DEFAULT, ASYNC_BATCH_DEFAULT
 from arthur_bench.scoring.prompts.summary_quality import COMPARE
 from arthur_bench.models.models import Category, ScoreResult
 
@@ -114,23 +114,7 @@ class SummaryQuality(Scorer):
     def to_dict(self, warn=False):
         return {}
 
-    def run(
-        self,
-        candidate_outputs: List[str],
-        reference_outputs: Optional[List[str]] = None,
-        inputs: Optional[List[str]] = None,
-        contexts: Optional[List[str]] = None,
-        batch_size: int = SINGLE_ITEM_BATCH_DEFAULT,
-    ) -> Union[List[ScoreResult], List[float]]:
-        if inputs is None:
-            raise TypeError(
-                "Inputs must be provided for Summary Quality scorer, got None"
-            )
-        if reference_outputs is None:
-            raise TypeError(
-                "Reference Outputs must be provided for Summary Quality scorer, "
-                "got None"
-            )
+    def _truncate_inputs(self, inputs, reference_outputs, candidate_outputs):
         # truncate inputs if needed
         truncated_inputs = []
         num_truncated = 0
@@ -152,21 +136,74 @@ class SummaryQuality(Scorer):
                 f"Truncated {num_truncated} out of {len(inputs)} total summary inputs "
                 f"to {self.context_window} characters"
             )
+        return truncated_inputs
+
+    async def arun(
+        self,
+        candidate_outputs: List[str],
+        reference_outputs: Optional[List[str]] = None,
+        inputs: Optional[List[str]] = None,
+        contexts: Optional[List[str]] = None,
+        batch_size: int = ASYNC_BATCH_DEFAULT,
+    ) -> Union[List[float], List[ScoreResult]]:
+        if inputs is None:
+            raise UserValueError(
+                "input text is required for this scorer. Please provide a dataframe "
+                "column or a list of your "
+                "input text strings in the Test Suite."
+            )
+        if reference_outputs is None:
+            raise UserTypeError(
+                "Reference Outputs must be provided for Summary Quality scorer. Please "
+                "provide reference outputs to the test suite"
+            )
+
+        if contexts is not None:
+            raise UserValueError(
+                "using context is not currently supported for summary quality"
+            )
+        truncated_inputs = self._truncate_inputs(
+            inputs, reference_outputs, candidate_outputs
+        )
+
+        return await super().arun(
+            candidate_outputs, reference_outputs, truncated_inputs, contexts, batch_size
+        )
+
+    def run(
+        self,
+        candidate_outputs: List[str],
+        reference_outputs: Optional[List[str]] = None,
+        inputs: Optional[List[str]] = None,
+        contexts: Optional[List[str]] = None,
+        batch_size: int = SINGLE_ITEM_BATCH_DEFAULT,
+    ) -> Union[List[ScoreResult], List[float]]:
+        truncated_inputs = self._truncate_inputs(
+            inputs, reference_outputs, candidate_outputs
+        )
 
         return super().run(
             candidate_outputs, reference_outputs, truncated_inputs, contexts, batch_size
         )
 
-    def run_batch(
-        self,
+    def _parse_response(self, response: Dict[str, Any]) -> ScoreResult:
+        llmchoice = response["text"][:3] if "text" in response else None
+
+        if llmchoice in LLM_CHOICE_TO_FLOAT:
+            return ScoreResult(
+                score=LLM_CHOICE_TO_FLOAT[llmchoice],
+                category=LLM_CHOICE_TO_CATEGORIES[llmchoice],
+            )
+        else:
+            return ScoreResult(score=-1.0, category=LLM_CHOICE_TO_CATEGORIES["default"])
+
+    @staticmethod
+    def validate_batch(
         candidate_batch: List[str],
         reference_batch: Optional[List[str]] = None,
         input_text_batch: Optional[List[str]] = None,
         context_batch: Optional[List[str]] = None,
-    ) -> List[ScoreResult]:
-        """
-        Summary quality requires input_text_batch.
-        """
+    ) -> Tuple[List[str], List[str]]:
         if input_text_batch is None:
             raise UserValueError(
                 "input text is required for this scorer. Please provide a dataframe "
@@ -183,7 +220,51 @@ class SummaryQuality(Scorer):
             raise UserValueError(
                 "using context is not currently supported for summary quality"
             )
+        return input_text_batch, reference_batch
 
+    async def arun_batch(
+        self,
+        candidate_batch: List[str],
+        reference_batch: Optional[List[str]] = None,
+        input_text_batch: Optional[List[str]] = None,
+        context_batch: Optional[List[str]] = None,
+    ) -> Union[List[float], List[ScoreResult]]:
+        """
+        Summary quality requires input_text_batch. Asynchronous implementation
+        """
+        input_text_batch, reference_batch = self.validate_batch(
+            candidate_batch, reference_batch, input_text_batch, context_batch
+        )
+        res = []
+        for i in range(len(input_text_batch)):
+            # run LLMChain to choose whether summary A or summary B is a better summary
+            # of the input text
+
+            choice = await self.evaluator.acall(
+                {
+                    "text": input_text_batch[i],
+                    "summary_A": reference_batch[i],
+                    "summary_B": candidate_batch[i],
+                }
+            )
+
+            res.append(self._parse_response(choice))
+
+        return res
+
+    def run_batch(
+        self,
+        candidate_batch: List[str],
+        reference_batch: Optional[List[str]] = None,
+        input_text_batch: Optional[List[str]] = None,
+        context_batch: Optional[List[str]] = None,
+    ) -> List[ScoreResult]:
+        """
+        Summary quality requires input_text_batch.
+        """
+        input_text_batch, reference_batch = self.validate_batch(
+            candidate_batch, reference_batch, input_text_batch, context_batch
+        )
         res = []
         for i in range(len(input_text_batch)):
             # run LLMChain to choose whether summary A or summary B is a better summary
@@ -197,24 +278,5 @@ class SummaryQuality(Scorer):
                 }
             )
 
-            # return -1.0 if the LLMChain returns an invalid result
-            score = None
-            if "text" in choice:
-                llmchoice = choice["text"][:3]
-                score = LLM_CHOICE_TO_FLOAT.get(llmchoice)
-                if score is not None:
-                    res.append(
-                        ScoreResult(
-                            score=score,
-                            category=LLM_CHOICE_TO_CATEGORIES.get(
-                                llmchoice, LLM_CHOICE_TO_CATEGORIES["default"]
-                            ),
-                        )
-                    )
-            if score is None:
-                res.append(
-                    ScoreResult(
-                        score=-1.0, category=LLM_CHOICE_TO_CATEGORIES["default"]
-                    )
-                )
+            res.append(self._parse_response(choice))
         return res
