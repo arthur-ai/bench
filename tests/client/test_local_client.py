@@ -4,6 +4,7 @@ from unittest import mock
 from pathlib import Path
 from arthur_bench.client.fs import LocalBenchClient
 from arthur_bench.client.fs.local_client import _summarize_run
+from arthur_bench.client.fs.local_fs_client import LocalFSClientConfig
 from arthur_bench.exceptions import UserValueError, NotFoundError
 from arthur_bench.models.models import PaginatedTestSuite
 
@@ -59,13 +60,15 @@ def bench_temp_dir_with_runs(tmpdir_factory):
 
 
 def test_get_test_suites_empty(bench_temp_dir_empty):
-    client = LocalBenchClient(bench_temp_dir_empty)
+    conf = LocalFSClientConfig(root_dir=bench_temp_dir_empty)
+    client = LocalBenchClient(conf)
     suites = client.get_test_suites()
     assert suites == MOCK_NO_SUITES
 
 
 def test_get_test_suite_empty(bench_temp_dir_empty):
-    client = LocalBenchClient(bench_temp_dir_empty)
+    conf = LocalFSClientConfig(root_dir=bench_temp_dir_empty)
+    client = LocalBenchClient(conf)
     with pytest.raises(NotFoundError):
         _ = client.get_test_suite(SUITE_NOT_FOUND)
 
@@ -78,7 +81,8 @@ def test_get_test_suite_empty(bench_temp_dir_empty):
     ],
 )
 def test_create_test_suite(bench_temp_dir_empty, req, expected_response):
-    client = LocalBenchClient(bench_temp_dir_empty)
+    conf = LocalFSClientConfig(root_dir=bench_temp_dir_empty)
+    client = LocalBenchClient(conf)
     resp = client.create_test_suite(req)
     assert_test_suite_equal(resp, expected_response)
 
@@ -93,7 +97,8 @@ def test_create_test_suite(bench_temp_dir_empty, req, expected_response):
 
 
 def test_create_test_suite_exists(bench_temp_dir_with_suites):
-    client = LocalBenchClient(bench_temp_dir_with_suites)
+    conf = LocalFSClientConfig(root_dir=bench_temp_dir_with_suites)
+    client = LocalBenchClient(conf)
     with pytest.raises(expected_exception=UserValueError):
         _ = client.create_test_suite(MOCK_SUITE)
 
@@ -118,36 +123,42 @@ def test_create_test_suite_exists(bench_temp_dir_with_suites):
     ],
 )
 def test_get_test_suites(bench_temp_dir_with_suites, req, expected_response):
-    client = LocalBenchClient(bench_temp_dir_with_suites)
+    conf = LocalFSClientConfig(root_dir=bench_temp_dir_with_suites)
+    client = LocalBenchClient(conf)
     resp = client.get_test_suites(**req)
     assert resp == expected_response
 
 
 def test_get_test_suite_by_id(bench_temp_dir_with_suites):
-    client = LocalBenchClient(bench_temp_dir_with_suites)
+    conf = LocalFSClientConfig(root_dir=bench_temp_dir_with_suites)
+    client = LocalBenchClient(conf)
     resp = client.get_test_suite(SUITE_EXISTS)
     assert resp == MOCK_SUITE_RESPONSE_WITH_PAGES
 
 
 def test_get_test_suite_by_id_not_found(bench_temp_dir_with_suites):
-    client = LocalBenchClient(bench_temp_dir_with_suites)
+    conf = LocalFSClientConfig(root_dir=bench_temp_dir_with_suites)
+    client = LocalBenchClient(conf)
     with pytest.raises(NotFoundError):
         _ = client.get_test_suite(SUITE_NOT_FOUND)
 
 
 def test_get_suite_if_exists(bench_temp_dir_with_suites):
-    client = LocalBenchClient(bench_temp_dir_with_suites)
+    conf = LocalFSClientConfig(root_dir=bench_temp_dir_with_suites)
+    client = LocalBenchClient(conf)
     resp = client.get_suite_if_exists("test_suite")
     assert_test_suite_equal(resp, MOCK_SUITE_RESPONSE, check_page=False)
 
 
 def test_get_suite_if_exists_not_found(bench_temp_dir_with_suites):
-    client = LocalBenchClient(bench_temp_dir_with_suites)
+    conf = LocalFSClientConfig(root_dir=bench_temp_dir_with_suites)
+    client = LocalBenchClient(conf)
     assert client.get_suite_if_exists("invalid name") == None
 
 
 def test_create_test_run(bench_temp_dir_with_suites):
-    client = LocalBenchClient(bench_temp_dir_with_suites)
+    conf = LocalFSClientConfig(root_dir=bench_temp_dir_with_suites)
+    client = LocalBenchClient(conf)
     _ = client.create_new_test_run(SUITE_EXISTS, MOCK_RUN)
 
     bench_root = Path(bench_temp_dir_with_suites)
@@ -162,7 +173,8 @@ def test_create_test_run(bench_temp_dir_with_suites):
 
 
 def test_get_runs_for_suite(bench_temp_dir_with_runs):
-    client = LocalBenchClient(bench_temp_dir_with_runs)
+    conf = LocalFSClientConfig(root_dir=bench_temp_dir_with_runs)
+    client = LocalBenchClient(conf)
     resp = client.get_runs_for_test_suite(SUITE_EXISTS)
     assert resp == MOCK_RUNS_RESPONSE
 
@@ -180,7 +192,8 @@ def create_test_run_suite_not_found(bench_temp_dir_with_runs):
 
 
 def test_check_run_exists(bench_temp_dir_with_runs):
-    client = LocalBenchClient(bench_temp_dir_with_runs)
+    conf = LocalFSClientConfig(root_dir=bench_temp_dir_with_runs)
+    client = LocalBenchClient(conf)
     assert client.check_run_exists(SUITE_EXISTS, "test_run") == True
     assert client.check_run_exists(SUITE_EXISTS, "invalid run") == False
 
@@ -190,7 +203,8 @@ def test_get_summary_statistics(bench_temp_dir_with_runs):
         "arthur_bench.client.fs.local_client._summarize_run",
         mock_summarize,
     ):
-        client = LocalBenchClient(bench_temp_dir_with_runs)
+        conf = LocalFSClientConfig(root_dir=bench_temp_dir_with_runs)
+        client = LocalBenchClient(conf)
         resp = client.get_summary_statistics(SUITE_EXISTS)
         assert resp == MOCK_SUMMARY_RESPONSE
         resp = client.get_summary_statistics(SUITE_EXISTS, run_ids=["does_not_exist"])

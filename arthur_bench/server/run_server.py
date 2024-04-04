@@ -6,6 +6,7 @@ from pathlib import Path
 import uuid
 from typing import Optional, Annotated, List, Union
 
+from arthur_bench.client.fs.local_fs_client import LocalFSClientConfig
 from .spa_static_files import SPAStaticFiles
 
 try:
@@ -222,7 +223,9 @@ def run():
         persist_usage_data(False)
         return
 
-    client = LocalBenchClient(args.directory)
+    # TODO(zfry): think about how to do this better
+    conf = LocalFSClientConfig(root_dir=args.directory)
+    client = LocalBenchClient(conf)
     app.state.client = client
 
     config = get_or_persist_id()

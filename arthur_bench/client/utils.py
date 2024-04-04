@@ -1,5 +1,6 @@
 import os
 
+from arthur_bench.client.fs.local_fs_client import LocalFSClientConfig
 from arthur_bench.exceptions import UserValueError, MissingParameterError
 from arthur_bench.client.bench_client import BenchClient
 from arthur_bench.client.fs import LocalBenchClient
@@ -17,5 +18,6 @@ def _get_bench_client() -> BenchClient:
                 f"You must provide authentication when using remote url: {e}"
             )
     else:
-        client = LocalBenchClient()
+        conf = LocalFSClientConfig(root_dir=None)
+        client = LocalBenchClient(conf)
     return client

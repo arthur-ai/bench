@@ -1,17 +1,16 @@
-import os
 import getpass
-import numpy as np
-import glob
-import json
+import uuid
+from collections import defaultdict
+from dataclasses import dataclass
 from datetime import datetime
 from math import ceil
 from typing import Optional, Union, List, Dict, Any
-from dataclasses import dataclass
-import uuid
-from pathlib import Path
-from collections import defaultdict
+
+import numpy as np
+
 from arthur_bench.client.bench_client import BenchClient
-from arthur_bench.exceptions import NotFoundError, ArthurError, UserValueError
+from arthur_bench.client.fs.local_fs_client import LocalFSClient
+from arthur_bench.exceptions import NotFoundError, ArthurError
 from arthur_bench.models.models import (
     CreateRunRequest,
     CreateRunResponse,
@@ -39,14 +38,6 @@ from arthur_bench.models.models import (
     TestSuiteSortEnum,
 )
 
-from arthur_bench.utils.loaders import load_suite_from_json, get_file_extension
-
-BENCH_FILE_DIR_KEY = "BENCH_FILE_DIR"
-DEFAULT_BENCH_FILE_DIR = Path(os.getcwd()) / "bench_runs"
-
-SUITE_INDEX_FILE = "suite_id_to_name.json"
-RUN_INDEX_FILE = "run_id_to_name.json"
-
 DEFAULT_PAGE_SIZE = 5
 
 NUM_BINS = 20
@@ -69,8 +60,8 @@ SORT_QUERY_TO_FUNC = {
 }
 
 
-def _bench_root_dir() -> Path:
-    return Path(os.environ.get(BENCH_FILE_DIR_KEY, DEFAULT_BENCH_FILE_DIR))
+def _get_run_name_from_file_path(run_file: str) -> str:
+    return run_file.split("/")[-2]
 
 
 def _initialize_metadata() -> Dict[str, Any]:
@@ -80,17 +71,6 @@ def _initialize_metadata() -> Dict[str, Any]:
         "created_by": getpass.getuser(),
         "updated_at": timestamp,
     }
-
-
-def _load_suite_with_optional_id(
-    filepath: Union[str, os.PathLike]
-) -> Optional[PaginatedTestSuite]:
-    if get_file_extension(filepath) != ".json":
-        raise UserValueError("filepath must be json file")
-    suite = json.load(open(filepath))
-    if "id" in suite:
-        return PaginatedTestSuite.parse_obj(suite)
-    return None
 
 
 def _summarize_run(
@@ -175,105 +155,31 @@ class LocalBenchClient(BenchClient):
     Client for managing local file system test suites and runs
     """
 
-    def __init__(self, root_dir: Optional[Union[str, Path]] = None):
-        if root_dir is None:
-            root_dir = _bench_root_dir()
-
-        # if root dir does not exist, create:
-        if not os.path.exists(root_dir):
-            os.mkdir(root_dir)
-
-        self.root_dir = Path(root_dir)
-        self._write_suite_index()
-
-    def _test_suite_dir(self, test_suite_name: str):
-        return Path(self.root_dir) / test_suite_name
-
-    def _create_test_suite_dir(self, test_suite_name: str) -> Path:
-        test_suite_dir = self._test_suite_dir(test_suite_name)
-        if test_suite_dir.is_dir():
-            raise UserValueError(f"test_suite {test_suite_name} already exists")
-        os.mkdir(test_suite_dir)
-        return test_suite_dir
-
-    def _create_run_dir(self, test_suite_name: str, run_name: str) -> Path:
-        run_dir = self._test_suite_dir(test_suite_name) / run_name
-        if os.path.exists(run_dir):
-            raise UserValueError(f"run {run_name} already exists")
-        os.mkdir(run_dir)
-        return run_dir
-
-    def _get_suite_name_from_id(self, id: str) -> Optional[str]:
-        suite_index = json.load(open(self.root_dir / SUITE_INDEX_FILE))
-        if id not in suite_index:
-            return None
-        return suite_index[id]
-
-    def _get_run_name_from_id(self, test_suite_name: str, id: str) -> Optional[str]:
-        run_index = json.load(open(self.root_dir / test_suite_name / RUN_INDEX_FILE))
-        if id not in run_index:
-            return None
-        return run_index[id]
-
-    def _update_suite_run_time(self, test_suite_name: str, runtime: datetime):
-        suite_file = self.root_dir / test_suite_name / "suite.json"
-        suite = PaginatedTestSuite.parse_file(suite_file)
-        suite.last_run_time = runtime
-        suite.num_runs += 1
-        suite_file.write_text(suite.json())
-
-    def _write_suite_index(self):
-        suite_index_path = self.root_dir / SUITE_INDEX_FILE
-        if suite_index_path.is_file():
-            return
-        json.dump({}, open(suite_index_path, "w"))
-        return None
-
-    def _write_run_index(self, test_suite: str):
-        run_index_path = self.root_dir / test_suite / RUN_INDEX_FILE
-        if run_index_path.is_file():
-            return
-        json.dump({}, open(run_index_path, "w"))
-        return None
-
-    @staticmethod
-    def _update_index(filepath: Path, id: uuid.UUID, name: str):
-        suite_index = json.load(open(filepath))
-        suite_index[str(id)] = name
-        json.dump(suite_index, open(filepath, "w"))
-
-    def _update_suite_index(self, id: uuid.UUID, name: str):
-        suite_index_path = self.root_dir / SUITE_INDEX_FILE
-        LocalBenchClient._update_index(suite_index_path, id, name)
-
-    def _update_run_index(self, test_suite_name: str, id: uuid.UUID, name: str):
-        run_index_path = self.root_dir / test_suite_name / RUN_INDEX_FILE
-        LocalBenchClient._update_index(run_index_path, id, name)
+    def __init__(self, config, use_s3 = False):
+        if not use_s3:
+            self.fs_client = LocalFSClient(config)
+        else:
+            raise NotImplementedError("S3 Client not implemented yet")
 
     def get_test_suite(
         self, test_suite_id: str, page: int = 1, page_size: int = DEFAULT_PAGE_SIZE
     ) -> PaginatedTestSuite:
-        suite_index = json.load(open(self.root_dir / SUITE_INDEX_FILE))
-        if test_suite_id not in suite_index:
-            raise NotFoundError(f"no test suite with id: {test_suite_id}")
-        else:
-            suite_file = self.root_dir / suite_index[test_suite_id] / "suite.json"
-            suite = PaginatedTestSuite.parse_file(suite_file)
-            pagination = _paginate(suite.test_cases, page, page_size)
-            return PaginatedTestSuite(
-                id=uuid.UUID(test_suite_id),
-                name=suite.name,
-                scoring_method=suite.scoring_method,
-                test_cases=pagination.sorted_pages[pagination.start : pagination.end],
-                created_at=suite.created_at,
-                updated_at=suite.updated_at,
-                last_run_time=suite.last_run_time,
-                num_runs=suite.num_runs,
-                page=pagination.page,
-                page_size=pagination.page_size,
-                total_count=pagination.total_count,
-                total_pages=pagination.total_pages,
-            )
+        suite = self.fs_client.parse_paginated_test_suite(test_suite_id)
+        pagination = _paginate(suite.test_cases, page, page_size)
+        return PaginatedTestSuite(
+            id=uuid.UUID(test_suite_id),
+            name=suite.name,
+            scoring_method=suite.scoring_method,
+            test_cases=pagination.sorted_pages[pagination.start : pagination.end],
+            created_at=suite.created_at,
+            updated_at=suite.updated_at,
+            last_run_time=suite.last_run_time,
+            num_runs=suite.num_runs,
+            page=pagination.page,
+            page_size=pagination.page_size,
+            total_count=pagination.total_count,
+            total_pages=pagination.total_pages,
+        )
 
     def get_test_suites(
         self,
@@ -285,11 +191,11 @@ class LocalBenchClient(BenchClient):
     ) -> PaginatedTestSuites:
         # name uniqueness
         if name is not None:
-            test_suite_dir = self.root_dir / name
+            test_suite_dir = self.fs_client.get_test_suite_dir(name)
             if test_suite_dir.is_dir():
-                suite = _load_suite_with_optional_id(test_suite_dir / "suite.json")
+                suite = self.fs_client.load_suite_with_optional_id(test_suite_dir / "suite.json")
                 if suite is None:
-                    suite = self.get_test_suite_by_name(name)
+                    suite = self.fs_client.get_test_suite_by_name(name)
                 return PaginatedTestSuites(
                     test_suites=[
                         TestSuiteMetadata(
@@ -317,11 +223,11 @@ class LocalBenchClient(BenchClient):
                 )
 
         suites: List[TestSuiteMetadata] = []
-        suite_files = glob.glob(f"{self.root_dir}/*/suite.json")
+        suite_files = self.fs_client.get_suite_files()
         for f in suite_files:
-            suite = _load_suite_with_optional_id(f)
+            suite = self.fs_client.load_suite_with_optional_id(f)
             if suite is None:
-                suite = self.get_test_suite_by_name(f.split("/")[-2])
+                suite = self.fs_client.get_test_suite_by_name(f.split("/")[-2])
             if scoring_method is None or suite.scoring_method.name in scoring_method:
                 suites.append(
                     TestSuiteMetadata(
@@ -345,12 +251,10 @@ class LocalBenchClient(BenchClient):
         )
 
     def create_test_suite(self, json_body: TestSuiteRequest) -> PaginatedTestSuite:
-        test_suite_dir = self._create_test_suite_dir(json_body.name)
-        suite_file = test_suite_dir / "suite.json"
-
+        test_suite_dir = self.fs_client.create_test_suite_dur(json_body.name)
         test_suite_id = uuid.uuid4()
-        self._update_suite_index(test_suite_id, json_body.name)
-        self._write_run_index(json_body.name)
+        self.fs_client.update_suite_index(test_suite_id, json_body.name)
+        self.fs_client.write_run_index(json_body.name)
 
         resp = PaginatedTestSuite(
             id=test_suite_id,
@@ -368,13 +272,13 @@ class LocalBenchClient(BenchClient):
             **_initialize_metadata(),
         )
 
-        suite_file.write_text(resp.json())
+        self.fs_client.write_suite_file(test_suite_dir, resp)
         return resp
 
     def create_new_test_run(
         self, test_suite_id: str, json_body: CreateRunRequest
     ) -> CreateRunResponse:
-        test_suite_name = self._get_suite_name_from_id(test_suite_id)
+        test_suite_name = self.fs_client.get_suite_name_from_id(test_suite_id)
         if test_suite_name is None:
             raise NotFoundError(f"no test suite with id {test_suite_id} ")
 
@@ -386,11 +290,10 @@ class LocalBenchClient(BenchClient):
             **json_body.dict(),
         )
 
-        run_dir = self._create_run_dir(test_suite_name, json_body.name)
-        run_file = run_dir / "run.json"
-        run_file.write_text(resp.json())
-        self._update_run_index(test_suite_name, run_id, json_body.name)
-        self._update_suite_run_time(
+        run_dir = self.fs_client.create_run_dir(test_suite_name, json_body.name)
+        self.fs_client.write_run_file(run_dir, resp)
+        self.fs_client.update_run_index(test_suite_name, run_id, json_body.name)
+        self.fs_client.update_suite_run_time(
             test_suite_name=test_suite_name, runtime=resp.created_at
         )
         return CreateRunResponse(id=resp.id)
@@ -402,14 +305,13 @@ class LocalBenchClient(BenchClient):
         page: int = 1,
         page_size: int = DEFAULT_PAGE_SIZE,
     ) -> PaginatedRuns:
-        test_suite_name = self._get_suite_name_from_id(test_suite_id)
+        test_suite_name = self.fs_client.get_suite_name_from_id(test_suite_id)
         if test_suite_name is None:
             raise NotFoundError(f"no test suite with id: {test_suite_id}")
 
         runs = []
-        run_files = glob.glob(f"{self.root_dir}/{test_suite_name}/*/run.json")
-        for f in run_files:
-            run_obj = PaginatedRun.parse_file(f)
+        for f in self.fs_client.get_run_files(test_suite_name):
+            run_obj = self.fs_client.parse_paginated_test_run(test_suite_id, _get_run_name_from_file_path(f))
             avg_score = np.mean([o.score for o in run_obj.test_cases])
             run_resp = TestRunMetadata(**run_obj.dict(), avg_score=float(avg_score))
             runs.append(run_resp)
@@ -431,7 +333,7 @@ class LocalBenchClient(BenchClient):
         page: int = 1,
         page_size: int = DEFAULT_PAGE_SIZE,
     ) -> TestSuiteSummary:
-        test_suite_name = self._get_suite_name_from_id(test_suite_id)
+        test_suite_name = self.fs_client.get_suite_name_from_id(test_suite_id)
         if test_suite_name is None:
             raise NotFoundError(f"no test suite with id {test_suite_id}")
 
@@ -440,12 +342,12 @@ class LocalBenchClient(BenchClient):
             raise NotFoundError(f"no test suite with id {test_suite_id}")
 
         runs: list[SummaryItem] = []
-        run_files = glob.glob(f"{self.root_dir}/{test_suite_name}/*/run.json")
+        run_files = self.fs_client.get_run_files(test_suite_name)
 
         if run_ids:
-            run_name_to_file_dict = {file.split("/")[-2]: file for file in run_files}
+            run_name_to_file_dict = {_get_run_name_from_file_path(file): file for file in run_files}
             run_names = [
-                self._get_run_name_from_id(test_suite_name, id) for id in run_ids
+                self.fs_client.get_run_name_from_id(test_suite_name, id) for id in run_ids
             ]
             filtered_run_files = {
                 k: run_name_to_file_dict[k]
@@ -455,7 +357,7 @@ class LocalBenchClient(BenchClient):
             run_files = list(filtered_run_files.values())
 
         for f in run_files:
-            run_obj = PaginatedRun.parse_file(f)
+            run_obj = self.fs_client.parse_paginated_test_run(test_suite_id, _get_run_name_from_file_path(f))
             runs.append(
                 _summarize_run(run=run_obj, scoring_method=suite.scoring_method)
             )
@@ -484,20 +386,10 @@ class LocalBenchClient(BenchClient):
         page_size: int = DEFAULT_PAGE_SIZE,
         sort: Optional[TestCaseSortEnum] = None,
     ) -> PaginatedRun:
-        test_suite_name = self._get_suite_name_from_id(test_suite_id)
-        if test_suite_name is None:
-            raise NotFoundError(f"test suite with id: {test_suite_id} does not exist")
-
-        run_name = self._get_run_name_from_id(test_suite_name, test_run_id)
-        if run_name is None:
-            raise NotFoundError(f"test run with id: {test_run_id} does not exist")
-
-        run_data = PaginatedRun.parse_file(
-            self.root_dir / test_suite_name / run_name / "run.json"
-        )
-        suite_data = PaginatedTestSuite.parse_file(
-            self.root_dir / test_suite_name / "suite.json"
-        )
+        suite_name = self.fs_client.get_suite_name_from_id(test_suite_id)
+        run_name = self.fs_client.get_run_name_from_id(suite_name, test_run_id)
+        run_data = self.fs_client.parse_paginated_test_run(test_suite_id, test_run_id)
+        suite_data = self.fs_client.parse_paginated_test_suite(test_suite_id)
         run_results = []
         for i, test_case in enumerate(run_data.test_cases):
             run_result = RunResult(
@@ -531,20 +423,3 @@ class LocalBenchClient(BenchClient):
     def delete_test_run(self, test_suite_id: str, test_run_id: str):
         # TODO:
         return ArthurError("delete test run is not supported in local mode yet")
-
-    def get_test_suite_by_name(self, test_suite_name: str) -> PaginatedTestSuite:
-        """
-        Additional getter to maintain backwards compatibility with non-identified
-        local files
-        """
-        suite_file = self.root_dir / test_suite_name / "suite.json"
-        suite = load_suite_from_json(suite_file)
-
-        # override file with index
-        id_ = uuid.uuid4()
-        resp = PaginatedTestSuite(id=id_, **suite.dict())
-        suite_file.write_text(resp.json())
-        self._update_suite_index(id_, test_suite_name)
-        self._write_run_index(test_suite_name)
-
-        return resp
