@@ -3,7 +3,7 @@ import shutil
 from unittest import mock
 from pathlib import Path
 from arthur_bench.client.fs import LocalBenchClient
-from arthur_bench.client.fs.client import _summarize_run
+from arthur_bench.client.fs.local_client import _summarize_run
 from arthur_bench.exceptions import UserValueError, NotFoundError
 from arthur_bench.models.models import PaginatedTestSuite
 
@@ -187,7 +187,7 @@ def test_check_run_exists(bench_temp_dir_with_runs):
 
 def test_get_summary_statistics(bench_temp_dir_with_runs):
     with mock.patch(
-        "arthur_bench.client.fs.client._summarize_run",
+        "arthur_bench.client.fs.local_client._summarize_run",
         mock_summarize,
     ):
         client = LocalBenchClient(bench_temp_dir_with_runs)

@@ -1,2 +1,2 @@
 # flake8: noqa
-from .client import LocalBenchClient
+from .local_client import LocalBenchClient
