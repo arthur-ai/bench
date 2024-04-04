@@ -155,7 +155,7 @@ class LocalBenchClient(BenchClient):
     Client for managing local file system test suites and runs
     """
 
-    def __init__(self, config, use_s3 = False):
+    def __init__(self, config, use_s3=False):
         if not use_s3:
             self.fs_client = LocalFSClient(config)
         else:
@@ -193,7 +193,9 @@ class LocalBenchClient(BenchClient):
         if name is not None:
             test_suite_dir = self.fs_client.get_test_suite_dir(name)
             if test_suite_dir.is_dir():
-                suite = self.fs_client.load_suite_with_optional_id(test_suite_dir / "suite.json")
+                suite = self.fs_client.load_suite_with_optional_id(
+                    test_suite_dir / "suite.json"
+                )
                 if suite is None:
                     suite = self.fs_client.get_test_suite_by_name(name)
                 return PaginatedTestSuites(
@@ -311,7 +313,9 @@ class LocalBenchClient(BenchClient):
 
         runs = []
         for f in self.fs_client.get_run_files(test_suite_name):
-            run_obj = self.fs_client.parse_paginated_test_run(test_suite_id, _get_run_name_from_file_path(f))
+            run_obj = self.fs_client.parse_paginated_test_run(
+                test_suite_id, _get_run_name_from_file_path(f)
+            )
             avg_score = np.mean([o.score for o in run_obj.test_cases])
             run_resp = TestRunMetadata(**run_obj.dict(), avg_score=float(avg_score))
             runs.append(run_resp)
@@ -345,9 +349,12 @@ class LocalBenchClient(BenchClient):
         run_files = self.fs_client.get_run_files(test_suite_name)
 
         if run_ids:
-            run_name_to_file_dict = {_get_run_name_from_file_path(file): file for file in run_files}
+            run_name_to_file_dict = {
+                _get_run_name_from_file_path(file): file for file in run_files
+            }
             run_names = [
-                self.fs_client.get_run_name_from_id(test_suite_name, id) for id in run_ids
+                self.fs_client.get_run_name_from_id(test_suite_name, id)
+                for id in run_ids
             ]
             filtered_run_files = {
                 k: run_name_to_file_dict[k]
@@ -357,7 +364,9 @@ class LocalBenchClient(BenchClient):
             run_files = list(filtered_run_files.values())
 
         for f in run_files:
-            run_obj = self.fs_client.parse_paginated_test_run(test_suite_id, _get_run_name_from_file_path(f))
+            run_obj = self.fs_client.parse_paginated_test_run(
+                test_suite_id, _get_run_name_from_file_path(f)
+            )
             runs.append(
                 _summarize_run(run=run_obj, scoring_method=suite.scoring_method)
             )

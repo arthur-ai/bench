@@ -89,7 +89,9 @@ class ABCFSClient(ABC):
 
     @staticmethod
     @abstractmethod
-    def load_suite_with_optional_id(filepath: Union[str, os.PathLike]) -> Optional[PaginatedTestSuite]:
+    def load_suite_with_optional_id(
+        filepath: Union[str, os.PathLike]
+    ) -> Optional[PaginatedTestSuite]:
         raise NotImplementedError(
             "Calling an abstract method. Please use a concrete base class"
         )
@@ -113,7 +115,9 @@ class ABCFSClient(ABC):
         )
 
     @abstractmethod
-    def parse_paginated_test_run(self, test_suite_id: str, test_run_id: str) -> PaginatedRun:
+    def parse_paginated_test_run(
+        self, test_suite_id: str, test_run_id: str
+    ) -> PaginatedRun:
         raise NotImplementedError(
             "Calling an abstract method. Please use a concrete base class"
         )

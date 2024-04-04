@@ -119,7 +119,9 @@ class LocalFSClient(ABCFSClient):
         return resp
 
     @staticmethod
-    def load_suite_with_optional_id(filepath: Union[str, os.PathLike]) -> Optional[PaginatedTestSuite]:
+    def load_suite_with_optional_id(
+        filepath: Union[str, os.PathLike]
+    ) -> Optional[PaginatedTestSuite]:
         if get_file_extension(filepath) != ".json":
             raise UserValueError("filepath must be json file")
         suite = json.load(open(filepath))
@@ -141,7 +143,9 @@ class LocalFSClient(ABCFSClient):
         suite_file = self.root_dir / suite_name / "suite.json"
         return PaginatedTestSuite.parse_file(suite_file)
 
-    def parse_paginated_test_run(self, test_suite_id: str, run_name: str) -> PaginatedRun:
+    def parse_paginated_test_run(
+        self, test_suite_id: str, run_name: str
+    ) -> PaginatedRun:
         suite_name = self.get_suite_name_from_id(test_suite_id)
         if not suite_name:
             raise NotFoundError(f"no test suite with id: {test_suite_id}")
@@ -157,4 +161,3 @@ class LocalFSClient(ABCFSClient):
     def write_run_file(self, run_dir: Path, test_run: PaginatedRun) -> None:
         run_file = run_dir / "run.json"
         run_file.write_text(test_run.json())
-
