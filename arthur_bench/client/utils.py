@@ -2,7 +2,7 @@ import os
 
 from arthur_bench.exceptions import UserValueError, MissingParameterError
 from arthur_bench.client.bench_client import BenchClient
-from arthur_bench.client.local import LocalBenchClient
+from arthur_bench.client.fs import LocalBenchClient
 from arthur_bench.client.rest import ArthurClient
 
 

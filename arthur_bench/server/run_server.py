@@ -20,7 +20,7 @@ except ImportError as e:
         "pip install arthur-bench[server]"
     ) from e
 
-from arthur_bench.client.local.client import LocalBenchClient
+from arthur_bench.client.fs.client import LocalBenchClient
 from arthur_bench.exceptions import NotFoundError
 from arthur_bench.models.models import (
     PaginationSuiteSortEnum,
