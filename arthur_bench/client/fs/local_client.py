@@ -26,7 +26,6 @@ from arthur_bench.models.models import (
     SummaryItem,
     HistogramItem,
     CategoricalHistogramItem,
-    TestCaseRequest,
     TestCaseResponse,
     RunResult,
     ScoringMethod,
@@ -216,13 +215,6 @@ class LocalBenchClient(BenchClient):
             return None
         return run_index[id]
 
-    def _create_test_case_with_id(self, test_case: TestCaseRequest) -> TestCaseResponse:
-        return TestCaseResponse(
-            id=uuid.uuid4(),
-            input=test_case.input,
-            reference_output=test_case.reference_output,
-        )
-
     def _update_suite_run_time(self, test_suite_name: str, runtime: datetime):
         suite_file = self.root_dir / test_suite_name / "suite.json"
         suite = PaginatedTestSuite.parse_file(suite_file)
@@ -364,7 +356,11 @@ class LocalBenchClient(BenchClient):
             id=test_suite_id,
             name=json_body.name,
             test_cases=[
-                self._create_test_case_with_id(test_case)
+                TestCaseResponse(
+                    id=uuid.uuid4(),
+                    input=test_case.input,
+                    reference_output=test_case.reference_output,
+                )
                 for test_case in json_body.test_cases
             ],
             description=json_body.description,
