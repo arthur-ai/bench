@@ -44,7 +44,7 @@ class LocalFSClient(ABCFSClient):
     def get_test_suite_dir(self, test_suite_name: str) -> Path:
         return Path(self.root_dir) / test_suite_name
 
-    def create_test_suite_dur(self, test_suite_name: str) -> Path:
+    def create_test_suite_dir(self, test_suite_name: str) -> Path:
         test_suite_dir = self.get_test_suite_dir(test_suite_name)
         if test_suite_dir.is_dir():
             raise UserValueError(f"test_suite {test_suite_name} already exists")

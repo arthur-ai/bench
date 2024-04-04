@@ -1,6 +1,6 @@
 import os
 import uuid
-from abc import ABC, abstractmethod, abstractstaticmethod
+from abc import ABC, abstractmethod
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, Union, List
@@ -21,7 +21,7 @@ class ABCFSClient(ABC):
         )
 
     @abstractmethod
-    def create_test_suite_dur(self, test_suite_name: str) -> Path:
+    def create_test_suite_dir(self, test_suite_name: str) -> Path:
         raise NotImplementedError(
             "Calling an abstract method. Please use a concrete base class"
         )

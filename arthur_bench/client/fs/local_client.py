@@ -253,7 +253,7 @@ class LocalBenchClient(BenchClient):
         )
 
     def create_test_suite(self, json_body: TestSuiteRequest) -> PaginatedTestSuite:
-        test_suite_dir = self.fs_client.create_test_suite_dur(json_body.name)
+        test_suite_dir = self.fs_client.create_test_suite_dir(json_body.name)
         test_suite_id = uuid.uuid4()
         self.fs_client.update_suite_index(test_suite_id, json_body.name)
         self.fs_client.write_run_index(json_body.name)
