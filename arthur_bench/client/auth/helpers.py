@@ -176,4 +176,4 @@ def user_login(
 
     auth_token = login_cookies.get("Authorization")
 
-    return auth_token
+    return auth_token  # type: ignore
