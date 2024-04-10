@@ -62,12 +62,23 @@ const CompareTable = () => {
         pagination: state.testSuites.currentTestRun?.pagination,
         runs: state.testSuites.currentTestRun?.data,
     }));
-    const data = formatTestRunData(runs);
-    const columns = runs?.map((run: TTestRunData) => run.name);
 
     useEffect(() => {
         testSuiteId && testRunIdsArray && fetchMultipleTestRunDetails(testSuiteId, testRunIdsArray, page, 5);
     }, [page]);
+
+    const data = formatTestRunData(runs);
+    const columns = runs?.map((run: TTestRunData) => run.name);
+
+    const { hasReference } = (data || []).reduce(
+        (acc, data) => {
+            if (data.referenceOutput) {
+                acc.hasReference = true;
+            }
+            return acc;
+        },
+        { hasReference: false }
+    );
 
     const setNewPage = useCallback(
         (propsPage: number) => {
@@ -87,7 +98,9 @@ const CompareTable = () => {
             <Table className={css(styles.table)}>
                 <TableHeader>
                     <TableCell className={css(styles.headerCell(primary.white))}>{t("testSuite.inputPrompts")}</TableCell>
-                    <TableCell className={css(styles.headerCell(primary.white))}>{t("testSuite.referenceOutputs")}</TableCell>
+                    {hasReference && (
+                        <TableCell className={css(styles.headerCell(primary.white))}>{t("testSuite.referenceOutputs")}</TableCell>
+                    )}
                     {columns.map((column: string) => (
                         <TableCell className={css(styles.headerCell(primary.white))}>{column}</TableCell>
                     ))}

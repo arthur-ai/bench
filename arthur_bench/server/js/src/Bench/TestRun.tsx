@@ -27,11 +27,11 @@ const TestRun = () => {
     useEffect(() => {
         if (testSuiteId && testRunId) {
             fetchTestRunDetail(testSuiteId, testRunId, 1, 10, sort);
-            fetchTestSuiteData(testSuiteId);
+            fetchTestSuiteData(testSuiteId, 1, 5);
             fetchTestRunSummary(testSuiteId);
             fetchTestRunSummary(testSuiteId, [testRunId]);
         }
-    }, []);
+    }, [testSuiteId]);
 
     const { currentTestRun, name } = useSelector((state: State) => ({
         currentTestRun: state.testSuites.currentTestRun?.data,

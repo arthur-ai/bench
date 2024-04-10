@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, ReactElement } from "react";
 import SummaryVisualizations from "@compound/SummaryVisualizations/SummaryVisualizations";
 import CompareTable from "@compound/TestRunDeepDive/CompareTable";
 import TestSuiteHeader from "../Bench/TestSuiteHeader";
@@ -18,10 +18,10 @@ const CompareTestRuns = () => {
 
     useEffect(() => {
         if (testSuiteId) {
-            fetchTestSuiteData(testSuiteId);
+            fetchTestSuiteData(testSuiteId, 1 , 5);
             fetchTestRunSummary(testSuiteId, testRunIdsArray);
         }
-    }, []);
+    }, [testSuiteId]);
 
     const data = useSelector((state: State) => state.testSuites?.currentTestSuite?.data?.data);
 
