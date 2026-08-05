@@ -47,8 +47,8 @@ Choice:"""
 example_choice_2 = AIMessagePromptTemplate.from_template("tie")
 comparison_template = HumanMessagePromptTemplate.from_template(
     """Text: {text}
-Response 0: {summary_A}
-Response 1: {summary_B}
+Response 0: <response>{summary_A}</response>
+Response 1: <response>{summary_B}</response>
 Choice:"""
 )
 

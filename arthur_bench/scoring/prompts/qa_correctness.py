@@ -65,7 +65,7 @@ QUESTION: {question}
 ========
 CONTEXT: {context}
 ========
-ANSWER: {answer}
+ANSWER: <answer>{answer}</answer>
 DECISION:"""
 )
 
